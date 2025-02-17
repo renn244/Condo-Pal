@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { ValidationException } from 'src/lib/exception/validationException';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
+import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,37 @@ export class AuthService {
         return user
     }
 
+    // google login
+    async validateGoogleLogin(user: Profile) {
+        const getUser = await this.prisma.user.findFirst({
+            where: {
+                AND: [
+                   { provider: "google" },
+                   { providerId: user.id }
+                ]
+            }
+        })
+
+        if(!getUser) {
+            console.log('creating user')
+            const createUser = await this.prisma.user.create({
+                data: {
+                    name: user.displayName,
+                    email: user.emails![0].value,
+                    provider: "google",
+                    providerId: user.id,
+                    isOAuth: true,
+                    profile: user.photos![0].value || null,
+                }
+            })
+
+            return this.login(createUser);
+        }
+
+        return this.login(getUser);
+    }
+
+    // local login
     async validateLocalLogin({ email, password }: LoginDto) {
         const getUser = await this.prisma.user.findUnique({
             where: {

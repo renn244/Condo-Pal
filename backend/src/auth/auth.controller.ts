@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Response, UseGuards } from '@nestjs/common';
+import { GoogleAuthGuard } from 'src/passport/google.strategy';
+import { JwtAuthGuard } from 'src/passport/jwt.strategy';
+import { LocalAuthGuard } from 'src/passport/local.strategy';
 import { AuthService } from './auth.service';
 import { RegisterLandLordDto } from './dto/auth.dto';
-import { LocalAuthGuard } from 'src/passport/local.strategy';
-import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 
 @Controller('auth')
 export class AuthController {
@@ -16,6 +17,20 @@ export class AuthController {
         return this.authService.check(req.user)
     }
 
+    @Get('google-login')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth(@Request() req: any) {}
+
+    @Get('google-redirect')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Request() req: any, @Response() res: any) {
+        const tokens = await this.authService.validateGoogleLogin(req.user);
+        return res.redirect(
+            `${process.env.CLIENT_BASE_URL}/redirecttoken?access_token=${tokens.access_token}`
+        )
+    }
+
+    // local login
     @UseGuards(LocalAuthGuard)
     @Post('login/local')
     async localLogin(@Request() req) {
