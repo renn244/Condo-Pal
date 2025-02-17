@@ -30,7 +30,6 @@ export class AuthService {
         })
 
         if(!getUser) {
-            console.log('creating user')
             const createUser = await this.prisma.user.create({
                 data: {
                     name: user.displayName,
