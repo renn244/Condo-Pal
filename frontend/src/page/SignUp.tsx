@@ -1,10 +1,14 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import InputPassword from "@/components/common/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import axiosFetch from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
@@ -32,13 +36,48 @@ const formSchema = z.object({
 })
 
 const SignUp = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   })
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    //fetch data later
-    console.log(data)
+    setIsLoading(true);
+    try {
+      const response = await axiosFetch.post("/auth/register-landlord", data)
+
+      if(response.status === 400) {
+        // handle when it's not a validation exception
+        if(!response.data.errors) {
+          toast.error(response.data.message)
+          return
+        }
+
+        response.data.errors.forEach((error: any) => {
+          form.setError(error.field, {
+            type: "manual",
+            message: error.message?.[0]
+          })
+        })
+
+        return
+      }
+
+      if(response.status >= 401) {
+        toast.error(response.data.message)
+      }
+      
+      // save the access_token
+      localStorage.setItem("access_token", response.data.access_token)
+      toast.success("Sign up successful")
+
+      //redirect
+      window.location.assign("/")
+    } catch(error) {
+      toast.error("An error occurred. Please try again later");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -104,7 +143,7 @@ const SignUp = () => {
                   </FormItem>
               )} />
               <Button type="submit" className="w-full mt-3">
-                Sign Up
+                {isLoading ? <LoadingSpinner /> : "Sign Up"}
               </Button>
             </form>
           </Form>

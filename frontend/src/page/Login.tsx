@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 import InputPassword from "@/components/common/PasswordInput"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,8 +6,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import axiosFetch from "@/lib/axios"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { Link } from "react-router-dom"
 import { z } from "zod"
 
@@ -18,13 +22,53 @@ const formSchema = z.object({
 })
 
 const Login = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema)
     });
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        // fetch data later
-        console.log(data)
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
+        setIsLoading(true)
+        try {
+            const response = await axiosFetch.post("/auth/login/local", {
+                ...data,
+                rememberMe
+            })
+
+            if(response.status === 400) {
+                // handle when it's not a validation exception
+                if(!response.data.errors) {
+                    toast.error(response.data.message)
+                    return
+                }
+
+                response.data.errors.forEach((error: any) => {
+                    form.setError(error.field, {
+                        type: "manual",
+                        message: error.message?.[0]
+                    })
+                })
+
+                return
+            }
+
+            if(response.status >= 401) {
+                toast.error(response.data.message)
+            }
+
+            // save the access_token
+            response.data.refresh_token && localStorage.setItem("refresh_token", response.data.refresh_token)
+            localStorage.setItem("access_token", response.data.access_token)
+            toast.success("Login successful")
+
+            //redirect
+            window.location.assign("/")
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.")
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -69,7 +113,7 @@ const Login = () => {
                             />
                             <div className="flex justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <Checkbox id="remember" className="border-muted-foreground" />
+                                    <Checkbox onCheckedChange={() => setRememberMe((prev) => !prev)} checked={rememberMe} id="remember" className="border-muted-foreground" />
                                     <Label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
                                         Remember me
                                     </Label>
@@ -79,7 +123,7 @@ const Login = () => {
                                 </Link>
                             </div>
                             <Button type="submit" className="w-full mt-3">
-                                Login
+                                {isLoading ? <LoadingSpinner /> : "Login"}
                             </Button>
                             <Button type="button" variant={"outline"} className="w-full" asChild>
                                 <Link to={import.meta.env.VITE_BACKEND_URL + "/auth/google-login"}>

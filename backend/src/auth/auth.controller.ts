@@ -3,7 +3,7 @@ import { GoogleAuthGuard } from 'src/passport/google.strategy';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { LocalAuthGuard } from 'src/passport/local.strategy';
 import { AuthService } from './auth.service';
-import { RegisterLandLordDto } from './dto/auth.dto';
+import { LoginDto, RegisterLandLordDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +17,11 @@ export class AuthController {
         return this.authService.check(req.user)
     }
 
+    @Post("refresh-token")
+    async refreshToken(@Body() body: { refreshToken: string }) {
+        return this.authService.validateRefreshToken(body.refreshToken);
+    }
+
     @Get('google-login')
     @UseGuards(GoogleAuthGuard)
     async googleAuth(@Request() req: any) {}
@@ -26,15 +31,15 @@ export class AuthController {
     async googleAuthRedirect(@Request() req: any, @Response() res: any) {
         const tokens = await this.authService.validateGoogleLogin(req.user);
         return res.redirect(
-            `${process.env.CLIENT_BASE_URL}/redirecttoken?access_token=${tokens.access_token}`
+            `${process.env.CLIENT_BASE_URL}/redirecttoken?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}`
         )
     }
 
     // local login
     @UseGuards(LocalAuthGuard)
     @Post('login/local')
-    async localLogin(@Request() req) {
-        return this.authService.login(req.user);
+    async localLogin(@Request() req: any, @Body() body: LoginDto) {
+        return this.authService.login(req.user, body.rememberMe);
     }
 
     @Post('register-landlord')

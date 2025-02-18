@@ -11,6 +11,11 @@ async function bootstrap() {
   app.useGlobalPipes(new CustomValidationPipe());
   app.useGlobalFilters(new AllExceptionFilter());
 
+  app.enableCors({
+    origin: process.env.CLIENT_BASE_URL ?? 'http://localhost:5173',
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

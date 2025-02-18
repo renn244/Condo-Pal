@@ -1,4 +1,4 @@
-import { IsString, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsBoolean } from 'class-validator';
 import { Match } from 'src/lib/decorators/isMatch';
 
 export class RegisterLandLordDto {
@@ -25,4 +25,7 @@ export class LoginDto {
 
     @IsString()
     password: string;
+
+    @IsBoolean()
+    rememberMe: boolean;
 }
