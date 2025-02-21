@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axiosFetch from "@/lib/axios";
+import handleValidationError from "@/lib/handleValidationError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -47,18 +48,7 @@ const SignUp = () => {
       const response = await axiosFetch.post("/auth/register-landlord", data)
 
       if(response.status === 400) {
-        // handle when it's not a validation exception
-        if(!response.data.errors) {
-          toast.error(response.data.message)
-          return
-        }
-
-        response.data.errors.forEach((error: any) => {
-          form.setError(error.field, {
-            type: "manual",
-            message: error.message?.[0]
-          })
-        })
+        handleValidationError(response, response.data.errors, form.setError)        
 
         return
       }
@@ -142,7 +132,7 @@ const SignUp = () => {
                     <FormMessage />
                   </FormItem>
               )} />
-              <Button type="submit" className="w-full mt-3">
+              <Button disabled={isLoading} type="submit" className="w-full mt-3">
                 {isLoading ? <LoadingSpinner /> : "Sign Up"}
               </Button>
             </form>

@@ -3,7 +3,7 @@ import { GoogleAuthGuard } from 'src/passport/google.strategy';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { LocalAuthGuard } from 'src/passport/local.strategy';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterLandLordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, LoginDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,5 +45,20 @@ export class AuthController {
     @Post('register-landlord')
     async registerLandlord(@Body() body: RegisterLandLordDto) {
         return this.authService.registerLandlord(body)
+    }
+    
+    @Post('forgot-password')
+    async forgotPassword(@Body() body: ForgotPasswordDto) {
+        return this.authService.forgotPassword(body)
+    }
+
+    @Post('forgot-password/resend')
+    async resendForgotPassword(@Body() body: ForgotPasswordDto) {
+        return this.authService.resendForgotPassword(body)
+    }
+
+    @Post('forgot-password/reset')
+    async resetPasswordForgotPassword(@Body() body: ResetPasswordForgotPasswordDto) {
+        return this.authService.resetPasswordForgotPassword(body)
     }
 }

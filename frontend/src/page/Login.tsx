@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axiosFetch from "@/lib/axios"
+import handleValidationError from "@/lib/handleValidationError"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -38,17 +39,7 @@ const Login = () => {
 
             if(response.status === 400) {
                 // handle when it's not a validation exception
-                if(!response.data.errors) {
-                    toast.error(response.data.message)
-                    return
-                }
-
-                response.data.errors.forEach((error: any) => {
-                    form.setError(error.field, {
-                        type: "manual",
-                        message: error.message?.[0]
-                    })
-                })
+                handleValidationError(response, response.data.errors, form.setError)
 
                 return
             }
@@ -122,7 +113,7 @@ const Login = () => {
                                     Forgot password?
                                 </Link>
                             </div>
-                            <Button type="submit" className="w-full mt-3">
+                            <Button disabled={isLoading} type="submit" className="w-full mt-3">
                                 {isLoading ? <LoadingSpinner /> : "Login"}
                             </Button>
                             <Button type="button" variant={"outline"} className="w-full" asChild>

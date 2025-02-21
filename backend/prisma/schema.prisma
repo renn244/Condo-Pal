@@ -43,3 +43,12 @@ model refreshToken {
 
   createdAt  DateTime @default(now())
 }
+
+model resetPassword {
+  id         String   @id @default(cuid())
+  userId     String // the user
+  token      String // the random unique token
+
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // the token expiration date // 1 hour
+}

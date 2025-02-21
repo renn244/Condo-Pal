@@ -29,3 +29,21 @@ export class LoginDto {
     @IsBoolean()
     rememberMe: boolean;
 }
+
+export class ForgotPasswordDto {
+    @IsString()
+    @IsEmail()
+    email: string;
+}
+
+export class ResetPasswordForgotPasswordDto {
+    @IsString()
+    password: string;
+
+    @IsString()
+    @Match('password')
+    confirmPassword: string;
+
+    @IsString()
+    token: string;
+}

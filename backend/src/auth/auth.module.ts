@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from 'src/passport/jwt.strategy';
 import { GoogleStrategy } from 'src/passport/google.strategy';
+import { EmailSenderModule } from 'src/email-sender/email-sender.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { GoogleStrategy } from 'src/passport/google.strategy';
         signOptions: { expiresIn: '30d' } // 30 days
       }),
       inject: [ConfigService]
-    })
+    }),
+    EmailSenderModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, GoogleStrategy, JwtStrategy]

@@ -1,18 +1,21 @@
 import { BadRequestException, GoneException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RegisterLandLordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { ValidationException } from 'src/lib/exception/validationException';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { Profile } from 'passport-google-oauth20';
 import { v4 as uuidv4 } from 'uuid';
+import { userAgent } from 'next/server';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly emailSender: EmailSenderService,
     ) {}
 
     async check(user: any) {
@@ -176,5 +179,144 @@ export class AuthService {
     // input the data
     async registerTenant() {
         
+    }
+
+    // forgot password
+    async createResetPasswordToken(userId: string) {
+        try {
+            const token = uuidv4();
+            const saveTokenTransaction = await this.prisma.$transaction(async (txprisma) => {
+                // delete all the token connected to the user
+                await txprisma.resetPassword.deleteMany({
+                    where: {
+                        userId: userId
+                    }
+                })
+
+                // save the token to the database
+                const saveToken = await txprisma.resetPassword.create({
+                    data: {
+                        token: token,
+                        userId: userId,
+                        expiresAt: new Date(Date.now() + 1000 * 60 * 60)
+                    }
+                })
+
+                return saveToken
+            })
+
+            return saveTokenTransaction
+        } catch (error) {
+            throw new GoneException({
+                name: "General Error",
+                message: "An error occurred"
+            })
+        }
+    }
+    
+    async forgotPassword(body: ForgotPasswordDto) {
+        const getUser = await this.prisma.user.findUnique({
+            where: {
+                email: body.email
+            },
+            select: {
+                id: true,
+                email: true,
+                isOAuth: true,
+                provider: true
+            }
+        })
+        
+        if(!getUser) {
+            throw new ValidationException({
+                field: "email",
+                message: ["User does not exist"]
+            })
+        }
+
+        if(getUser.isOAuth) {
+            throw new ValidationException({
+                field: "email",
+                message: [`You're using ${getUser.provider}. Log in with your respective provider.`]
+            })
+        }
+
+        // set a token for the user
+        const saveToken = await this.createResetPasswordToken(getUser.id);
+
+        // send an email to the user
+        await this.emailSender.sendResetPasswordEmail(getUser.email, saveToken.token);
+
+        return {
+            message: "An email has been sent to your email"
+        }
+    }
+
+    async resendForgotPassword(body: ForgotPasswordDto) {
+        const getUser = await this.prisma.user.findUnique({
+            where: {
+                email: body.email
+            },
+            select: {
+                id: true,
+                email: true
+            }
+        })
+
+        if(!getUser) {
+            throw new ValidationException({
+                field: "email",
+                message: ["User does not exist"]
+            })
+        }
+        const createResetPasswordToken = await this.createResetPasswordToken(getUser.id)
+
+        await this.emailSender.sendResetPasswordEmail(getUser.email, createResetPasswordToken.token);
+
+        return {
+            message: 'An email has been resent to your email'
+        }
+    }
+
+    async resetPasswordForgotPassword(body: ResetPasswordForgotPasswordDto) {
+        // no need to match token because we are finding it by the token
+        const getResetPassword = await this.prisma.resetPassword.findFirst({
+            where: {
+                token: body.token
+            }
+        })
+
+        if(!getResetPassword) {
+            throw new ValidationException({
+                field: "token",
+                message: ["Token does not exist"]
+            })
+        }
+
+        if(new Date(getResetPassword.expiresAt).getTime() < Date.now()) {
+            throw new ValidationException({
+                field: "token",
+                message: ["Token has expired"]
+            })
+        }
+
+        const hashedPassword = await bcrypt.hash(body.password, 10);
+        const updateUserPassword = await this.prisma.user.update({
+            where: {
+                id: getResetPassword.userId
+            },
+            data: {
+                password: hashedPassword
+            }
+        })
+
+        // delete the resetToken
+        await this.prisma.resetPassword.delete({
+            where: {
+                id: getResetPassword.id
+            }
+        })  
+
+        return this.login(updateUserPassword, true)
     }
 }
