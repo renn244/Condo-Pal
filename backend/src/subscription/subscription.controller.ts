@@ -1,0 +1,23 @@
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { SubscriptionService } from './subscription.service';
+import { SubscriptionTypeBody } from './dto/subscription.dto';
+import { User, UserJwt } from 'src/lib/decorators/User.decorator';
+import { JwtAuthGuard } from 'src/passport/jwt.strategy';
+
+@UseGuards(JwtAuthGuard)
+@Controller('subscription')
+export class SubscriptionController {
+    constructor(
+        private readonly subscriptionService: SubscriptionService,
+    ) {}
+
+    @Post('generatePayment')
+    async generatePaymentLink(@Body() body: SubscriptionTypeBody, @User() user: UserJwt) {
+        return this.subscriptionService.handleSubscriptionPayment(body.type)
+    }
+
+    @Get('verifyPayment')
+    async verifyPaymentLink(@Query('linkId') linkId: string, @User() user: UserJwt) {
+        return this.subscriptionService.verifyPayment(linkId, user)
+    }
+}
