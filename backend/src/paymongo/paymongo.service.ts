@@ -18,31 +18,46 @@ export class PaymongoService {
         }
     }
 
-    async createPaymentLink(amount: number, description: string) {
+    async createPaymentLink(amount: number, title: string ,description: string, subscriptionId: string) {
         try {
             const response = await axios.post(
-                `${process.env.PAYMONGO_API_URL}/links`,
+                `${process.env.PAYMONGO_API_URL}/checkout_sessions`,
                 {
                     data: {
                         attributes: {
-                            amount: parseInt(amount.toString() + '00'),
-                            description: description,
+                            line_items: [
+                                {
+                                    name: title,
+                                    description: description,
+                                    amount: parseInt(amount.toString() + "00"), // Amount in centavos (e.g., 1000.00 PHP)
+                                    currency: "PHP",
+                                    quantity: 1
+                                }
+                            ],
+                            payment_method_types: [ 
+                                "billease", "card", "dob", "dob_ubp", "brankas_bdo", 
+                                "brankas_landbank", "brankas_metrobank", "gcash", "grab_pay", "paymaya" 
+                            ], // Supported payment methods
+                            success_url: `${process.env.CLIENT_BASE_URL}/payment-status?subscriptionId=${subscriptionId}`,
+                            cancel_url: `${process.env.CLIENT_BASE_URL}/payment-status?subscriptionId=${subscriptionId}`,
+                            description: "A subscription for CondoPal SaaS Online Application for condo management system",
+                            send_email_receipt: true
                         }
                     }
                 },
                 {...this.getHeaders('secret'), validateStatus: () => true}
             )
-    
+
             return response.data.data;
         } catch (error) {
             throw new InternalServerErrorException('Error creating payment links')
         }
     }
 
-    async getPaymentLink(linkId: string) {
+    async getPaymentLink(checkout_sessionId: string) {
         try {
             const response = await axios.get(
-                `${process.env.PAYMONGO_API_URL}/links/${linkId}`,
+                `${process.env.PAYMONGO_API_URL}/checkout_sessions/${checkout_sessionId}`,
                 {...this.getHeaders('secret'), validateStatus: () => true}
             )
 

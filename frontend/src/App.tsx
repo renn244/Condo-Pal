@@ -3,11 +3,12 @@ import NavBar from './components/common/NavBar';
 import ForgotPassword from './page/ForgotPassword';
 import HomePage from './page/HomePage';
 import Login from './page/Login';
-import Pricing from './page/Pricing';
+import Pricing from './page/Payment/Pricing';
 import RedirectToken from './page/RedirectToken';
 import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
 import { useAuthContext } from './context/AuthContext';
+import PaymentSuccess from './page/Payment/PaymentSuccess';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -28,14 +29,17 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
 
+        {/* Authentication Routes */}
         <Route path='/login' element={user ? <Navigate to={'/'} /> : <Login />} />
         <Route path='/signup' element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/redirecttoken" element={user ? <Navigate to={'/'} /> : <RedirectToken />} />
         <Route path='/forgot-password' element={user ? <Navigate to={'/'} /> : <ForgotPassword />} />
         <Route path='/forgot-password/reset' element={user ? <Navigate to={'/'} /> : <ResetForgottenPassword />} />
 
+        {/* Subscription related routes */}
         <Route path='/pricing' element={<Pricing />} />
-
+        <Route path='/payment-status' element={<PaymentSuccess />} />
+        
       </Routes>
     </div>
   )

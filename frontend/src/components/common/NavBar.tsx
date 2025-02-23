@@ -1,12 +1,9 @@
-import { useAuthContext } from "@/context/AuthContext";
 import { Settings2 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Toggle } from '../ui/toggle';
 import UserNav from "./UserNav";
 
 const NavBar = () => {
-    const { user } = useAuthContext();
-
     return (
         <div className="flex items-center justify-between mx-4 mt-1 p-3 px-10 border-b-2 border-[#f3f3f3]">
             <div className="flex items-center gap-16">

@@ -1,14 +1,18 @@
 import { Check } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Button } from "../ui/button"
+import { UseMutateFunction } from "@tanstack/react-query"
+import LoadingSpinner from "./LoadingSpinner"
 
 type PricingCardProps = {
     title: string,
     description: string,
     monthlyPrice: number,
     features: string[],
-    buttonText: string,
     mostPopular?: boolean,
+    buttonText: string,
+    onButtonClick: UseMutateFunction<void, Error, string, unknown>,
+    isLoading?: boolean,
 }
 
 const PricingCard = ({
@@ -18,6 +22,8 @@ const PricingCard = ({
     features,
     buttonText,
     mostPopular=false,
+    onButtonClick,
+    isLoading=false,
 }: PricingCardProps) => {
     return (
         <Card className={`relative ${mostPopular ? 'border-blue-200 bg-blue-50' : ''}`}>
@@ -49,8 +55,8 @@ const PricingCard = ({
                 </ul>
             </CardContent>
             <CardFooter>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
-                    {buttonText}
+                <Button disabled={isLoading} onClick={() => onButtonClick(title)} className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                    {isLoading ? <LoadingSpinner /> : buttonText}
                 </Button>  
             </CardFooter>
         </Card>

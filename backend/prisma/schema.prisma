@@ -67,7 +67,8 @@ model Subscription {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  linkId      String // this the the linkId of the link payment
+  linkId      String? // this the the linkId of the link payment
+  isPaid      Boolean @default(false)
 
   createdAt   DateTime @default(now())
   expiresAt   DateTime

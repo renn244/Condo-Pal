@@ -23,7 +23,7 @@ export class AuthService {
 
     async check(user: UserJwt) {
         const getCacheUser = await this.cacheManager.get(user.id) //getting the cache
-
+        
         if(getCacheUser) {
             return getCacheUser;
         }
@@ -44,6 +44,9 @@ export class AuthService {
                 createdAt: true,
                 updatedAt: true,
                 subscriptions: {
+                    where: {
+                        isPaid: true
+                    },
                     select: {
                         id: true,
                         type: true,

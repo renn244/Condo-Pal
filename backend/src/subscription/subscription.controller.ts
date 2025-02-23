@@ -13,11 +13,11 @@ export class SubscriptionController {
 
     @Post('generatePayment')
     async generatePaymentLink(@Body() body: SubscriptionTypeBody, @User() user: UserJwt) {
-        return this.subscriptionService.handleSubscriptionPayment(body.type)
+        return this.subscriptionService.handleSubscriptionPayment(body.type, user)
     }
 
     @Get('verifyPayment')
-    async verifyPaymentLink(@Query('linkId') linkId: string, @User() user: UserJwt) {
-        return this.subscriptionService.verifyPayment(linkId, user)
+    async verifyPaymentLink(@Query('subscriptionId') subscriptionId: string, @User() user: UserJwt) {
+        return this.subscriptionService.verifyPayment(subscriptionId, user)
     }
 }
