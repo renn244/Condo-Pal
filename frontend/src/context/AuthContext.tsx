@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createContext, PropsWithChildren, useContext } from 'react';
 
 type AuthContextTypeState = {
-    user: any;
+    user: checkUser | undefined;
     isLoading: boolean;
 }
 
@@ -33,14 +33,15 @@ const AuthContextProvider = ({
                 return undefined
             }
 
-            return response.data
+            return response.data as checkUser
         },
         refetchOnWindowFocus: false
     })
     
     const value = {
         user: user,
-        isLoading: isLoading
+        isLoading: isLoading,
+        isLoggedIn: user ? true : false
     }
 
     return (

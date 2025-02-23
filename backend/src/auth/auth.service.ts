@@ -1,14 +1,16 @@
-import { BadRequestException, GoneException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ForgotPasswordDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
-import * as bcrypt from 'bcrypt';
-import { ValidationException } from 'src/lib/exception/validationException';
-import { User } from '@prisma/client';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { BadRequestException, GoneException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { Cache } from 'cache-manager';
 import { Profile } from 'passport-google-oauth20';
-import { v4 as uuidv4 } from 'uuid';
-import { userAgent } from 'next/server';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { UserJwt } from 'src/lib/decorators/User.decorator';
+import { ValidationException } from 'src/lib/exception/validationException';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
+import { ForgotPasswordDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,10 +18,53 @@ export class AuthService {
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
         private readonly emailSender: EmailSenderService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
-    async check(user: any) {
-        return user
+    async check(user: UserJwt) {
+        const getCacheUser = await this.cacheManager.get(user.id) //getting the cache
+
+        if(getCacheUser) {
+            return getCacheUser;
+        }
+
+        const getUser = await this.prisma.user.findUnique({
+            where: {
+                id: user.id
+            },
+            select: {
+                id: true,
+                email: true,
+                profile: true,
+                name: true,
+                role: true,
+                isOAuth: true,
+                provider: true,
+                providerId: true,
+                createdAt: true,
+                updatedAt: true,
+                subscriptions: {
+                    select: {
+                        id: true,
+                        type: true,
+                        createdAt: true,
+                        expiresAt: true
+                    },
+                    take: 1,
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                }
+            }
+        })
+
+        if(!getUser) {
+            throw new UnauthorizedException();
+        }
+
+        await this.cacheManager.set(getUser?.id, getUser) // caching it
+
+        return getUser
     }
 
     // google login

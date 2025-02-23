@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=block"); /* inter font from google api */
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
