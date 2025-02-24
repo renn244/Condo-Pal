@@ -12,9 +12,11 @@ const NavBar = () => {
         <div className="flex items-center justify-between mx-4 mt-1 p-3 px-10 border-b-2 border-[#f3f3f3]">
             <div className="flex items-center gap-16">
                 <div aria-label="logo">
-                    <h1 className="text-xl font-bold">
-                        CONDOPAL
-                    </h1>
+                    <Link to={'/'}>
+                        <h1 className="text-xl font-bold select-none cursor-pointer">
+                            CONDOPAL
+                        </h1>
+                    </Link>
                 </div>
                 <div className="flex items-center justify-evenly gap-3" aria-label="links">
                     <NavLink 

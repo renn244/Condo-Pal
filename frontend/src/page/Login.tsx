@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { z } from "zod"
 
 const formSchema = z.object({
@@ -23,11 +23,15 @@ const formSchema = z.object({
 })
 
 const Login = () => {
+    const [searchParams] = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema)
     });
+
+    const next = searchParams.get('next');
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsLoading(true)
@@ -54,12 +58,21 @@ const Login = () => {
             toast.success("Login successful")
 
             //redirect
-            window.location.assign("/")
+            window.location.assign(next || "/")
         } catch (error) {
             toast.error("An error occurred. Please try again later.")
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const OauthLogin = async (url: string) => {
+        setIsGoogleLoading(true) // might want tochange this if we add more oauth
+        if(next) {
+            sessionStorage.setItem('next', next)
+        }
+
+        window.location.href = url;
     }
 
     return (
@@ -116,11 +129,13 @@ const Login = () => {
                             <Button disabled={isLoading} type="submit" className="w-full mt-3">
                                 {isLoading ? <LoadingSpinner /> : "Login"}
                             </Button>
-                            <Button type="button" variant={"outline"} className="w-full" asChild>
-                                <Link to={import.meta.env.VITE_BACKEND_URL + "/auth/google-login"}>
-                                    <img src="/google.svg" className="w-5 h-5" />
-                                    Log in with Google
-                                </Link>
+                            <Button disabled={isGoogleLoading} onClick={() => OauthLogin(import.meta.env.VITE_BACKEND_URL + "/auth/google-login")} type="button" variant={"outline"} className="w-full">
+                                {isGoogleLoading ? <LoadingSpinner /> : 
+                                    <>
+                                        <img src="/google.svg" className="w-5 h-5" />
+                                        Log in with Google
+                                    </>
+                                }
                             </Button>
                         </form>
                     </Form>

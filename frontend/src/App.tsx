@@ -9,6 +9,8 @@ import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
 import { useAuthContext } from './context/AuthContext';
 import PaymentSuccess from './page/Payment/PaymentSuccess';
+import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
+import NotFound from './components/common/NotFound';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -38,8 +40,14 @@ const App = () => {
 
         {/* Subscription related routes */}
         <Route path='/pricing' element={<Pricing />} />
-        <Route path='/payment-status' element={<PaymentSuccess />} />
+        <Route path='/payment-status' element={
+          <AuthenticatedRoute>
+            <PaymentSuccess />
+          </AuthenticatedRoute>
+        } />
         
+        {/* Error Pages */}
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </div>
   )

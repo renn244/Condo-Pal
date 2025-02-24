@@ -12,7 +12,9 @@ const RedirectToken = () => {
             localStorage.setItem("access_token", access_token)
             localStorage.setItem("refresh_token", refresh_token || "")
 
-            window.location.href = "/"
+            const next = sessionStorage.getItem('next');
+
+            window.location.href = next || "/"
         }
     }, [access_token, refresh_token])
 

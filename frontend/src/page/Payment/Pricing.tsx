@@ -48,7 +48,11 @@ const Pricing = () => {
         mutationFn: async (type: string) => {
             const response = await axiosFetch.post('/subscription/generatePayment', {
                 type: type
-            })
+            }, { validateStatus: () => true })
+            
+            if(response.status === 401) {
+                return location.assign('/login?next=/pricing')
+            }
 
             if(response.status >= 400) throw new Error(response.data.message);
             
@@ -63,8 +67,8 @@ const Pricing = () => {
     })
 
     return (
-        <div>
-            <div className=" px-4 py-16 md:py-24 mx-auto">
+        <div className="">
+            <div className="px-4 py-16 md:py-20 mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-700 to-blue-900 sm:text-5xl mb-4">
                         Simple, transparent pricing
