@@ -2,7 +2,6 @@ import PricingCard from "@/components/common/PricingCard";
 import axiosFetch from "@/lib/axios";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const Pricing = () => {
     const pricingPlans = [
@@ -59,14 +58,12 @@ const Pricing = () => {
             return toast.error(error.message)
         },
         onSuccess: (data) => {
-            console.log(data)
-            // redirect link
             window.location.assign(data.attributes.checkout_url)
         }
     })
 
     return (
-        <div className="">
+        <div>
             <div className=" px-4 py-16 md:py-24 mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-700 to-blue-900 sm:text-5xl mb-4">

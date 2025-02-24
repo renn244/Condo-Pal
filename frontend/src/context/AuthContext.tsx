@@ -5,11 +5,13 @@ import { createContext, PropsWithChildren, useContext } from 'react';
 type AuthContextTypeState = {
     user: checkUser | undefined;
     isLoading: boolean;
+    isLoggedIn: boolean;
 }
 
 const initalContextState: AuthContextTypeState = {
     user: undefined,
-    isLoading: true
+    isLoading: true,
+    isLoggedIn: false,
 }
 
 const AuthContext = createContext<AuthContextTypeState>(initalContextState);
@@ -41,7 +43,7 @@ const AuthContextProvider = ({
     const value = {
         user: user,
         isLoading: isLoading,
-        isLoggedIn: user ? true : false
+        isLoggedIn: user ? true : false,
     }
 
     return (

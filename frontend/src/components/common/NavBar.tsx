@@ -1,9 +1,13 @@
 import { Settings2 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Toggle } from '../ui/toggle';
 import UserNav from "./UserNav";
+import { useAuthContext } from "@/context/AuthContext";
+import { Button } from "../ui/button";
 
 const NavBar = () => {
+    const { isLoggedIn } = useAuthContext()
+
     return (
         <div className="flex items-center justify-between mx-4 mt-1 p-3 px-10 border-b-2 border-[#f3f3f3]">
             <div className="flex items-center gap-16">
@@ -38,8 +42,8 @@ const NavBar = () => {
                     className={({ isActive }) => `
                         px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
                     `} 
-                    to={''}>
-                        Integrations
+                    to={'/pricing'}>
+                        Pricing
                     </NavLink>
                 </div>
             </div>
@@ -50,7 +54,15 @@ const NavBar = () => {
                     </Toggle>
                 </div>
                 <div aria-label="profile-sheet"  className="cursor-pointer">
-                    <UserNav />
+                    {isLoggedIn ? (
+                        <UserNav /> 
+                    ) : (
+                        <Button asChild>
+                            <Link to={'/login'}>
+                                Login
+                            </Link>
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

@@ -4,7 +4,6 @@ import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Skeleton } from "../ui/skeleton"
 
-
 const UserNav = () => {
     const { user, isLoading } = useAuthContext();
     
@@ -14,6 +13,14 @@ const UserNav = () => {
 
     if(!user) {
         return
+    }
+
+    const logOut = () => {
+        // delete all the tokens
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+    
+        location.reload();
     }
 
     // add functionlity later
@@ -51,7 +58,7 @@ const UserNav = () => {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logOut()}>
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>
