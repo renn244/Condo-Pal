@@ -30,7 +30,14 @@ const handlePrismaExceptionErrors = (exception: PrismaError) => {
                 handlePrismaErrorsCode(err, exception.code)
             ]
         }
-    }) : undefined;
+    }) : [
+        {
+            field: exception?.meta?.modelName || "Unkown",
+            message: [
+                handlePrismaErrorsCode(exception?.meta?.modelName, exception.code)
+            ]
+        },
+    ];
 }
 
 export default handlePrismaExceptionErrors;

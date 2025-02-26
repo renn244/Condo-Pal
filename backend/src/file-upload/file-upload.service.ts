@@ -15,7 +15,7 @@ export class FileUploadService {
         return pulicId
     }
 
-    async upload(file: Express.Multer.File, options: UploadApiOptions): Promise<CloudinaryResponse> {
+    async upload(file: Express.Multer.File, options?: UploadApiOptions): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 { resource_type: 'auto', ...options },

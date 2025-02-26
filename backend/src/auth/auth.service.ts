@@ -10,7 +10,7 @@ import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { ValidationException } from 'src/lib/exception/validationException';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { ForgotPasswordDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, RegisterLandLordDto, RegisterTenantDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,9 +43,12 @@ export class AuthService {
                 providerId: true,
                 createdAt: true,
                 updatedAt: true,
-                subscriptions: {
+                subscriptions: { // latest subscription
                     where: {
-                        isPaid: true
+                        isPaid: true,
+                        expiresAt: {
+                            gte: new Date(),
+                        }
                     },
                     select: {
                         id: true,
@@ -65,7 +68,7 @@ export class AuthService {
             throw new UnauthorizedException();
         }
 
-        await this.cacheManager.set(getUser?.id, getUser) // caching it
+        this.cacheManager.set(getUser?.id, getUser) // caching it
 
         return getUser
     }
@@ -223,10 +226,25 @@ export class AuthService {
         return this.login(createLandlordAccount);
     }
 
-    // is this supposed to be automated like format or the landlord should
-    // input the data
-    async registerTenant() {
-        
+    // should also include condo id because when tenant is created it should all be connected to proper condo unit
+    async registerTenant(landlord: UserJwt, body: RegisterTenantDto) {
+        const password = body.email.split('@')[0];
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const createTenantAccount = await this.prisma.user.create({
+            data: {
+                email: body.email,
+                name: body.name,
+                password: hashedPassword,
+                provider: "local",
+            }
+        })
+
+        return {
+            email: createTenantAccount.email,
+            name: createTenantAccount.name,
+            password: password // not hashed
+        }
     }
 
     // forgot password

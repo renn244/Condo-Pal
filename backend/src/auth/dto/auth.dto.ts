@@ -18,6 +18,15 @@ export class RegisterLandLordDto {
     confirmPassword: string;
 }
 
+export class RegisterTenantDto {
+    @IsString()
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    name: string;
+}
+
 export class LoginDto {
     @IsString()
     @IsEmail()
