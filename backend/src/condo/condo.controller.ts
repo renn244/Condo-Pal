@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, ParseIntPipe, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
@@ -20,6 +20,12 @@ export class CondoController {
     }))
     async createCondo(@User() user: UserJwt, @Body() body: CreateCondoDto, @UploadedFile() photo: Express.Multer.File) {
         return this.condoService.createCondo(user, body, photo);
+    }
+
+    @Get('getMyCondos')
+    async getMyCondos(@Query('page', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) page: number,
+    @User() user: UserJwt) {
+        return this.condoService.getMyCondos(user, page);
     }
 
     @Get()

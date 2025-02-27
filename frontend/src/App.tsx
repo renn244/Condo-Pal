@@ -11,6 +11,7 @@ import { useAuthContext } from './context/AuthContext';
 import PaymentSuccess from './page/Payment/PaymentSuccess';
 import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
 import NotFound from './components/common/NotFound';
+import Dashboard from './page/Dashboard/Dashboard';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -46,6 +47,9 @@ const App = () => {
           </AuthenticatedRoute>
         } />
         
+        {/* Dashboards */}
+        <Route path='/dashboard/*' element={<Dashboard />} />
+      
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />
       </Routes>

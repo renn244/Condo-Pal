@@ -1,5 +1,14 @@
+import { AxiosResponse } from "axios";
 import { UseFormSetError } from "react-hook-form";
 import toast from "react-hot-toast";
+
+export class ValidationError extends Error {
+    response: AxiosResponse<any, any>
+    constructor(response: AxiosResponse<any, any>) {
+        super(response.data.messag)
+        this.response = response;
+    }
+}
 
 const handleValidationError = (response: any, errors: any, setError: UseFormSetError<any>) => {
     if(!errors) {

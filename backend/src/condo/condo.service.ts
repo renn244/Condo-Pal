@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryResponse } from 'src/file-upload/cloudinary/cloudinary-response';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
@@ -29,10 +29,47 @@ export class CondoService {
                 isActive: isActive,
                 name: condoInfo.name,
                 address: condoInfo.address
+            },
+            include: {
+                tenant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile: true,
+                    }
+                }
             }
         })
 
         return createCondoPrisma;
+    }
+
+    // landlord
+    async getMyCondos(user: UserJwt, page: number) {
+        const take = 10;
+        const skip = Math.max((page - 1) * take, 0);
+
+        const getCondos = await this.prisma.condo.findMany({
+            where: {
+                ownerId: user.id
+            },
+            include: {
+                tenant: {
+                    select: {
+                        id: true,
+                        profile: true,
+                        name: true,
+                    }
+                }
+            },
+            take: take,
+            skip: skip
+        })
+
+        const getCondoCount = await this.prisma.condo.count({ where: { ownerId: user.id } });
+        const hasNext = getCondoCount > (skip + getCondos.length);
+
+        return { getCondos, hasNext }
     }
 
     async getCondo(condoId: string) {
@@ -75,6 +112,15 @@ export class CondoService {
                     address: updateCondo.address,
                     isActive: isActive,
                     rentAmount: rentAmount,
+                },
+                include: {
+                    tenant: {
+                        select: {
+                            id: true,
+                            name: true,
+                            profile: true,
+                        }
+                    }
                 }
             })
 
