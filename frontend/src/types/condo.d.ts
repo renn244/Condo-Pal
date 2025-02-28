@@ -6,10 +6,10 @@ type condo = {
     photo: string,
 
     ownerId: string,
-    owner: any, // user
+    // owner: any, // user
 
     tenantId: string,
-    tenant: any, // user
+    // tenant: any, // user
 
     rentAmount: number,
     isActive: boolean,

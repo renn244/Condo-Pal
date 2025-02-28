@@ -1,7 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { UserX } from "lucide-react"
+import { MoreVertical, UserPlus, UserX } from "lucide-react"
+import UpdateCondo from "./UpdateCondo"
+import { useState } from "react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import DeleteCondo from "./DeleteCondo"
 
 type CondoCardProps = {
     condo: CondoCard
@@ -10,6 +15,7 @@ type CondoCardProps = {
 const CondoCard = ({
     condo
 }: CondoCardProps) => {
+    const [open, setOpen] = useState(false)
 
     const formatToPesos = (amount: number) => {
         return new Intl.NumberFormat("en-Ph", {
@@ -27,6 +33,22 @@ const CondoCard = ({
                     <Badge variant={condo.isActive ? "default" : "secondary"} className="absolute top-3 right-3 rounded-full">
                         {condo.isActive ? "Active" : "Inactive"}
                     </Badge>
+                    <div className="absolute top-3 left-3">
+
+                        {/* Options */}
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="secondary" size="icon" className="h-8 w-8" >
+                                    <MoreVertical className="h-4 w-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-48 p-1">
+                                <UpdateCondo condoId={condo.id} initialCondo={condo as condo} />
+                                <DeleteCondo condoId={condo.id} />
+                            </PopoverContent>
+                        </Popover>
+                        
+                    </div>
                 </div>
                 <CardContent className="p-5 flex-1 flex-col">
                     <div className="mb-4">
@@ -46,6 +68,7 @@ const CondoCard = ({
         </Card>
     )
 }
+
 
 type TenantProfile = {
     tenant: {

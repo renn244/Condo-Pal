@@ -14,7 +14,7 @@ export type CondoResponse = {
 const Condo = () => {
     const { page, search } = useCondoParams();
 
-    const { data: condos, isFetching, isError, refetch } = useQuery({
+    const { data: condos, isLoading, isError, refetch } = useQuery({
         queryKey: ['condos', page, search],
         queryFn: async () => {
             const response = await axiosFetch.get(`/condo/getMyCondos?page=${page || 1}&search=${search}`)
@@ -28,7 +28,7 @@ const Condo = () => {
         refetchOnWindowFocus: false
     })
 
-    if(isFetching) {
+    if(isLoading) {
         return <LoadingSpinner />
     }
 
