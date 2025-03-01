@@ -2,11 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { MoreVertical, UserPlus, UserX } from "lucide-react"
+import { MoreVertical, UserX } from "lucide-react"
 import UpdateCondo from "./UpdateCondo"
 import { useState } from "react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import DeleteCondo from "./DeleteCondo"
+import { Separator } from "@/components/ui/separator"
+import AddTenant from "../tenant/AddTenant"
 
 type CondoCardProps = {
     condo: CondoCard
@@ -44,6 +46,8 @@ const CondoCard = ({
                             </PopoverTrigger>
                             <PopoverContent align="start" className="w-48 p-1">
                                 <UpdateCondo condoId={condo.id} initialCondo={condo as condo} />
+                                <AddTenant condoId={condo.id} />
+                                <Separator className="my-1" />
                                 <DeleteCondo condoId={condo.id} />
                             </PopoverContent>
                         </Popover>
@@ -71,11 +75,7 @@ const CondoCard = ({
 
 
 type TenantProfile = {
-    tenant: {
-        id: string,
-        name: string,
-        profile: string,
-    }
+    tenant: CondoCard['tenant']
 }
 
 const TenantProfile = ({ 

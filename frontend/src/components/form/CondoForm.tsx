@@ -45,8 +45,9 @@ const CondoForm = ({
         }
     })
 
-    // reference: https://medium.com/@damien_16960/input-file-x-shadcn-x-zod-88f0472c2b81
+    // photoRef reference: https://medium.com/@damien_16960/input-file-x-shadcn-x-zod-88f0472c2b81
     const photoRef = form.register('photo')
+    const buttonText = isUpdate ? "Save Changes" : "Create Condo";
 
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsLoading(true);
@@ -62,7 +63,7 @@ const CondoForm = ({
             await onsubmit(data);
         } catch(error: any) {
             if(error instanceof ValidationError) {
-                handleValidationError(error.response, error.response.data, form.setError);
+                handleValidationError(error.response, error.response.data.errors, form.setError);
                 return
             }
 
@@ -180,7 +181,7 @@ const CondoForm = ({
                 </div>
                 <div>
                     <Button className='w-full mt-4' disabled={isLoading} type='submit'>
-                        {isLoading ? <LoadingSpinner /> : "Save Condo"}
+                        {isLoading ? <LoadingSpinner /> : buttonText}
                     </Button>
                 </div>
             </form>

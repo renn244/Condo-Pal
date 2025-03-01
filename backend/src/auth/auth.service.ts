@@ -231,19 +231,45 @@ export class AuthService {
         const password = body.email.split('@')[0];
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const createTenantAccount = await this.prisma.user.create({
-            data: {
-                email: body.email,
-                name: body.name,
-                password: hashedPassword,
-                provider: "local",
-            }
+        const createTenantTransactions = await this.prisma.$transaction(async txprisma => {
+            const createTenantAccount = await txprisma.user.create({
+                data: {
+                    email: body.email,
+                    name: body.name,
+                    role: 'tenant',
+                    password: hashedPassword,
+                    provider: "local",
+                }
+            })
+
+            // update the condo to have the tenant in the condo
+            await txprisma.condo.update({
+                where: {
+                    id_ownerId: {
+                        id: body.condoId,
+                        ownerId: landlord.id
+                    }
+                },
+                data: {
+                    tenantId: createTenantAccount.id
+                }
+            })
+            
+            return createTenantAccount
         })
+        
+        // send email
+        this.emailSender.sendEmail(body.email, 'tenants account', 'your account credentials',
+        `
+            email: ${body.email},
+            password: ${password}
+        `)
 
         return {
-            email: createTenantAccount.email,
-            name: createTenantAccount.name,
-            password: password // not hashed
+            id: createTenantTransactions.id,
+            email: createTenantTransactions.email,
+            name: createTenantTransactions.name,
+            profile: createTenantTransactions.profile,
         }
     }
 

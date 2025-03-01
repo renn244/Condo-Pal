@@ -25,6 +25,9 @@ export class RegisterTenantDto {
 
     @IsString()
     name: string;
+
+    @IsString()
+    condoId: string;
 }
 
 export class LoginDto {

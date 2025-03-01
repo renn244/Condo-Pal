@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Post, Request, Response, UseGuards } from '@nestjs/common';
+import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { GoogleAuthGuard } from 'src/passport/google.strategy';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { LocalAuthGuard } from 'src/passport/local.strategy';
 import { AuthService } from './auth.service';
-import { ForgotPasswordDto, LoginDto, RegisterLandLordDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, LoginDto, RegisterLandLordDto, RegisterTenantDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +46,12 @@ export class AuthController {
     @Post('register-landlord')
     async registerLandlord(@Body() body: RegisterLandLordDto) {
         return this.authService.registerLandlord(body)
+    }
+    
+    @UseGuards(JwtAuthGuard)
+    @Post('register-tenant')
+    async registerTenant(@User() user: UserJwt, @Body() body: RegisterTenantDto) {
+        return this.authService.registerTenant(user, body);
     }
     
     @Post('forgot-password')

@@ -31,7 +31,7 @@ type CondoCard = {
         id: user['id'],
         name: user['name'],
         profile: user['profile']
-    }
+    } | undefined;
 
     rentAmount: condo['rentAmount'],
     isActive: condo['isActive'],
