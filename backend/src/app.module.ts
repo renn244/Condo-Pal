@@ -8,6 +8,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { CondoModule } from './condo/condo.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { MaintenanceModule } from './maintinance/maintinance.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
       isGlobal: true,
       ttl: 60 * 1000, // time to live of 60 seconds
     }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule
+    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule
   ],
   controllers: [],
   providers: [],

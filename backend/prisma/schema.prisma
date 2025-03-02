@@ -97,6 +97,57 @@ model Condo {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  maintinances Maintenance[]
+
   // used for update and delete to make sure the one performing those actions is the owner
   @@unique([id, ownerId]) 
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPELETED
+  CANCELED
+} 
+
+// this will define how you want to respond to maintenance
+enum PriorityLevel {
+  LOW
+  MEDIUM 
+  HIGH
+}
+
+enum PaymentResponsibility {
+  TENANT
+  LANDLORD
+}
+
+enum MaintenanceType {
+  CORRECTIVE // fixing the issues that had occured
+  PREVENTIVE // routing check to prevent future issues that might occur // cleaning air filter
+  EMERGENCY  // Urgent repairs to prevent property damage or safety hazards.
+}
+
+model Maintenance {
+  id          String    @id @default(cuid())
+  
+  condoId     String
+  condo       Condo     @relation(fields: [condoId], references: [id]) 
+
+  photos      String[]  // 3 photos max
+  title       String
+  description String
+
+  type          MaintenanceType
+  Status        MaintenanceStatus @default(PENDING)
+  priorityLevel PriorityLevel
+
+  estimatedCost     Int?
+  totalCost         Int?
+
+  paymentResponsibility PaymentResponsibility?
+
+  preferredSchedule DateTime? // if null then that means anytime
+  completionDate    DateTime? // if null then it means i has been cancelled
+  createdAt         DateTime  @default(now())
 }
