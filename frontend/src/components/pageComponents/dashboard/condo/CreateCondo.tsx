@@ -18,7 +18,7 @@ const CreateCondo = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-          const formData = toFormData({
+        const formData = toFormData({
             photo: data.photo?.[0],
             name: data.name,
             address: data.address,

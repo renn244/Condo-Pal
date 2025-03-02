@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
@@ -17,7 +17,7 @@ export class MaintenanceController {
     @UseInterceptors(FilesInterceptor('photos', 3, {
         storage: multer.memoryStorage()
     }))
-    async requestMaintenance(@User() user: UserJwt, body: TenantMaintenaceRequestDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+    async requestMaintenance(@User() user: UserJwt, @Body() body: TenantMaintenaceRequestDto, @UploadedFiles() files: Array<Express.Multer.File>) {
         return this.maintenanceService.TenantMaintenanceRequest(user, body, files);
     }
 

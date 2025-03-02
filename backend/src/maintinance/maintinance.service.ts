@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
@@ -7,6 +8,7 @@ import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 export class MaintenanceService {
     constructor(
         private readonly prisma: PrismaService,
+        private readonly fileUploadService: FileUploadService
     ) {}
 
     async TenantMaintenanceRequest(tenantUser: UserJwt, body: TenantMaintenaceRequestDto, photos: Array<Express.Multer.File>) {
@@ -22,13 +24,19 @@ export class MaintenanceService {
         }
 
         // upload photos maximum of 3
+        const photoUrls = await Promise.all(
+            photos.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url;
+            })
+        );
 
         const createMaintinanceRequest = await this.prisma.maintenance.create({
             data: {
                 condoId: condo.id,
                 title: body.title,
                 description: body.description,
-                
+                photos: photoUrls,
                 type: body.type,
                 priorityLevel: body.priorityLevel,
                 preferredSchedule: body.preferredSchedule

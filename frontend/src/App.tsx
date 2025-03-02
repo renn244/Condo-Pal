@@ -12,6 +12,7 @@ import PaymentSuccess from './page/Payment/PaymentSuccess';
 import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
 import NotFound from './components/common/NotFound';
 import Dashboard from './page/Dashboard/Dashboard';
+import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -47,9 +48,12 @@ const App = () => {
           </AuthenticatedRoute>
         } />
         
-        {/* Dashboards */}
+        {/* Dashboards Landlord */}
         <Route path='/dashboard/*' element={<Dashboard />} />
       
+        {/* Dashboard Tenant */}
+        <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
+
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />
       </Routes>
