@@ -1,4 +1,4 @@
-import { Hotel, LayoutDashboard } from "lucide-react"
+import { Hotel, LayoutDashboard, Wrench } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
 const DashboardSidebar = () => {
@@ -6,6 +6,7 @@ const DashboardSidebar = () => {
     const sidebarLinks = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard/dashboard' },
         { icon: Hotel, label: 'Condo', href: '/dashboard/condo' },
+        { icon: Wrench ,label: 'Maintenance', href: '/dashboard/maintenance' }
     ]
 
     return (

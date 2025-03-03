@@ -1,6 +1,7 @@
 import DashboardSidebar from "@/components/pageComponents/dashboard/Sidebar"
 import { Route, Routes } from "react-router-dom"
 import Condo from "./Condo"
+import Maintenance from "./Maintenance"
 
 const Dashboard = () => {
     return (
@@ -10,6 +11,7 @@ const Dashboard = () => {
                 <Routes>
                     <Route path="/dashboard" element={undefined} />
                     <Route path="/condo" element={<Condo />} />
+                    <Route path="/maintenance" element={<Maintenance />} />
                 </Routes>
             </main>
         </div>

@@ -21,6 +21,11 @@ export class MaintenanceController {
         return this.maintenanceService.TenantMaintenanceRequest(user, body, files);
     }
 
+    @Get('')
+    async getMaintenaneRequest(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, priority: string }) {
+        return this.maintenanceService.getMaintenanceRequestsLandlord(user, query);
+    }
+
     @Get('getRequest')
     async getMaintenanceRequest(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
         return this.maintenanceService.getMaintenanceRequest(maintenanceId, user);

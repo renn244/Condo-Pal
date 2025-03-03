@@ -1,3 +1,4 @@
+import handleValidationError, { ValidationError } from '@/lib/handleValidationError';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -10,7 +11,6 @@ import { Checkbox } from '../ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import handleValidationError, { ValidationError } from '@/lib/handleValidationError';
 
 export const formSchema = z.object({
     photo: z.instanceof(FileList),

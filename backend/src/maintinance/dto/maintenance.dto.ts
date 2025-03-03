@@ -1,5 +1,5 @@
 import { MaintenanceType, PriorityLevel } from "@prisma/client";
-import { IsDateString, IsEnum, IsString } from "class-validator";
+import { IsDateString, IsEnum, IsOptional, IsString } from "class-validator";
 
 export class TenantMaintenaceRequestDto {
     // @IsString()
@@ -20,5 +20,6 @@ export class TenantMaintenaceRequestDto {
     priorityLevel: PriorityLevel;
 
     @IsDateString()
+    @IsOptional()
     preferredSchedule: string;
 }
