@@ -49,23 +49,12 @@ export class MaintenanceService {
 
     async getMaintenanceRequestsLandlord(user: UserJwt, query: { search: string, page: string, status: string, priority: string }) {
         const take = 6;
-        const skip = (parseInt(query.page || '1') - 1) * 6;
-
-        const getCondoIdFromUser = await this.prisma.user.findUnique({
-            where: { id: user.id },
-            select: {
-                condos: {
-                    select: {
-                        id: true
-                    }
-                }
-            }
-        })
-        const getCondoIds = getCondoIdFromUser?.condos.map((condo) => condo.id) ?? [];
-        if (getCondoIds.length === 0) return { data: [], totalPages: 0, hasNext: false }; // to prevent unecessary db calls
+        const skip = (parseInt(query.page || '1') - 1) * take;
 
         const where: Prisma.MaintenanceWhereInput = {
-            condoId: { in: getCondoIds },
+            condo: {
+                ownerId: user.id
+            },
             ...(query.search && {
                 title: {
                     contains: query.search,
@@ -92,12 +81,14 @@ export class MaintenanceService {
             this.prisma.maintenance.count({ where: where })
         ])
 
-        // hasNext
         const hasNext = totalCount > (skip + take);
-        // count of pagination available
-        const totalPages = Math.ceil(totalCount / take);
+        const totalPages = Math.ceil(totalCount / take); // total pages available
 
-        return maintenanceRequests
+        return {
+            maintenanceRequests,
+            hasNext,
+            totalPages
+        }
     }
 
     async getMaintenanceRequest(maintinanceId: string, user: UserJwt) {

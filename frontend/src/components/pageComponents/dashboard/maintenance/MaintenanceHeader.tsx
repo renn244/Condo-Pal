@@ -12,6 +12,7 @@ const MaintenanceHeader = () => {
     const debounceValue = useDebounceValue(inputSearch, 500);
     
     useEffect(() => {
+        if(debounceValue === undefined) return
         setSearch(debounceValue)
     }, [debounceValue])
 

@@ -1,22 +1,28 @@
 import MaintenanceCard from "@/components/pageComponents/dashboard/maintenance/MaintenanceCard"
 import MaintenanceHeader from "@/components/pageComponents/dashboard/maintenance/MaintenanceHeader"
+import MaintenancePagination from "@/components/pageComponents/dashboard/maintenance/MaintenancePagination"
 import { Button } from "@/components/ui/button"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 
+export type MaintenanceRequest = {
+    maintenanceRequests: maintenanceCard[],
+    hasNext: boolean,
+    totalPages: number
+}
+
 const Maintenance = () => {
-    const { search, status, priority } = useMaintenanceParams();
+    const { search, status, priority, page } = useMaintenanceParams();
 
     const { data: getMaintenance } = useQuery({
-        queryKey: ['maintenance', search, status, priority],
+        queryKey: ['maintenance', page, search, status, priority],
         queryFn: async () => {
             // add search ang page later as well as the filters of status and priority
-            const response = await axiosFetch.get(`/maintenance?search=${search || ""}&status=${status}&priority=${priority}`)
+            const response = await axiosFetch.get(`/maintenance?search=${search || ""}&status=${status}&priority=${priority}&page=${page}`)
 
-            return response.data as maintenanceCard[]
+            return response.data as MaintenanceRequest
         },
         refetchOnWindowFocus: false,
     })
@@ -38,37 +44,19 @@ const Maintenance = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {getMaintenance?.map((maintenance) => (
+                {getMaintenance?.maintenanceRequests.map((maintenance) => (
                     <MaintenanceCard maintenance={maintenance} />
                 ))}
             </div>
 
-            {(getMaintenance && getMaintenance.length === 0) && (
+            {(getMaintenance && getMaintenance?.maintenanceRequests.length === 0) && (
                 <div className="text-center py-12 text-muted-foreground">
                     No maintenance requests found matching your criteria
                 </div>
             )}
 
             {/* Pagination */}
-            <div className="mt-8 justify-center">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious />
-                        </PaginationItem>
-                        {Array.from({ length: 6 }, (_, i) => i + 1).map((page) => (
-                            <PaginationItem key={page}>
-                                <PaginationLink onClick={() => undefined}>
-                                    {page}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
+            <MaintenancePagination totalPages={getMaintenance?.totalPages || 1} hasNext={getMaintenance?.hasNext || false} />
         </div>
     )
 }

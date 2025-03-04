@@ -8,6 +8,7 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { useAuthContext } from "@/context/AuthContext"
+import { MaintenanceRequest } from "@/page/Dashboard/Maintenance"
 
 type CancelMaintenanceProps = {
     maintenanceId: string
@@ -18,7 +19,7 @@ const CancelMaintenance = ({
 }: CancelMaintenanceProps) => {
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
-    const { search, status, priority } = useMaintenanceParams();
+    const { search, status, priority, page } = useMaintenanceParams();
     const [open, setOpen] = useState<boolean>(false);
 
     const { mutate, isPending } = useMutation({
@@ -37,18 +38,19 @@ const CancelMaintenance = ({
         },
         onSuccess: async () => {
             toast.success("maintenance canceled")
-            await queryClient.setQueryData(['maintenance', search, status, priority], (oldData: maintenanceCard[]) => 
-                oldData.map((maintenance) => {
+            await queryClient.setQueryData(['maintenance', page, search, status, priority], (oldData: MaintenanceRequest) => ({
+                ...oldData,
+                maintenanceRequests: oldData.maintenanceRequests.map(maintenance => {
                     if(maintenance.id === maintenanceId) {
                         return {
                             ...maintenance,
                             Status: 'CANCELED',
                             canceledBy: user?.role
                         }
-                    } 
+                    }
                     return maintenance
                 })
-            )
+            }))
         }
     })
 
