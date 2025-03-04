@@ -15,7 +15,7 @@ const RequestMaintenance = () => {
             priorityLevel: data.priorityLevel,
             preferredSchedule: data.preferredSchedule
         })
-        data.photos.forEach((file) => {
+        data?.photos?.forEach((file) => {
             formData.append('photos', file); // Ensure backend expects 'photos' as an array
         });
         

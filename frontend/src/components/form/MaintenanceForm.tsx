@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from "../ui/textarea";
 
 export const formSchema = z.object({
-    photos: z.array(z.instanceof(File)).min(1, "At least one image is required"),
+    photos: z.array(z.instanceof(File)).optional(),
     title: z.string().nonempty({
         message: 'title is required',
     }),
@@ -28,9 +28,10 @@ export const formSchema = z.object({
 });
 
 type MaintenanceFormProps = {
-    onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>,
+    onsubmit: (data: z.infer<typeof formSchema>, previousPhotos?: string[]) => Promise<void>,
     className?: string,
-    isUpdate?: boolean
+    isUpdate?: boolean,
+    initialData?: maintenance
 }
 
 type previewFiles = {
@@ -38,20 +39,26 @@ type previewFiles = {
     url: string
 }
 
+// only for tenant
 const MaintenanceForm = ({
     onsubmit,
     className,
     isUpdate=false,
+    initialData
 }: MaintenanceFormProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [previewFiles, setPreviewFiles]  = useState<previewFiles[]>([])
+    const [previewFiles, setPreviewFiles]  = useState<previewFiles[]>(() => initialData?.photos.map(
+        (photo, idx) => ({ name: `Photo ${idx + 1}`, url: photo }) // getting the previous data
+    ) || [])
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: '',
-            description: '',
-            type: 'CORRECTIVE',
-            priorityLevel: 'LOW',
+            title: initialData?.title || '',
+            description: initialData?.description || '',
+            type: initialData?.type || 'CORRECTIVE',
+            priorityLevel: initialData?.priorityLevel ||  'LOW',
+            preferredSchedule: initialData?.preferredSchedule ? new Date(initialData.preferredSchedule) : undefined
         }
     })
 
@@ -60,14 +67,16 @@ const MaintenanceForm = ({
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsLoading(true)
         try {
-            // if(!data.photos.length && !isUpdate) {
-            //     form.setError('photos', {
-            //         type: 'required',
-            //         message: 'photos is required'
-            //     })
-            // }
-
-            await onsubmit(data)
+            if(!data?.photos?.length && !isUpdate) {
+                form.setError('photos', {
+                    type: 'min',
+                    message: "At least one image is required"
+                })
+            }
+            
+            // getting all the previous files only for update
+            const previousPhotos = previewFiles.flatMap((preview) => preview.url.includes('https') ? preview.url : '').filter((p) => !!p)
+            await onsubmit(data, previousPhotos);
         } catch (error: any) {
             if(error instanceof ValidationError) {
                 handleValidationError(error.response, error.response.data.errors, form.setError);

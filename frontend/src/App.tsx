@@ -1,18 +1,19 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
 import NavBar from './components/common/NavBar';
+import NotFound from './components/common/NotFound';
+import { useAuthContext } from './context/AuthContext';
+import Dashboard from './page/Dashboard/Dashboard';
 import ForgotPassword from './page/ForgotPassword';
 import HomePage from './page/HomePage';
 import Login from './page/Login';
+import PaymentSuccess from './page/Payment/PaymentSuccess';
 import Pricing from './page/Payment/Pricing';
 import RedirectToken from './page/RedirectToken';
 import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
-import { useAuthContext } from './context/AuthContext';
-import PaymentSuccess from './page/Payment/PaymentSuccess';
-import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
-import NotFound from './components/common/NotFound';
-import Dashboard from './page/Dashboard/Dashboard';
 import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
+import EditMaintenance from './page/Dashboard/EditMaintenance';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -53,6 +54,7 @@ const App = () => {
       
         {/* Dashboard Tenant */}
         <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
+        <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
 
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />

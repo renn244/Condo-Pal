@@ -3,7 +3,7 @@ import { MaintenanceStatus, PriorityLevel, Prisma } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 
 @Injectable()
 export class MaintenanceService {
@@ -119,6 +119,47 @@ export class MaintenanceService {
         }
    
         return maintenanceRequest
+    }
+
+    async editMaintenanceRequest(maintenanceId: string, tenantUser: UserJwt, body: TenantEditMaintenanceRequest, photos: Array<Express.Multer.File>) {
+        const getPhotosofMaintenance = await this.prisma.maintenance.findFirst({
+            where: { id: maintenanceId },
+            select: { photos: true }
+        })
+        const previousPhotos = body.previousPhotos || []
+        
+        // delete certain photos that will be replace
+        if(getPhotosofMaintenance?.photos) {
+            await Promise.all(getPhotosofMaintenance?.photos
+            .filter((photo) => !previousPhotos.includes(photo))
+            .map(async (photo) => 
+                await this.fileUploadService.deleteFile(photo)
+            ))
+        }
+
+        // upload photos maximum of 3
+        const photoUrls = await Promise.all(
+            photos.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url;
+            })
+        );
+
+        const editedMaintenance = await this.prisma.maintenance.update({
+            where: {
+                id: maintenanceId
+            },
+            data: {
+                photos: [...previousPhotos, ...photoUrls], // combine all the photos that is kept and newly uploaded
+                title: body.title,
+                description: body.description,
+                type: body.type,
+                priorityLevel: body.priorityLevel,
+                preferredSchedule: body.preferredSchedule,
+            }
+        })
+
+        return editedMaintenance
     }
 
     // landlord // maybe add message why later?
