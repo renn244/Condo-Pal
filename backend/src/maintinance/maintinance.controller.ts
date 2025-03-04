@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
@@ -29,5 +29,10 @@ export class MaintenanceController {
     @Get('getRequest')
     async getMaintenanceRequest(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
         return this.maintenanceService.getMaintenanceRequest(maintenanceId, user);
+    }
+
+    @Patch('cancel')
+    async cancelMaintenance(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
+        return this.maintenanceService.cancelMaintenanceRequest(maintenanceId, user);
     }
 }

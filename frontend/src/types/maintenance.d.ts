@@ -44,6 +44,7 @@ type maintenance = {
     estimatedCost?: number,
     totalCost?: number,
 
+    canceledBy?: string,
     paymentResponsibility?: PaymentResponsibility,
 
     preferredSchedule?: string,

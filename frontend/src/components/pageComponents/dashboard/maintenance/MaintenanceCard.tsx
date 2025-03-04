@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { MaintenanceStatus, PriorityLevel } from "@/constant/maintenance.constants"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Clock, DollarSign, Calendar, Eye, Home, MoreVertical, Pencil, PenTool, XCircle } from "lucide-react"
+import { Clock, DollarSign, Calendar, Home, MoreVertical, Pencil, PenTool } from "lucide-react"
+import ViewDetails from "./ViewDetails"
+import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
+import CancelMaintenance from "./CancelMaintenance"
 
 type MaintenanceCardProps = {
     maintenance: maintenanceCard
@@ -15,30 +17,6 @@ type MaintenanceCardProps = {
 const MaintenanceCard = ({
     maintenance
 }: MaintenanceCardProps) => {
-
-    const getPriorityBadgeVariant = (priority: PriorityLevel) => {
-        switch(priority) {
-            case PriorityLevel.LOW:
-                return "secondary"
-            case PriorityLevel.MEDIUM:
-                return "default"
-            case PriorityLevel.HIGH:
-                return "destructive"
-        }
-    }    
-
-    const getStatusBadgeVariant = (status: MaintenanceStatus) => {
-        switch(status) {
-            case MaintenanceStatus.PENDING:
-                return "secondary";
-            case MaintenanceStatus.IN_PROGRESS:
-                return "default";
-            case MaintenanceStatus.COMPLETED:
-                return "success";
-            case MaintenanceStatus.CANCELED:
-                return "destructive";
-        }
-    }
 
     return (
         <Card key={maintenance.id} className="overflow-hidden">
@@ -55,10 +33,7 @@ const MaintenanceCard = ({
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent align="end" className="w-56 p-1">
-                            <Button variant="ghost" className="w-full justify-start">
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                            </Button>
+                            <ViewDetails maintenance={maintenance} />
                             <Button variant="ghost" className="w-full justify-start">
                                 <Clock className="mr-2 h-4 w-4" />
                                 Update Status
@@ -67,11 +42,12 @@ const MaintenanceCard = ({
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Edit maintenance
                             </Button>
-                            <Separator className="my-1" />
-                            <Button variant="ghost" className="w-full justify-start text-destructive focus:text-destructive hover:text-destructive">
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Cancel maintenance
-                            </Button>
+                            {maintenance.Status !== "CANCELED" && (
+                                <>
+                                    <Separator className="my-1" />
+                                    <CancelMaintenance maintenanceId={maintenance.id} />
+                                </>
+                            )}
                         </PopoverContent>
                     </Popover>
                 </div>
@@ -125,8 +101,8 @@ const MaintenanceCard = ({
                     <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Preferred Scheduled: {
-                        maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
-                    }</span>
+                            maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
+                        }</span>
                     </div>
 
                     <div className="flex items-center gap-2">

@@ -106,7 +106,7 @@ model Condo {
 enum MaintenanceStatus {
   PENDING
   IN_PROGRESS
-  COMPELETED
+  COMPLETED
   CANCELED
 } 
 
@@ -146,6 +146,7 @@ model Maintenance {
   totalCost         Int?
 
   paymentResponsibility PaymentResponsibility?
+  canceledBy        String? // "Tenant" and "Landlord"
 
   preferredSchedule DateTime? // if null then that means anytime
   completionDate    DateTime? // if null then it means i has been cancelled

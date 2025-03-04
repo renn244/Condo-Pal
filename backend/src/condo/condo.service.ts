@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CloudinaryResponse } from 'src/file-upload/cloudinary/cloudinary-response';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';

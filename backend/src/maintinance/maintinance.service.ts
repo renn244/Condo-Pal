@@ -1,9 +1,9 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { MaintenanceStatus, PriorityLevel, Prisma } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TenantMaintenaceRequestDto } from './dto/maintenance.dto';
-import { MaintenanceStatus, MaintenanceType, PriorityLevel } from '@prisma/client';
 
 @Injectable()
 export class MaintenanceService {
@@ -61,42 +61,43 @@ export class MaintenanceService {
                 }
             }
         })
-        const getCondoIds = getCondoIdFromUser?.condos.map((condo) => condo.id)
+        const getCondoIds = getCondoIdFromUser?.condos.map((condo) => condo.id) ?? [];
+        if (getCondoIds.length === 0) return { data: [], totalPages: 0, hasNext: false }; // to prevent unecessary db calls
 
-        const maintenanceRequest = await this.prisma.maintenance.findMany({
-            where: {
-                condoId: { in: getCondoIds },
-                // filtering of search, status and priority
-                ...(query.search && {
-                    title: {
-                        contains: query.search,
-                        mode: 'insensitive'
-                    }
-                }),
-                ...(query.status && query.status !== 'ALL' && {
-                    Status: query.status as MaintenanceStatus
-                }),
-                ...(query.priority && query.priority !== 'ALL' && {
-                    priorityLevel: query.priority as PriorityLevel
-                })
-            },
-            include: {
-                condo: {
-                    select: {
-                        id: true,
-                        name: true,
-                        address: true,
-                    }
+        const where: Prisma.MaintenanceWhereInput = {
+            condoId: { in: getCondoIds },
+            ...(query.search && {
+                title: {
+                    contains: query.search,
+                    mode: 'insensitive'
                 }
-            },
-            take: take,
-            skip: skip
-        })
-    
-        // hasNext
-        // count of pagination available
+            }),
+            ...(query.status && query.status !== 'ALL' && {
+                Status: query.status as MaintenanceStatus
+            }),
+            ...(query.priority && query.priority !== 'ALL' && {
+                priorityLevel: query.priority as PriorityLevel
+            })
+        }
 
-        return maintenanceRequest
+        const [maintenanceRequests, totalCount] = await Promise.all([
+            this.prisma.maintenance.findMany({
+                where: where,
+                include: {
+                    condo: { select: { id: true, name: true, address: true, } }
+                },
+                take: take,
+                skip: skip
+            }),
+            this.prisma.maintenance.count({ where: where })
+        ])
+
+        // hasNext
+        const hasNext = totalCount > (skip + take);
+        // count of pagination available
+        const totalPages = Math.ceil(totalCount / take);
+
+        return maintenanceRequests
     }
 
     async getMaintenanceRequest(maintinanceId: string, user: UserJwt) {
@@ -125,8 +126,40 @@ export class MaintenanceService {
         if(!isOwnerOrTenant) {
             throw new ForbiddenException('you are not allowed to get this information')
         }
-
+   
         return maintenanceRequest
     }
 
+    // landlord // maybe add message why later?
+    async cancelMaintenanceRequest(maintenanceId: string, user: UserJwt) {
+        // make sure he owns the condo
+        const condoOfMaintenance = await this.prisma.maintenance.findFirst({
+            where: {
+                id: maintenanceId
+            },
+            include: {
+                condo: {
+                    select: { tenantId: true, ownerId: true }
+                }
+            }
+        })
+        
+        if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
+
+        const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
+        if(!isOwnerOrTenant) throw new ForbiddenException('you are not allowed to update this!')
+
+        // TODO LATER: when he cancel's we should be able to put message of the landlord or tenant
+        const cancelMaintenance = await this.prisma.maintenance.update({
+            where: {
+                id: maintenanceId,
+            },
+            data: {
+                Status: 'CANCELED',
+                canceledBy: user.role
+            }
+        })
+
+        return cancelMaintenance
+    }    
 }

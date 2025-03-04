@@ -5,8 +5,8 @@ const useMaintenanceParams = () => {
 
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
-    const status = searchParams.get('status') || '';
-    const priority = searchParams.get('priority') || '';
+    const status = searchParams.get('status') || 'ALL';
+    const priority = searchParams.get('priority') || 'ALL';
 
     const setSearch = (value: string) => {
         const newParams = new URLSearchParams(searchParams);
