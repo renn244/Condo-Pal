@@ -51,8 +51,8 @@ export class SubscriptionService {
                 }
             })
 
-            const createPaymentLink = await this.paymongoService.createPaymentLink(
-                subscription.price, subscription.title, subscription.description, createSubscriptionPrisma.id
+            const createPaymentLink = await this.paymongoService.createPaymentSubscription(
+                subscription.price, subscription.title, "Payment for CondoPal", createSubscriptionPrisma.id
             );
 
             // updating the linkId
@@ -81,12 +81,10 @@ export class SubscriptionService {
             }
         })
 
-        if(!getSessionId) throw new NotFoundException({ name: 'subscription', message: 'failed to find subscription' })
+        if(!getSessionId || !getSessionId.linkId  ) throw new NotFoundException({ name: 'subscription', message: 'failed to find subscription' })
 
-        const getPayment = await this.paymongoService.getPaymentLink(getSessionId?.linkId || '');
-        const lastPaymentIdx = getPayment.attributes.payments.length - 1;
-        const status = getPayment.attributes.payments?.[lastPaymentIdx]?.attributes?.status as 'pending' | 'paid' | 'failed '
-
+        const getPayment = await this.paymongoService.getPaymentLink(getSessionId.linkId || '');
+        const status = this.paymongoService.getStatusCheckoutSession(getPayment)
         if(status !== 'paid') {
             return {
                 name: "Payment Status",
