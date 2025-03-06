@@ -112,7 +112,7 @@ export class PaymongoService {
 
     getStatusCheckoutSession(payment: any) {
         const payments = payment.attributes.payments;
-        if (!payments || payments.length === 0) return 'no_payments';
+        if (!payments || payments.length === 0) return 'pending';
     
         // Sort payments by creation date in descending order
         const sortedPayments = payments.sort((a: any, b: any) => b.attributes.created_at - a.attributes.created_at);

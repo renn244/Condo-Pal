@@ -37,6 +37,8 @@ model User {
   condos        Condo[]  @relation("Owner")
   condo         Condo?   @relation("Tenant") 
 
+  payments      CondoPayment[]
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -70,7 +72,7 @@ model Subscription {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  linkId      String? // this the the linkId of the link payment
+  linkId      String? // this the the linkId of the checkout payment
   isPaid      Boolean @default(false)
 
   createdAt   DateTime @default(now())
@@ -98,9 +100,50 @@ model Condo {
   updatedAt   DateTime  @updatedAt
 
   maintinances Maintenance[]
+  payments     CondoPayment[]
 
   // used for update and delete to make sure the one performing those actions is the owner
   @@unique([id, ownerId]) 
+}
+
+enum CondoPaymentType {
+  PAYMONGO // this is include all digital payment automated
+  GCASH    // this is just in photo of the receipt itself being sent to the landlord
+  MANUAL   // this is when the landlord get the payment physically // much more riskier since there is no evidence.
+}
+
+enum GcashPaymentStatus {
+  PENDING  // Awaiting landlord verification (for GCASH)
+  APPROVED // Verified by the landlord
+  REJECTED // Rejected by the landlord (if invalid proof)
+}
+
+model CondoPayment {
+  id              String    @id @default(cuid())
+
+  type            CondoPaymentType
+
+  rentCost        Int
+  additionalCost  Int? @default(0) // this is the additional costing for things like the maintenance, and penalties
+  totalPaid       Int // should be the added rent cost and addiotional cost
+
+  // paymongo
+  linkId          String? // this the the linkId of the checkout payment
+  isPaid          Boolean @default(false)
+
+  tenantId        String
+  tenant          User  @relation(fields: [tenantId], references: [id])
+
+  condoId         String
+  condo           Condo  @relation(fields: [condoId], references: [id])
+
+  // gcash
+  receiptImage    String? // for GCASH receipt
+  isVerified      Boolean? // for confirming GCASH payment only landlord is allowed to do this
+  gcashStatus     GcashPaymentStatus?
+
+  billingMonth    DateTime
+  payedAt         DateTime @default(now())
 }
 
 enum MaintenanceStatus {

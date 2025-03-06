@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
+import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Clock, DollarSign, Calendar, Home, MoreVertical, Pencil, PenTool } from "lucide-react"
-import ViewDetails from "./ViewDetails"
-import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
+import { Calendar, Clock, DollarSign, Home, MoreVertical, Pencil, PenTool } from "lucide-react"
 import CancelMaintenance from "./CancelMaintenance"
+import ViewDetails from "./ViewDetails"
 
 type MaintenanceCardProps = {
     maintenance: maintenanceCard
