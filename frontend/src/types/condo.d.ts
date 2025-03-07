@@ -39,3 +39,13 @@ type CondoCard = {
     createdAt: condo['createdAt'],
     updatedAt: condo['updatedAt']
 }
+
+type CondoBillInformation = {
+    id: condo['id'],
+    name: condo['name'],
+    address: condo['address'],
+    photo: condo['photo'],
+    rentCost: number,
+    additionalCost: number,
+    totalCost: number,
+}

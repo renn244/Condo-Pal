@@ -4,7 +4,6 @@ import { GcashPayment, GcashPaymentVerification, ManualPayment } from './dto/con
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
-import { userAgent } from 'next/server';
 import { CondoPaymentType } from '@prisma/client';
 
 @Injectable()
@@ -62,6 +61,29 @@ export class CondoPaymentService {
         }
     }
 
+    async getPaymentInformation(user: UserJwt, condoId: string) {
+        // we need to know what month he or she is paying
+        const [condoInfo, getBill] = await Promise.all([
+            await this.prisma.condo.findFirst({
+                where: { AND: [
+                    { id: condoId },
+                    { tenantId: user.id }
+                ] },
+                select: { id: true, name: true, address: true, photo: true }
+            }),
+            await this.getTotalPayment(condoId)
+        ])
+        
+        if(!condoInfo) {
+            throw new NotFoundException('condo not found')
+        }
+
+        return {
+            ...condoInfo,
+            ...getBill,
+        }
+    }
+
     // GCASH PAYMENT
     async createGcashPayment(user: UserJwt, condoId: string, gcashPhoto: Express.Multer.File, body: GcashPayment) {
         const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
@@ -86,10 +108,10 @@ export class CondoPaymentService {
         return createPaymentGcash // wait for it to be verified by the landlord
     }
 
-    async getGcashPayment(paymentId: string) {
+    async getGcashPayment(condoPaymentId: string) {
         const gcashPayment =  await this.prisma.condoPayment.findFirst({
             where: {
-                id: paymentId
+                id: condoPaymentId
             },
             select: {
                 id: true,
@@ -119,13 +141,13 @@ export class CondoPaymentService {
         return gcashPayment
     }
 
-    async verifyGcashPayment(user: UserJwt, paymentId: string, body: GcashPaymentVerification) {
+    async verifyGcashPayment(user: UserJwt, condoPaymentId: string, body: GcashPaymentVerification) {
         const isVerified = body.gcashStatus === 'APPROVED';
         const isPaid = isVerified; // same thing but this is used for paymongo
         
         const updatePayment = await this.prisma.condoPayment.update({
             where: {
-                id: paymentId
+                id: condoPaymentId
             },
             data: {
                 isVerified,

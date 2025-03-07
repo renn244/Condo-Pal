@@ -50,7 +50,7 @@ const EditMaintenance = () => {
             const response = await axiosFetch.get(`/maintenance/getRequest?maintenanceId=${maintenanceId}`)
         
             if(response.status === 404) {
-                return undefined
+                return null
             }
 
             if(response.status >= 400) {

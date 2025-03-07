@@ -13,6 +13,11 @@ export class CondoPaymentController {
         private readonly condoPaymentService: CondoPaymentService
     ) {}
 
+    @Get('getBill')
+    async getPaymentInformation(@User() user: UserJwt, @Query('condoId') condoId: string) {
+        return this.condoPaymentService.getPaymentInformation(user, condoId);
+    }
+
     // GCASH
     @Post('createPayment/Gcash')
     @UseInterceptors(FileInterceptor('gcashPhoto', {
@@ -28,13 +33,13 @@ export class CondoPaymentController {
     }
 
     @Patch('verifyPayment/Gcash')
-    async verifyGsachPayment(@User() user: UserJwt, @Query('paymentId') paymentId: string, body: GcashPaymentVerification) {
-        return this.condoPaymentService.verifyGcashPayment(user, paymentId, body);
+    async verifyGsachPayment(@User() user: UserJwt, @Query('condoPaymentId') condoPaymentId: string, @Body() body: GcashPaymentVerification) {
+        return this.condoPaymentService.verifyGcashPayment(user, condoPaymentId, body);
     }
 
     // MANUAL
     @Post('createPayment/Manual')
-    async createManualPayment(@User() user: UserJwt, @Query('condoId') condoId: string, body: ManualPayment) {
+    async createManualPayment(@User() user: UserJwt, @Query('condoId') condoId: string, @Body() body: ManualPayment) {
         return this.condoPaymentService.createManualPayment(user, condoId, body);
     }
 

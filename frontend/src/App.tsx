@@ -14,6 +14,8 @@ import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
 import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import EditMaintenance from './page/Dashboard/EditMaintenance';
+import GcashPayment from './page/TenantDashboard/CondoPayment/GcashPayment';
+import PaymongoPayment from './page/TenantDashboard/CondoPayment/PaymongoPayment';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -55,6 +57,10 @@ const App = () => {
         {/* Dashboard Tenant */}
         <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
         <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
+
+        <Route path='/condoPayments/gcash/:condoId' element={<GcashPayment />} />
+        <Route path='/condoPayments/manual' element={undefined} />
+        <Route path='/condoPayments/paymongo/:condoId' element={<PaymongoPayment />} />
 
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />
