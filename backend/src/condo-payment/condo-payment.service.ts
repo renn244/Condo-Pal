@@ -216,7 +216,7 @@ export class CondoPaymentService {
             const title = `Monthly Rent and Additional Cost Payment for the condo "${getCondo.name}"`;
 
             const createPaymentLink = await this.paymongoService.createCondoPayment(
-                totalPayment.rentCost, totalPayment.additionalCost, title, condoPayment.id
+                totalPayment.rentCost, totalPayment.additionalCost, title, condoPayment.id, condoId
             )
 
             // updating the linkId

@@ -16,6 +16,7 @@ import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import EditMaintenance from './page/Dashboard/EditMaintenance';
 import GcashPayment from './page/TenantDashboard/CondoPayment/GcashPayment';
 import PaymongoPayment from './page/TenantDashboard/CondoPayment/PaymongoPayment';
+import VerifyPaymongoPayment from './page/TenantDashboard/CondoPayment/VerifyPaymongoPayment';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -60,6 +61,7 @@ const App = () => {
 
         <Route path='/condoPayments/gcash/:condoId' element={<GcashPayment />} />
         <Route path='/condoPayments/manual' element={undefined} />
+        <Route path='/condoPayments/paymongo/verify' element={<VerifyPaymongoPayment />} />
         <Route path='/condoPayments/paymongo/:condoId' element={<PaymongoPayment />} />
 
         {/* Error Pages */}

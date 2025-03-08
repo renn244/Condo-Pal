@@ -9,13 +9,6 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type PaymentStatusResponse = {
-    name: string,
-    status: "pending" | "paid" | "failed" | "loading",
-    linkId: string,
-    checkouturl: string, // just in case the user want to go back to paying
-}
-
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
     const subscriptionId = searchParams.get('subscriptionId')

@@ -53,7 +53,7 @@ export class PaymongoService {
         }
     }
 
-    async createCondoPayment(rentCost: number, additionalCost: number, title: string, condoPaymentId: string) {
+    async createCondoPayment(rentCost: number, additionalCost: number, title: string, condoPaymentId: string, condoId: string) {
         try {
             const response = await axios.post(
                 `${process.env.PAYMONGO_API_URL}/checkout_sessions`, 
@@ -80,8 +80,8 @@ export class PaymongoService {
                                 "billease", "card", "dob", "dob_ubp", "brankas_bdo", 
                                 "brankas_landbank", "brankas_metrobank", "gcash", "grab_pay", "paymaya" 
                             ], // Supported payment methods
-                            success_url: `${process.env.CLIENT_BASE_URL}/payment-status?condoPaymentId=${condoPaymentId}`,
-                            cancel_url: `${process.env.CLIENT_BASE_URL}/payment-status?condoPaymentId=${condoPaymentId}`,
+                            success_url: `${process.env.CLIENT_BASE_URL}/condoPayments/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
+                            cancel_url: `${process.env.CLIENT_BASE_URL}/condoPayments/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
                             description: title,
                             send_email_receipt: true,
                             show_description: true
