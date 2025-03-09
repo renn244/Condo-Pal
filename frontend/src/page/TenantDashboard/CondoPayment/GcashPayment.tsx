@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import NotFound from "@/components/common/NotFound";
 import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import PaymentReceipt from "@/components/pageComponents/tenantDashboard/PaymentReceipt";
@@ -8,11 +9,11 @@ import { Label } from "@/components/ui/label";
 import axiosFetch from "@/lib/axios";
 import formatToPesos from "@/lib/formatToPesos";
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import CondoInformationCard from "./CondoInformationCard";
 import { useParams } from "react-router-dom";
+import CondoInformationCard from "../../../components/pageComponents/tenantDashboard/CondoInformationCard";
 
 const GcashPayment = () => {
     const { condoId } = useParams<{ condoId: string }>()
@@ -43,7 +44,7 @@ const GcashPayment = () => {
         return now.toLocaleDateString("en-US", { month: "long", year: "numeric" })
     }
 
-    if(isLoading) return
+    if(isLoading) return <LoadingSpinner />
 
     if(error) return <SomethingWentWrong reset={refetch} />
 
@@ -55,7 +56,7 @@ const GcashPayment = () => {
 
             {isSuccess ? (
                 <Alert className="mb-6 bg-green-50 border-green-200">
-                    <Check className="h-5 w-5 text-green-600" />
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
                     <AlertTitle className="text-green-800">Payment Submitted Successfully</AlertTitle>
                     <AlertDescription className="text-green-700">
                         {/* The march is a placeholder */}

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CondoPaymentType } from '@prisma/client';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { UserJwt } from 'src/lib/decorators/User.decorator';
+import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GcashPayment, GcashPaymentVerification, ManualPayment } from './dto/condo-payment.dto';
-import { UserJwt } from 'src/lib/decorators/User.decorator';
-import { FileUploadService } from 'src/file-upload/file-upload.service';
-import { PaymongoService } from 'src/paymongo/paymongo.service';
-import { CondoPaymentType } from '@prisma/client';
 
 @Injectable()
 export class CondoPaymentService {
@@ -67,9 +67,12 @@ export class CondoPaymentService {
             await this.prisma.condo.findFirst({
                 where: { AND: [
                     { id: condoId },
-                    { tenantId: user.id }
-                ] },
-                select: { id: true, name: true, address: true, photo: true }
+                    { tenantId: user.id}
+                ]},
+                select: { 
+                    id: true, name: true, address: true, photo: true, 
+                    tenant: { select: { id: true, name: true } }
+                }
             }),
             await this.getTotalPayment(condoId)
         ])
@@ -124,7 +127,13 @@ export class CondoPaymentService {
                         id: true,
                         name: true,
                         address: true,
-                        photo: true
+                        photo: true,
+                        tenant: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        }
                     }
                 },
                 receiptImage: true,

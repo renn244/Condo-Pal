@@ -1,15 +1,15 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import NotFound from "@/components/common/NotFound";
+import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, CreditCard } from "lucide-react";
-import CondoInformationCard from "./CondoInformationCard";
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import SomethingWentWrong from "@/components/common/SomethingWentWrong";
-import NotFound from "@/components/common/NotFound";
 import axiosFetch from "@/lib/axios";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, CreditCard } from "lucide-react";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import CondoInformationCard from "../../../components/pageComponents/tenantDashboard/CondoInformationCard";
 
 // paymongo available payment methods
 const paymentMethods = [
@@ -69,7 +69,7 @@ const PaymongoPayment = () => {
         refetchOnWindowFocus: false
     })
 
-    if(condoBillInfoLoading) return
+    if(condoBillInfoLoading) return <LoadingSpinner />
 
     if(error) return <SomethingWentWrong reset={refetch} />
 

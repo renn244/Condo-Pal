@@ -48,4 +48,8 @@ type CondoBillInformation = {
     rentCost: number,
     additionalCost: number,
     totalCost: number,
+    tenant?: {
+        id: user['id']
+        name: user['name']
+    }
 }

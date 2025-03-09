@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import formatToPesos from "@/lib/formatToPesos"
-import { Calendar } from "lucide-react"
+import { Calendar, Receipt } from "lucide-react"
 
 type CondoInformationCardProps = {
     condo: CondoBillInformation
@@ -26,6 +26,11 @@ const CondoInformationCard = ({
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                     <Calendar className="h-4 w-4" />
                     <span>Payment for: {"March"}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Receipt className="h-4 w-4" />
+                    <span>Tenant: {condo?.tenant?.name}</span>
                 </div>
 
                 <Separator className="my-4" />

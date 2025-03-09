@@ -3,7 +3,10 @@ import AuthenticatedRoute from './components/common/Authorization/AuthenticatedR
 import NavBar from './components/common/NavBar';
 import NotFound from './components/common/NotFound';
 import { useAuthContext } from './context/AuthContext';
+import ManualPayment from './page/Dashboard/CondoPayment/ManualPayment';
+import VerifyGcashPayment from './page/Dashboard/CondoPayment/VerifyGcashPayment';
 import Dashboard from './page/Dashboard/Dashboard';
+import EditMaintenance from './page/Dashboard/EditMaintenance';
 import ForgotPassword from './page/ForgotPassword';
 import HomePage from './page/HomePage';
 import Login from './page/Login';
@@ -12,11 +15,10 @@ import Pricing from './page/Payment/Pricing';
 import RedirectToken from './page/RedirectToken';
 import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
-import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
-import EditMaintenance from './page/Dashboard/EditMaintenance';
 import GcashPayment from './page/TenantDashboard/CondoPayment/GcashPayment';
 import PaymongoPayment from './page/TenantDashboard/CondoPayment/PaymongoPayment';
 import VerifyPaymongoPayment from './page/TenantDashboard/CondoPayment/VerifyPaymongoPayment';
+import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -59,8 +61,10 @@ const App = () => {
         <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
         <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
 
+        {/* we still need to put these pages to their proper url like dashboard of tenant or landlord  */}
+        <Route path='/condoPayments/manual/:condoId' element={<ManualPayment />} />
+        <Route path='/condoPayments/gcash/verify/:condoPaymentId' element={<VerifyGcashPayment />} />
         <Route path='/condoPayments/gcash/:condoId' element={<GcashPayment />} />
-        <Route path='/condoPayments/manual' element={undefined} />
         <Route path='/condoPayments/paymongo/verify' element={<VerifyPaymongoPayment />} />
         <Route path='/condoPayments/paymongo/:condoId' element={<PaymongoPayment />} />
 
