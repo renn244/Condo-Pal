@@ -27,7 +27,6 @@ model User {
 
   role          Role     @default(landlord)
 
-  //  properties Property[]
   isOAuth       Boolean  @default(false)
   provider      String? // e.g, "google", "local"
   providerId    String?  @unique // Unique ID from OAuth provider
@@ -38,9 +37,29 @@ model User {
   condo         Condo?   @relation("Tenant") 
 
   payments      CondoPayment[]
+  agreement     LeaseAgreement? // if it's a landlord then this should be null
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model LeaseAgreement {
+  id          String   @id @default(cuid())
+
+  leaseStart  DateTime
+  leaseEnd    DateTime?
+  due_date    Int     // Day of the month or (-1) for end of the month
+
+  condoId     String   
+  condo       Condo    @relation(fields: [condoId], references: [id])
+
+  tenantId    String   @unique
+  tenant      User     @relation(fields: [tenantId], references: [id])
+
+  isLeaseEnded  Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt  
 }
 
 model refreshToken {
@@ -99,6 +118,7 @@ model Condo {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  agreements   LeaseAgreement[] // condo may have many leases from different time
   maintinances Maintenance[]
   payments     CondoPayment[]
 
@@ -142,7 +162,7 @@ model CondoPayment {
   isVerified      Boolean? // for confirming GCASH payment only landlord is allowed to do this
   gcashStatus     GcashPaymentStatus?
 
-  billingMonth    DateTime
+  billingMonth    String // MM-YYYY
   payedAt         DateTime @default(now())
 }
 
