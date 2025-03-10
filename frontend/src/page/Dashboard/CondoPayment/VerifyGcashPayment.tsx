@@ -14,7 +14,7 @@ import formatDate from "@/lib/formatDate"
 import formatDateTime from "@/lib/formatDateTime"
 import formatToPesos from "@/lib/formatToPesos"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { AlertTriangle, Calendar, CheckCircle2, Clock, Receipt, User, XCircle } from "lucide-react"
+import { AlertTriangle, Calendar, CheckCircle2, Clock, User, XCircle } from "lucide-react"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { useParams } from "react-router-dom"
@@ -181,17 +181,12 @@ const VerifyGcashPayment = () => {
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <Receipt className="h-4 w-4" />
-                                        <span>Reference: {'321SNSAD)@)(#'}</span>
+                                        <User className="h-4 w-4" />
+                                        <span>Tenant: {data.condo.tenant.name}</span>
                                     </div>
                                 </div>
 
                                 <div className="space-y-1">
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <User className="h-4 w-4" />
-                                        <span>Tenant: {data.condo.tenant.name}</span>
-                                    </div>
-
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Calendar className="h-4 w-4" />
                                         <span>Date: {formatDate(new Date(data.payedAt))}</span>
@@ -241,10 +236,6 @@ const VerifyGcashPayment = () => {
                             <div className="bg-muted p-4 rounded-md">
                                 <h3 className="font-medium mb-2">Payment Information</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div>
-                                        <p className="text-muted-foreground">GCash Reference:</p>
-                                        <p className="font-medium">{"312msd8ha-"}</p>
-                                    </div>
                                     <div>
                                         <p className="text-muted-foreground">Amount:</p>
                                         <p className="font-medium">{formatToPesos(data.totalPaid)}</p>
