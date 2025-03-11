@@ -25,7 +25,7 @@ const CondoInformationCard = ({
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                     <Calendar className="h-4 w-4" />
-                    <span>Payment for: {"March"}</span>
+                    <span>Payment for: {condo.billingMonth}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

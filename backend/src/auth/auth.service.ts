@@ -11,6 +11,7 @@ import { ValidationException } from 'src/lib/exception/validationException';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ForgotPasswordDto, RegisterLandLordDto, RegisterTenantDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
+import { LeaseAgreementService } from 'src/lease-agreement/lease-agreement.service';
 
 @Injectable()
 export class AuthService {
@@ -255,6 +256,15 @@ export class AuthService {
                 }
             })
             
+            const createLeaseAgreement = await txprisma.leaseAgreement.create({
+                data: {
+                    leaseStart: new Date(),
+                    due_date: -1, // -1 for now
+                    condoId: body.condoId,
+                    tenantId: createTenantAccount.id
+                }
+            })
+
             return createTenantAccount
         })
         

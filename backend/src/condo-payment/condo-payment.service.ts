@@ -14,57 +14,107 @@ export class CondoPaymentService {
         private readonly paymongoService: PaymongoService,
     ) {}
 
-    private async getTotalPayment(condoId: string) {
-        // TODO LATER wwe should be able to identify what month he is paying for he might be paying a little bit late
-        // example march 1, but he was paying for february
-
-        const getCondoPayment = await this.prisma.condo.findUnique({
+    private async getBillingMonth(condoId: string, tenantId: string) {
+        const latestPayment = await this.prisma.condoPayment.findFirst({
             where: {
-                id: condoId
+                AND: [
+                    { condoId: condoId },
+                    { tenantId: tenantId }
+                ]
             },
-            select: {
-                rentAmount: true // monthly rent
-            }
+            select: { billingMonth: true },
+            orderBy: { payedAt: 'desc' }, // getting the most recent payment
         })
 
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1); 
-        startOfMonth.setHours(0, 0, 0, 0);
+        const tenantLease = await this.prisma.leaseAgreement.findFirst({
+            where: { 
+                AND: [
+                    { condoId: condoId },
+                    { tenantId: tenantId }
+                ],
+            },
+            select: { leaseStart: true }
+        })
+
+        if(!tenantLease) {
+            throw new NotFoundException("Lease not found for tenant")
+        }
+
+        const leaseStartDate = new Date(tenantLease.leaseStart);
+        let billingMonth: string;
+
+        if(!latestPayment) {
+            // First-time payer: Use lease start month as the first billing month
+            const leaseMonth = leaseStartDate.getMonth() + 1; // base 1 means january is 1
+            const leaseYear = leaseStartDate.getFullYear();
+            billingMonth = `${leaseMonth.toString().padStart(2, '0')}-${leaseYear}`;
+
+            return billingMonth
+        }
+
+        const lastBillingMonth = latestPayment.billingMonth;
+        const [lastMonth, lastYear] = lastBillingMonth.split('-')
+        .map((data) => Number(data)) // parsing to number
+
+        // just get the next month and if it's 13(means it's january) 
+        // increase year number and back to 1 in next Month(which means it's january)
+        let nextMonth = lastMonth + 1;
+        let nextYear = lastYear;
+        if(nextMonth > 12) {
+            nextMonth = 1; 
+            nextYear += 1;
+        }
         
-        const endOfMonth = new Date();
-        endOfMonth.setMonth(endOfMonth.getMonth() + 1, 0);
+        billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;
+        
+        return billingMonth 
+    }
+
+    private async getTotalPayment(condoId: string, user: UserJwt) {
+        const billingMonth = await this.getBillingMonth(condoId, user.id); 
+        const [month, year] = billingMonth.split('-').map((data) => Number(data));
+
+        const startOfMonth = new Date(year, month - 1, 1);
+        
+        const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
 
-        // as of now we don't have penalties so just maintenance
-        const getAdditionalCost = await this.prisma.maintenance.aggregate({
-            _sum: {
-                totalCost: true
-            },
-            where: {
-                condoId: condoId,
-                paymentResponsibility: 'TENANT',
-                completionDate: {
-                    gte: startOfMonth,
-                    lte: endOfMonth
+        const [getCondoPayment, getAdditionalCost] = await Promise.all([
+            this.prisma.condo.findUnique({
+                where: { id: condoId },
+                select: { rentAmount: true }
+            }),
+            // as of now we don't have penalties so just maintenance  (all where tenat is responble for payment)
+            this.prisma.maintenance.aggregate({
+                _sum: { totalCost: true },
+                where: {
+                    condoId: condoId,
+                    paymentResponsibility: 'TENANT',
+                    completionDate: {
+                        gte: startOfMonth,
+                        lte: endOfMonth
+                    }
                 }
-            }
-        })
+            })
+        ])
+        
 
         if(!getCondoPayment) {
             throw new NotFoundException('condo not found')
         }
 
         return {
-            rentCost: getCondoPayment?.rentAmount,
+            rentCost: getCondoPayment.rentAmount,
             additionalCost: getAdditionalCost._sum.totalCost || 0,
-            totalCost: getCondoPayment?.rentAmount + (getAdditionalCost._sum.totalCost || 0)
+            totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0),
+            billingMonth: billingMonth,
         }
     }
 
     async getPaymentInformation(user: UserJwt, condoId: string) {
         // we need to know what month he or she is paying
         const [condoInfo, getBill] = await Promise.all([
-            await this.prisma.condo.findFirst({
+            this.prisma.condo.findFirst({
                 where: { AND: [
                     { id: condoId },
                     { tenantId: user.id}
@@ -74,7 +124,7 @@ export class CondoPaymentService {
                     tenant: { select: { id: true, name: true } }
                 }
             }),
-            await this.getTotalPayment(condoId)
+            this.getTotalPayment(condoId, user)
         ])
         
         if(!condoInfo) {
@@ -90,7 +140,8 @@ export class CondoPaymentService {
     // GCASH PAYMENT
     async createGcashPayment(user: UserJwt, condoId: string, gcashPhoto: Express.Multer.File, body: GcashPayment) {
         const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
-        
+        const billingMonth = await this.getBillingMonth(condoId, user.id);
+
         const createPaymentGcash = await this.prisma.condoPayment.create({
             data: {
                 type: CondoPaymentType.GCASH,
@@ -104,7 +155,7 @@ export class CondoPaymentService {
                 gcashStatus: 'PENDING',
                 isVerified: false,
 
-                // also input the month
+                billingMonth: billingMonth
             }
         })
 
@@ -140,7 +191,7 @@ export class CondoPaymentService {
                 isVerified: true,
                 gcashStatus: true,
 
-                // get billingMonth,
+                billingMonth: true,
                 payedAt: true
             }
         })
@@ -179,6 +230,8 @@ export class CondoPaymentService {
 
         if(!getCondo.tenantId) throw new NotFoundException('there is no tenant!')
 
+        const billingMonth = await this.getBillingMonth(condoId, getCondo.tenantId);
+
         const createManualPayment = await this.prisma.condoPayment.create({
             data: {
                 type: CondoPaymentType.MANUAL,
@@ -187,7 +240,9 @@ export class CondoPaymentService {
                 additionalCost: body.additionalCost,
                 totalPaid: body.totalPaid,
                 isPaid: true,
-                tenantId: getCondo.tenantId
+                tenantId: getCondo.tenantId,
+
+                billingMonth: billingMonth
             }
         })
 
@@ -206,7 +261,7 @@ export class CondoPaymentService {
 
         if(!getCondo) throw new NotFoundException('condo not found!');
 
-        const totalPayment = await this.getTotalPayment(condoId);
+        const totalPayment = await this.getTotalPayment(condoId, tenant);
 
         const createCondoPayment = await this.prisma.$transaction(async txprisma => {
             // get which billing month late
@@ -219,6 +274,8 @@ export class CondoPaymentService {
                     rentCost: totalPayment.rentCost,
                     additionalCost: totalPayment.additionalCost,
                     totalPaid: totalPayment.totalCost,
+
+                    billingMonth: totalPayment.billingMonth
                 }
             })
 

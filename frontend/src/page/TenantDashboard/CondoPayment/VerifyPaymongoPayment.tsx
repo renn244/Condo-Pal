@@ -98,9 +98,6 @@ const VerifyPaymongoPayment = () => {
     const statusConfig = paymentStatusConfig[data?.status || 'loading']
     const StatusIcon = statusConfig.icon
 
-    // Generate a random reference number
-    const referenceNumber =`PAY-${Math.floor(Math.random() * 1000000).toString().padStart(6, "0")}`
-
     return (
         <div className="container max-w-3xl py-8 mx-auto">
             <h1 className="text-2xl font-bold mb-6">Payment Verification</h1>
@@ -134,7 +131,7 @@ const VerifyPaymongoPayment = () => {
                                     <p className="font-medium">Already paid but still pending?</p>
                                     <p className="mt-1">
                                         If you've waited more than 15 minutes and your payment is still pending, please contact our support
-                                        team at support@condopal.com or call (123) 456-7890 with your reference number: {referenceNumber}
+                                        team at support@condopal.com or call (123) 456-7890 with your receipt email from paymongo
                                     </p>
                                 </div>
                             </div>
@@ -194,16 +191,12 @@ const VerifyPaymongoPayment = () => {
                                 <p className="font-medium">{condoBillInfo.name}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-muted-foreground">Reference Number</p>
-                                <p className="font-medium">{referenceNumber}</p>
+                                <p className="text-sm text-muted-foreground">Payment Date</p>
+                                <p className="font-medium">{new Date().toDateString()}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Payment Date</p>
-                                <p className="font-medium">{new Date().toDateString()}</p>
-                            </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Total Cost</p>
                                 <p className="font-medium text-primary">{formatToPesos(3000)}</p>

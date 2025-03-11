@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from 'src/passport/jwt.strategy';
 import { GoogleStrategy } from 'src/passport/google.strategy';
 import { EmailSenderModule } from 'src/email-sender/email-sender.module';
+import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module';
 
 @Module({
   imports: [

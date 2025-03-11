@@ -177,7 +177,7 @@ const VerifyGcashPayment = () => {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Calendar className="h-4 w-4" />
-                                        <span>Payment for: {"March 2025"}</span>
+                                        <span>Payment for: {data.billingMonth}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
