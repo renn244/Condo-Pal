@@ -1,6 +1,7 @@
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
 import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
+import PaymentsSummary from "@/components/pageComponents/dashboard/payments/PaymentsSummary"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
@@ -24,7 +25,7 @@ const Payments = () => {
 
             if(response.status >= 400) {
                 toast.error('Something have gone wrong!')
-                throw new Error()
+                throw new Error();
             }
 
             return response.data as CondoPaymentsDashboard;
@@ -42,7 +43,7 @@ const Payments = () => {
         }
     }
 
-    if(error || (isLoading && !data)) {
+    if(error || (!isLoading && !data)) {
         return <SomethingWentWrong reset={refetch} />
     } 
 
@@ -60,72 +61,7 @@ const Payments = () => {
                 </div>
             </header>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Collected
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-primary">
-                            {formatToPesos(18000)}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-2">
-                            All verified payments
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Current Month
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-blue-500">
-                            {formatToPesos(4500)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            March 2025
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Previous Month
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-500">
-                            {formatToPesos(5500)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            Feb 2025
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Pending Verification
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-amber-500">
-                            {formatToPesos(2500)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            Awaiting approval
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+            <PaymentsSummary />
 
             <PaymentsHeader />
             
@@ -181,11 +117,9 @@ const Payments = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <div className="font-medium">{payment.condo.name}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {payment.tenant.name}
-                                                </div>
+                                            <div className="font-medium">{payment.condo.name}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {payment.tenant.name}
                                             </div>
                                         </TableCell>
                                         <TableCell>
