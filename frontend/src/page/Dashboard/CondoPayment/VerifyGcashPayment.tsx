@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import axiosFetch from "@/lib/axios"
+import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatDateTime from "@/lib/formatDateTime"
 import formatToPesos from "@/lib/formatToPesos"
@@ -177,7 +178,7 @@ const VerifyGcashPayment = () => {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Calendar className="h-4 w-4" />
-                                        <span>Payment for: {data.billingMonth}</span>
+                                        <span>Payment for: {formatBillingMonth(data.billingMonth)}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -53,4 +53,16 @@ export class CondoPaymentController {
     async verifyPaymongoPayment(@User() user: UserJwt, @Query('condoPaymentId') condoPaymentId: string) {
         return this.condoPaymentService.verifyPaymongoPayment(condoPaymentId, user);
     }
+
+    // DASHBOARD
+    
+    @Get('condoPaymentsSummary')
+    async getCondoPaymentsSummary(@User() user: UserJwt) {
+        return this.condoPaymentService.getCondoPaymentsSummary(user);
+    }
+
+    @Get('condoPayments')
+    async getCondoPaymentsLandLord(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, paymentType: string }) {
+        return this.condoPaymentService.getCondoPaymentsLandlord(user, query);
+    }
 }

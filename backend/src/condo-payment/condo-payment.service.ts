@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CondoPaymentType } from '@prisma/client';
+import { CondoPaymentType, GcashPaymentStatus, Prisma } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
@@ -159,7 +159,7 @@ export class CondoPaymentService {
             }
         })
 
-        return createPaymentGcash // wait for it to be verified by the landlord
+        return createPaymentGcash
     }
 
     async getGcashPayment(condoPaymentId: string) {
@@ -264,7 +264,6 @@ export class CondoPaymentService {
         const totalPayment = await this.getTotalPayment(condoId, tenant);
 
         const createCondoPayment = await this.prisma.$transaction(async txprisma => {
-            // get which billing month late
             
             const condoPayment = await txprisma.condoPayment.create({
                 data: {
@@ -342,5 +341,97 @@ export class CondoPaymentService {
             linkId: getSessionId,
             checkouturl: getPayment.attributes.checkout_url
         }
+    }
+
+    // LANDLORD DASHBOARD
+    async getCondoPaymentsSummary(user: UserJwt) {
+        const getCondoIds = await this.prisma.condo.findMany({
+            where: { ownerId: user.id },
+            select: { id: true }
+        });
+        const condoIds = getCondoIds.flatMap((condo) => condo.id)
+
+        // promise all of it
+        const getAllCondoPayments = await this.prisma.condoPayment.findMany({
+            where: {
+                condoId: {
+                    in: condoIds
+                }
+            }
+        })
+
+        const month = new Date().getMonth()
+        // get current month payment
+
+        
+        return {
+            all: getAllCondoPayments,
+        }
+    }
+
+    async getCondoPaymentsLandlord(user: UserJwt, query: { search: string, page: string, status: string, paymentType: string }) {
+        const getCondoIds = await this.prisma.condo.findMany({
+            where: { ownerId: user.id },
+            select: { id: true }
+        });
+        const condoIds = getCondoIds.flatMap((condo) => condo.id)
+
+        const page = parseInt(query.page || '1');
+        const take = 10;
+        const skip = (page - 1) * take;
+
+        const where: Prisma.CondoPaymentWhereInput = {
+            condoId: { in: condoIds },
+            ...(query.search && {
+                OR: [
+                    {tenant: {
+                        name: { 
+                            contains: query.search, 
+                            mode: 'insensitive'
+                        },
+                    }},
+                    {condo: {
+                        name: {
+                            contains: query.search,
+                            mode: 'insensitive'
+                        }
+                    }},
+                    {id: {
+                        contains: query.search,
+                        mode: 'insensitive'
+                    }}
+                ]
+            }),
+            ...((query.status && query.status !== "ALL") && {
+                gcashStatus: query.status as GcashPaymentStatus
+            }),
+            ...((query.paymentType && query.paymentType !== "ALL") && {
+                type: query.paymentType as CondoPaymentType
+            })
+        }
+
+        const [getCondoPayments, condoPaymentsCount] = await Promise.all([
+            this.prisma.condoPayment.findMany({
+                where: where,
+                include: { 
+                    tenant: { select: { id: true, name: true } }, 
+                    condo: { select: { id: true, name: true } } 
+                },
+                take: take,
+                skip: skip
+            }),
+            this.prisma.condoPayment.count({
+                where: where
+            })
+        ])
+
+        const hasNext = condoPaymentsCount > (skip + take);
+        const totalPages = Math.ceil(condoPaymentsCount / take); // total pages available
+
+        return {
+            getCondoPayments,
+            hasNext,
+            totalPages,
+        };
     }
 }

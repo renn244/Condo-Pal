@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatToPesos from "@/lib/formatToPesos"
 import { Calendar, Receipt } from "lucide-react"
 
@@ -25,7 +26,7 @@ const CondoInformationCard = ({
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                     <Calendar className="h-4 w-4" />
-                    <span>Payment for: {condo.billingMonth}</span>
+                    <span>Payment for: {formatBillingMonth(condo.billingMonth)}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

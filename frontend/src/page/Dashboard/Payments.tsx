@@ -1,129 +1,35 @@
+import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
+import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import usePaymentsParams from "@/hooks/usePaymentsParams"
+import axiosFetch from "@/lib/axios"
+import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { ArrowUpDown, ChevronDown, CreditCard, DollarSign, Search, Smartphone, Wallet } from "lucide-react"
-
-// Sample data
-const samplePayments = [
-    {
-      id: "pay-001",
-      condoId: "condo-1",
-      condoName: "Seaside Retreat",
-      tenantId: "tenant-1",
-      tenantName: "Alice Johnson",
-      amount: 2750,
-      paymentMethod: "GCASH",
-      status: "PENDING",
-      referenceNumber: "GC123456789",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      createdAt: "2024-03-08T14:30:00Z",
-      billMonth: "March 2024",
-    },
-    {
-      id: "pay-002",
-      condoId: "condo-2",
-      condoName: "Downtown Loft",
-      tenantId: "tenant-2",
-      tenantName: "Bob Smith",
-      amount: 3520,
-      paymentMethod: "MANUAL",
-      status: "APPROVED",
-      referenceNumber: "MAN-2024-002",
-      notes: "Cash payment received in person",
-      createdAt: "2024-03-07T10:15:00Z",
-      billMonth: "March 2024",
-    },
-    {
-      id: "pay-003",
-      condoId: "condo-3",
-      condoName: "Mountain View",
-      tenantId: "tenant-3",
-      tenantName: "Jennifer Garcia",
-      amount: 2800,
-      paymentMethod: "PAYMONGO",
-      status: "COMPLETED",
-      referenceNumber: "PM-987654321",
-      createdAt: "2024-03-06T16:45:00Z",
-      billMonth: "March 2024",
-    },
-    {
-      id: "pay-004",
-      condoId: "condo-4",
-      condoName: "Sunset Heights",
-      tenantId: "tenant-4",
-      tenantName: "Michael Brown",
-      amount: 3500,
-      paymentMethod: "GCASH",
-      status: "APPROVED",
-      referenceNumber: "GC987654321",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      createdAt: "2024-03-05T09:20:00Z",
-      billMonth: "March 2024",
-    },
-    {
-      id: "pay-005",
-      condoId: "condo-5",
-      condoName: "Harbor View",
-      tenantId: "tenant-5",
-      tenantName: "Lisa Martinez",
-      amount: 4000,
-      paymentMethod: "PAYMONGO",
-      status: "REJECTED",
-      referenceNumber: "PM-123789456",
-      notes: "Payment failed due to insufficient funds",
-      createdAt: "2024-03-04T13:10:00Z",
-      billMonth: "March 2024",
-    },
-    {
-      id: "pay-006",
-      condoId: "condo-1",
-      condoName: "Seaside Retreat",
-      tenantId: "tenant-1",
-      tenantName: "Alice Johnson",
-      amount: 2750,
-      paymentMethod: "MANUAL",
-      status: "APPROVED",
-      referenceNumber: "MAN-2024-001",
-      notes: "Check payment",
-      createdAt: "2024-02-05T11:30:00Z",
-      billMonth: "February 2024",
-    },
-    {
-      id: "pay-007",
-      condoId: "condo-2",
-      condoName: "Downtown Loft",
-      tenantId: "tenant-2",
-      tenantName: "Bob Smith",
-      amount: 3520,
-      paymentMethod: "GCASH",
-      status: "APPROVED",
-      referenceNumber: "GC456789123",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      createdAt: "2024-02-06T15:45:00Z",
-      billMonth: "February 2024",
-    },
-    {
-      id: "pay-008",
-      condoId: "condo-3",
-      condoName: "Mountain View",
-      tenantId: "tenant-3",
-      tenantName: "Jennifer Garcia",
-      amount: 2800,
-      paymentMethod: "PAYMONGO",
-      status: "COMPLETED",
-      referenceNumber: "PM-654321987",
-      createdAt: "2024-02-07T09:15:00Z",
-      billMonth: "February 2024",
-    },
-]
+import { useQuery } from "@tanstack/react-query"
+import { ArrowUpDown, ChevronDown, CreditCard, DollarSign, Smartphone, Wallet } from "lucide-react"
+import toast from "react-hot-toast"
 
 const Payments = () => {
+    const { page, search, status, paymentType } = usePaymentsParams();
+
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: ['getPayments', page, search, status, paymentType],
+        queryFn: async () => {
+            const response = await axiosFetch.get(`/condo-payment/condoPayments?page=${page}&search=${search}&status=${status}&paymentType=${paymentType}`);
+
+            if(response.status >= 400) {
+                toast.error('Something have gone wrong!')
+                throw new Error()
+            }
+
+            return response.data as CondoPaymentsDashboard;
+        }
+    })
 
     const getPaymentMethod = (method: string) => {
         switch(method) {
@@ -135,6 +41,10 @@ const Payments = () => {
                 return <CreditCard className="h-4 w-4 text-green-500" />
         }
     }
+
+    if(error || (isLoading && !data)) {
+        return <SomethingWentWrong reset={refetch} />
+    } 
 
     return (
         <div className="flex flex-col h-full">
@@ -155,15 +65,15 @@ const Payments = () => {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Payments
+                            Total Collected
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center">
-                            <div className="text-2xl font-bold">8</div>
-                            <div className="text-lg font-semibold">
-                                {formatToPesos(25640)}
-                            </div>
+                        <div className="text-2xl font-bold text-primary">
+                            {formatToPesos(18000)}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-2">
+                            All verified payments
                         </div>
                     </CardContent>
                 </Card>
@@ -171,15 +81,15 @@ const Payments = () => {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Pending
+                            Current Month
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center">
-                            <div className="text-2xl font-bold">1</div>
-                            <div className="text-lg font-semibold text-yellow-500">
-                                {formatToPesos(2750)}
-                            </div>
+                        <div className="text-2xl font-bold text-blue-500">
+                            {formatToPesos(4500)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                            March 2025
                         </div>
                     </CardContent>
                 </Card>
@@ -187,15 +97,15 @@ const Payments = () => {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Approved
+                            Previous Month
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center">
-                            <div className="text-2xl font-bold">6</div>
-                            <div className="text-lg font-semibold text-green-500">
-                                {formatToPesos(18890)}
-                            </div>
+                        <div className="text-2xl font-bold text-green-500">
+                            {formatToPesos(5500)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                            Feb 2025
                         </div>
                     </CardContent>
                 </Card>
@@ -203,69 +113,24 @@ const Payments = () => {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Rejected
+                            Pending Verification
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center">
-                            <div className="text-2xl font-bold">1</div>
-                            <div className="text-lg font-semibold text-red-500">
-                                {formatToPesos(4000)}
-                            </div>
+                        <div className="text-2xl font-bold text-amber-500">
+                            {formatToPesos(2500)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                            Awaiting approval
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                    placeholder="Search by condo, tenant, or reference..."
-                    className="pl-10"
-                    />
-                </div>
-
-                <div className="flex gap-2">
-                    <Select>
-                        <SelectTrigger className="w-[160px]">
-                            <SelectValue className="Payment Method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">ALL Methods</SelectItem>
-                            <SelectItem value="GCASH">Gcash</SelectItem>
-                            <SelectItem value="MANUAL">Manual</SelectItem>
-                            <SelectItem value="PAYMONGO">Paymongo</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Select>
-                        <SelectTrigger className="w-[160px]">
-                            <SelectValue className="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">ALL Status</SelectItem>
-                            <SelectItem value="PENDING">Pending</SelectItem>
-                            <SelectItem value="APPROVED">Approved</SelectItem>
-                            <SelectItem value="REJECTED">Rejected</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Select>
-                        <SelectTrigger className="w-[160px]">
-                            <SelectValue className="Month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Jan 2025">Jan 2025</SelectItem>
-                            <SelectItem value="Feb 2025">Feb 2025</SelectItem>
-                            <SelectItem value="March 2025">March 2025</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+            <PaymentsHeader />
             
             {/* Payments Table */}
-            <Card className="mb-6">
+            <Card className="mb-6 h-[700px]">
                 <CardHeader className="pb-2">
                     <CardTitle>Payments Transactions</CardTitle>
                     <CardDescription>
@@ -290,7 +155,7 @@ const Payments = () => {
                                 </TableHead>
                                 <TableHead>
                                     <Button variant="ghost" className="p-0 font-medium flex items-center">
-                                        Method
+                                        Type
                                         <ArrowUpDown className="ml-2 h-3 w-3" />
                                     </Button>
                                 </TableHead>
@@ -306,34 +171,34 @@ const Payments = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {samplePayments.length > 0 ? (
-                                samplePayments.map((payment) =>  (
+                            {(data && data.getCondoPayments.length > 0) ? (
+                                data.getCondoPayments.map((payment) =>  (
                                     <TableRow key={payment.id}>
                                         <TableCell className="font-medium">
-                                            <div>{formatDate(new Date(payment.createdAt))}</div>
+                                            <div>{formatDate(new Date(payment.payedAt))}</div>
                                             <div className="text-xs text-muted-foreground">
-                                                {payment.billMonth}
+                                                {formatBillingMonth(payment.billingMonth)}
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                <div className="font-medium">{payment.condoName}</div>
+                                                <div className="font-medium">{payment.condo.name}</div>
                                                 <div className="text-sm text-muted-foreground">
-                                                    {payment.tenantName}
+                                                    {payment.tenant.name}
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                {getPaymentMethod(payment.paymentMethod)}
-                                                <span>{payment.paymentMethod}</span>
+                                                {getPaymentMethod(payment.type)}
+                                                <span>{payment.type}</span>
                                             </div>
                                             <div className="text-xs text-muted-foreground">
-                                                {payment.referenceNumber}
+                                                {payment.id}
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-medium">
-                                            {formatToPesos(payment.amount)}
+                                            {formatToPesos(payment.totalPaid)}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Popover>
@@ -358,27 +223,7 @@ const Payments = () => {
                 </CardContent>
             </Card>
 
-            <div className="flex justify-center mb-6">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious />
-                        </PaginationItem>
-
-                        {Array.from({ length: 5 }, (_, i) => i + 1).map((page) => (
-                            <PaginationItem key={page}>
-                                <PaginationLink>
-                                    {page}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-
-                        <PaginationItem>
-                            <PaginationNext />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
+            <PaymentsPagination totalPages={data?.totalPages || 1} hasNext={data?.hasNext || false} />
         </div>
     )
 }

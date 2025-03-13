@@ -36,6 +36,7 @@ const MaintenanceHeader = () => {
                         <SelectItem value="CANCELED">Canceled</SelectItem>
                     </SelectContent>
                 </Select>
+                
                 <Select value={priority} onValueChange={setPriority}>
                     <SelectTrigger className="w-[120px]">
                         <SelectValue placeholder="Status" />
