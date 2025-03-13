@@ -66,7 +66,7 @@ export class CondoPaymentService {
         }
         
         billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;
-        
+
         return billingMonth 
     }
 
@@ -351,21 +351,23 @@ export class CondoPaymentService {
         });
         const condoIds = getCondoIds.flatMap((condo) => condo.id)
 
-        // promise all of it
-        const getAllCondoPayments = await this.prisma.condoPayment.findMany({
-            where: {
-                condoId: {
-                    in: condoIds
-                }
-            }
-        })
-
-        const month = new Date().getMonth()
-        // get current month payment
-
+        const now = new Date();
+        const currMonth = `${String(now.getMonth() + 1).padStart(2, "0")}-${now.getFullYear()}`;
+        const prevMonth = new Date(now.setMonth(now.getMonth() - 1));
+        const prevMonthFormatted = `${String(prevMonth.getMonth() + 1).padStart(2, "0")}-${prevMonth.getFullYear()}`;
         
+        const [allPayments, currMonthPayments, prevMonthPayments, pendingVerifications] = await Promise.all([
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds } }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: currMonth }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: prevMonthFormatted }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, gcashStatus: "PENDING", type: 'GCASH' }, _sum: { totalPaid: true } })
+        ]);
+
         return {
-            all: getAllCondoPayments,
+            all: allPayments._sum.totalPaid || 0,
+            currentMonth: currMonthPayments._sum.totalPaid || 0,
+            previousMonth: prevMonthPayments._sum.totalPaid || 0,
+            pendingVerification: pendingVerifications._sum.totalPaid || 0,
         }
     }
 
