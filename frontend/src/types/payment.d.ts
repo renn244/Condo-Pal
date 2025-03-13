@@ -45,3 +45,10 @@ type CondoPaymentsDashboard = {
     hasNext: boolean,
     totalPages: number
 }
+
+type CondoPaymentsSummaryDashboard = {
+    all: number,
+    currentMonth: number,
+    previousMonth: number,
+    pendingVerification: number
+}
