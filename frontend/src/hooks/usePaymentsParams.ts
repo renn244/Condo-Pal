@@ -21,15 +21,17 @@ const usePaymentsParams = () => {
         setSearchParams(newParams);
     }
 
-    const setStatus = (value: string) => {
+    const setStatus = (value: GcashPaymentStatus | "ALL") => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set('status', value);
         setSearchParams(newParams);
     }
 
-    const setPaymentType = (value: string) => {
+    const setPaymentType = (value: CondoPaymentType | "ALL") => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set('paymentType', value);
+        // so that when switch out from gcash we won't need to filter out gcash Status
+        if(value !== "GCASH") newParams.set('status', "ALL");
         setSearchParams(newParams);
     }
 

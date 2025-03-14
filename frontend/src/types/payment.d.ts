@@ -1,3 +1,16 @@
+
+const CondoPaymentType = {
+    PAYMONGOL: "PAYMONGO",
+    GCASH: "GCASH",
+    MANUAL: "MANUAL",
+} as const
+
+const GcashPaymentStatus = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+} as const
+
 type PaymentStatusResponse = {
     name: string,
     status: "pending" | "paid" | "failed" | "loading",
@@ -5,10 +18,13 @@ type PaymentStatusResponse = {
     checkouturl: string, // just in case the user want to go back to paying
 }
 
+type CondoPaymentType = typeof CondoPaymentType[keyof typeof CondoPaymentType];
+type GcashPaymentStatus = typeof GcashPaymentStatus[keyof typeof GcashPaymentStatus];
+
 type CondoPayment = {
     id: string,
 
-    type: string, // enum
+    type: CondoPaymentType, // enum
     
     rentCost: number,
     additionalCost: number | null;
@@ -23,7 +39,7 @@ type CondoPayment = {
 
     receiptImage: string | null,
     isVerified: boolean | null,
-    gcashStatus: string | null,
+    gcashStatus: GcashPaymentStatus | null,
 
     billingMonth: string,
     payedAt: string

@@ -2,6 +2,7 @@ import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
 import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
 import PaymentsSummary from "@/components/pageComponents/dashboard/payments/PaymentsSummary"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
@@ -12,7 +13,7 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowUpDown, ChevronDown, CreditCard, DollarSign, Smartphone, Wallet } from "lucide-react"
+import { ArrowUpDown, CheckCircle2, ChevronDown, Clock, CreditCard, DollarSign, ShieldQuestion, Smartphone, Wallet, XCircle } from "lucide-react"
 import toast from "react-hot-toast"
 
 const Payments = () => {
@@ -32,7 +33,40 @@ const Payments = () => {
         }
     })
 
-    const getPaymentMethod = (method: string) => {
+    const getStatusBadge = (status: GcashPaymentStatus | "UNKNOWN"="UNKNOWN") => {
+        switch(status) {
+            case "PENDING":
+                return (
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                        <Clock className="mr-1 h-3 w-3" />
+                        Pending
+                    </Badge>
+                )
+            case "APPROVED":
+                return (
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                        <CheckCircle2 className="mr-1 h-3 w-3" />
+                        Approved
+                    </Badge>
+                )
+            case "REJECTED":
+                return (
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
+                        <XCircle className="mr-1 h-3 w-3" />
+                        Rejected
+                    </Badge>
+                )
+            case "UNKNOWN":
+                return (
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
+                        <ShieldQuestion className="mr-1 h-3 w-3" />
+                        Unknown
+                    </Badge>
+                )
+        }
+    }
+
+    const getPaymentMethod = (method: CondoPaymentType) => {
         switch(method) {
             case "GCASH":
                 return <Smartphone className="h-4 w-4 text-blue-500" />
@@ -126,6 +160,7 @@ const Payments = () => {
                                             <div className="flex items-center gap-2">
                                                 {getPaymentMethod(payment.type)}
                                                 <span>{payment.type}</span>
+                                                {payment.type === "GCASH" && getStatusBadge(payment.gcashStatus || "UNKNOWN")}
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                                 {payment.id}
