@@ -48,7 +48,13 @@ type CondoPaymentsDashboard = {
 
 type CondoPaymentsSummaryDashboard = {
     all: number,
-    currentMonth: number,
-    previousMonth: number,
+    currentMonth: {
+        total: number,
+        month: string,
+    },
+    previousMonth: {
+        total: number,
+        month: string,
+    },
     pendingVerification: number
 }

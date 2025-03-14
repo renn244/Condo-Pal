@@ -365,8 +365,14 @@ export class CondoPaymentService {
 
         return {
             all: allPayments._sum.totalPaid || 0,
-            currentMonth: currMonthPayments._sum.totalPaid || 0,
-            previousMonth: prevMonthPayments._sum.totalPaid || 0,
+            currentMonth: {
+                total: currMonthPayments._sum.totalPaid || 0,
+                month: currMonth
+            },
+            previousMonth: {
+                total: prevMonthPayments._sum.totalPaid || 0,
+                month: prevMonthFormatted,
+            },
             pendingVerification: pendingVerifications._sum.totalPaid || 0,
         }
     }

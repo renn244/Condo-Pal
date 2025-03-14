@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios";
+import { formatBillingMonth } from "@/lib/formatBillingMonth";
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -45,10 +46,10 @@ const PaymentsSummary = () => {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold text-blue-500">
-                        {formatToPesos(summary?.currentMonth || 0)}
+                        {formatToPesos(summary?.currentMonth.total || 0)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                        March 2025
+                        {formatBillingMonth(summary?.currentMonth.month || "")}
                     </div>
                 </CardContent>
             </Card>
@@ -61,10 +62,10 @@ const PaymentsSummary = () => {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold text-green-500">
-                        {formatToPesos(summary?.previousMonth || 0)}
+                        {formatToPesos(summary?.previousMonth.total || 0)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                        Feb 2025
+                        {formatBillingMonth(summary?.previousMonth.month || "")}
                     </div>
                 </CardContent>
             </Card>
