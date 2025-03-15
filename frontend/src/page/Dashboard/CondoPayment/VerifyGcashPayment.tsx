@@ -1,8 +1,8 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import NotFound from "@/components/common/NotFound"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -27,32 +27,6 @@ const VerifyGcashPayment = () => {
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [gcashStatus, setGcashStatus] = useState<GCashStatus>("PENDING");
     const [notes, setNotes] = useState<string>("");
-
-    const getStatusBadge = (status: GCashStatus) => {
-        switch(status) {
-            case "PENDING":
-                return (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                        <Clock className="mr-1 h-3 w-3" />
-                        Pending
-                    </Badge>
-                )
-            case "APPROVED":
-                return (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Approved
-                    </Badge>
-                )
-            case "REJECTED":
-                return (
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
-                        <XCircle className="mr-1 h-3 w-3" />
-                        Rejected
-                    </Badge>
-                )
-        }
-    }
 
     const { data, error, isLoading, refetch } = useQuery({
         queryKey: ['get', 'gcash'],
@@ -147,7 +121,7 @@ const VerifyGcashPayment = () => {
                         {notes && <p className="mt-2">Notes: {notes}</p>}
                     </AlertDescription>
                     <div className="mt-4">
-                        <Button onClick={() => window.location.assign('/condo')}>
+                        <Button onClick={() => window.history.back()}>
                             Return to Dashboard
                         </Button>
                     </div>
@@ -162,7 +136,7 @@ const VerifyGcashPayment = () => {
                                     <CardTitle>{data.condo.name}</CardTitle>
                                     <CardDescription>{data.condo.address}</CardDescription>
                                 </div>
-                                {getStatusBadge(initialGcashStatus)}
+                                <GetStatusBadge status={initialGcashStatus || "UNKNOWN"} />
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -247,7 +221,7 @@ const VerifyGcashPayment = () => {
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Status:</p>
-                                        <div>{getStatusBadge(initialGcashStatus)}</div>
+                                        <GetStatusBadge status={initialGcashStatus || "UNKNOWN"} />
                                     </div>
                                 </div>
                             </div>

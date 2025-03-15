@@ -1,11 +1,13 @@
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
 import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
 import PaymentsSummary from "@/components/pageComponents/dashboard/payments/PaymentsSummary"
-import { Badge } from "@/components/ui/badge"
+import ViewReceipt from "@/components/pageComponents/dashboard/payments/ViewReceipt"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Popover, PopoverTrigger } from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import usePaymentsParams from "@/hooks/usePaymentsParams"
 import axiosFetch from "@/lib/axios"
@@ -13,8 +15,9 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowUpDown, CheckCircle2, ChevronDown, Clock, CreditCard, DollarSign, ShieldQuestion, Smartphone, Wallet, XCircle } from "lucide-react"
+import { ArrowUpDown, CreditCard, DollarSign, Download, Eye, FileCheck, MoreHorizontal, Smartphone, Wallet } from "lucide-react"
 import toast from "react-hot-toast"
+import { Link } from "react-router-dom"
 
 const Payments = () => {
     const { page, search, status, paymentType } = usePaymentsParams();
@@ -33,38 +36,6 @@ const Payments = () => {
         }
     })
 
-    const getStatusBadge = (status: GcashPaymentStatus | "UNKNOWN"="UNKNOWN") => {
-        switch(status) {
-            case "PENDING":
-                return (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                        <Clock className="mr-1 h-3 w-3" />
-                        Pending
-                    </Badge>
-                )
-            case "APPROVED":
-                return (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Approved
-                    </Badge>
-                )
-            case "REJECTED":
-                return (
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
-                        <XCircle className="mr-1 h-3 w-3" />
-                        Rejected
-                    </Badge>
-                )
-            case "UNKNOWN":
-                return (
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">
-                        <ShieldQuestion className="mr-1 h-3 w-3" />
-                        Unknown
-                    </Badge>
-                )
-        }
-    }
 
     const getPaymentMethod = (method: CondoPaymentType) => {
         switch(method) {
@@ -160,7 +131,7 @@ const Payments = () => {
                                             <div className="flex items-center gap-2">
                                                 {getPaymentMethod(payment.type)}
                                                 <span>{payment.type}</span>
-                                                {payment.type === "GCASH" && getStatusBadge(payment.gcashStatus || "UNKNOWN")}
+                                                {payment.type === "GCASH" && <GetStatusBadge status={payment.gcashStatus || "UNKNOWN"} /> }
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                                 {payment.id}
@@ -173,9 +144,29 @@ const Payments = () => {
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8">
-                                                        <ChevronDown className="h-4 w-4" />
+                                                        <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </PopoverTrigger>
+                                                <PopoverContent align="end" className="w-56 p-1">
+                                                    <ViewReceipt payment={payment} />
+                                                    <Button variant="ghost" className="w-full justify-start">
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        View Condo
+                                                    </Button>
+                                                    {(payment.type === "GCASH" && payment.gcashStatus !== "APPROVED") && (
+                                                        <Button variant="ghost" className="w-full justify-start" asChild>
+                                                            <Link to={`/condoPayments/gcash/verify/${payment.id}`}>
+                                                                <FileCheck className="mr-2 h-4 w-4" />
+                                                                Verify Payment
+                                                            </Link>
+                                                        </Button>
+                                                    )}
+                                                    <Separator className="mny-1" />
+                                                    <Button variant="ghost" className="w-full justify-start">
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                        Download Receipt
+                                                    </Button>
+                                                </PopoverContent>
                                             </Popover>
                                         </TableCell>
                                     </TableRow>

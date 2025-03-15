@@ -3,12 +3,13 @@ const userRole = {
     tenant="tenant",
     landlord="landlord"
 } as const
-type role = typeof userRole[keyof typeof userRole]
 
 const provider = {
     google="google",
     local="local",
 } as const
+
+type role = typeof userRole[keyof typeof userRole]
 type provider = typeof provider[keyof typeof provider]
 
 type checkUser = {

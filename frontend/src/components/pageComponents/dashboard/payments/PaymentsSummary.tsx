@@ -59,7 +59,7 @@ const PaymentsSummary = () => {
                             <div className="text-2xl font-bold text-blue-500">
                                 {formatToPesos(summary?.currentMonth.total || 0)}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground mt-2">
                                 {formatBillingMonth(summary?.currentMonth.month || "")}
                             </div>
                         </>
@@ -81,7 +81,7 @@ const PaymentsSummary = () => {
                             <div className="text-2xl font-bold text-green-500">
                                 {formatToPesos(summary?.previousMonth.total || 0)}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground mt-2">
                                 {formatBillingMonth(summary?.previousMonth.month || "")}
                             </div>
                         </>
@@ -103,7 +103,7 @@ const PaymentsSummary = () => {
                             <div className="text-2xl font-bold text-amber-500">
                                 {formatToPesos(summary?.pendingVerification || 0)}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground mt-2">
                                 Awaiting approval
                             </div>
                         </>
