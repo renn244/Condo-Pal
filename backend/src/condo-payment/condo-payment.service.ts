@@ -440,7 +440,10 @@ export class CondoPaymentService {
                     condo: { select: { id: true, name: true } } 
                 },
                 take: take,
-                skip: skip
+                skip: skip,
+                orderBy: {
+                    payedAt: 'desc'
+                }
             }),
             this.prisma.condoPayment.count({
                 where: where

@@ -72,6 +72,37 @@ export class CondoService {
         return { getCondos, hasNext }
     }
 
+    async getMyCondosForManualPayment(user: UserJwt, page: number) {
+        const take = 10;
+        const skip = Math.max(((page || 1) - 1) * take, 0);
+        
+        const [getCondos, getCondoCount] = await Promise.all([
+            this.prisma.condo.findMany({
+                where: { ownerId: user.id },
+                select: {
+                    id: true,
+                    name: true,
+                    address: true,
+                    rentAmount: true,
+                    tenant: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }, take: take, skip: skip
+            }),
+            this.prisma.condo.count({ where: { ownerId: user.id } })
+        ])
+
+        const hasNext = getCondoCount > (skip + getCondos.length);
+
+        return {
+            getCondos,
+            hasNext,
+        }
+    }
+
     async getCondo(condoId: string) {
         const Condo = await this.prisma.condo.findUnique({
             where: {

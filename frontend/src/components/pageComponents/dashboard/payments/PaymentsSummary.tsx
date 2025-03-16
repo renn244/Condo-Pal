@@ -18,7 +18,8 @@ const PaymentsSummary = () => {
             }
             
             return response.data as CondoPaymentsSummaryDashboard;
-        }
+        },
+        refetchOnWindowFocus: false
     })
 
     return (

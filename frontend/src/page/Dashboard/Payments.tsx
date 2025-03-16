@@ -1,5 +1,6 @@
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
+import ManualPaymentDialog from "@/components/pageComponents/dashboard/payments/ManualPaymentDialog"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
 import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
 import PaymentsSummary from "@/components/pageComponents/dashboard/payments/PaymentsSummary"
@@ -15,7 +16,7 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowUpDown, CreditCard, DollarSign, Download, Eye, FileCheck, MoreHorizontal, Smartphone, Wallet } from "lucide-react"
+import { ArrowUpDown, CreditCard, Download, Eye, FileCheck, MoreHorizontal, Smartphone, Wallet } from "lucide-react"
 import toast from "react-hot-toast"
 import { Link } from "react-router-dom"
 
@@ -33,7 +34,8 @@ const Payments = () => {
             }
 
             return response.data as CondoPaymentsDashboard;
-        }
+        },
+        refetchOnWindowFocus: false
     })
 
 
@@ -59,10 +61,7 @@ const Payments = () => {
                     Payment Management
                 </h1>
                 <div className="flex gap-2">
-                    <Button>
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Add Manual Payment
-                    </Button>
+                    <ManualPaymentDialog />
                 </div>
             </header>
 
