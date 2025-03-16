@@ -38,7 +38,7 @@ const ViewReceipt = ({
                     View Receipt
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md md:min-w-[567px]">
+            <DialogContent className="sm:max-w-md md:min-w-[567px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         Payment Receipt - {payment.id}
@@ -49,9 +49,13 @@ const ViewReceipt = ({
                 </DialogHeader>
 
                 {/* Gcash Receipt Image (If it's Gcash) */}
-                <div className="space-y-4">
-
-                </div>
+                {(payment.type === "GCASH" && payment.receiptImage) && <div className="flex justify-center">
+                  <img
+                    src={payment.receiptImage || "/placeholder.svg"}
+                    alt="Payment Receipt"
+                    className="max-h-[500px] rounded-md border object-contain w-full"
+                  />
+                </div>}
 
                 <div className="bg-muted p-4 rounded-md">
                     <h3 className="font-medium mb-2">

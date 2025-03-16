@@ -14,12 +14,17 @@ export class CondoPaymentService {
         private readonly paymongoService: PaymongoService,
     ) {}
 
-    private async getBillingMonth(condoId: string, tenantId: string) {
+    private async getBillingMonth(condoId: string, userId: string) {
         const latestPayment = await this.prisma.condoPayment.findFirst({
             where: {
                 AND: [
                     { condoId: condoId },
-                    { tenantId: tenantId }
+                    { 
+                        OR: [
+                            { tenantId: userId },
+                            { condo: { ownerId: userId } }
+                        ]
+                    }
                 ]
             },
             select: { billingMonth: true },
@@ -30,12 +35,17 @@ export class CondoPaymentService {
             where: { 
                 AND: [
                     { condoId: condoId },
-                    { tenantId: tenantId }
+                    { 
+                        OR: [
+                            { condo: { ownerId: userId } },
+                            { tenantId: userId },
+                        ]
+                    }
                 ],
             },
             select: { leaseStart: true }
         })
-
+        
         if(!tenantLease) {
             throw new NotFoundException("Lease not found for tenant")
         }
@@ -98,7 +108,6 @@ export class CondoPaymentService {
             })
         ])
         
-
         if(!getCondoPayment) {
             throw new NotFoundException('condo not found')
         }
@@ -117,7 +126,12 @@ export class CondoPaymentService {
             this.prisma.condo.findFirst({
                 where: { AND: [
                     { id: condoId },
-                    { tenantId: user.id}
+                    {
+                        OR: [
+                            { tenantId: user.id },
+                            { ownerId: user.id },
+                        ]
+                    }
                 ]},
                 select: { 
                     id: true, name: true, address: true, photo: true, 
