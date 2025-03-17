@@ -1,3 +1,4 @@
+import ReceiptDownload from "@/components/common/receiptDownload/ReceiptDownload"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
 import ManualPaymentDialog from "@/components/pageComponents/dashboard/payments/ManualPaymentDialog"
@@ -161,10 +162,10 @@ const Payments = () => {
                                                         </Button>
                                                     )}
                                                     <Separator className="mny-1" />
-                                                    <Button variant="ghost" className="w-full justify-start">
+                                                    <ReceiptDownload payment={payment}>
                                                         <Download className="mr-2 h-4 w-4" />
-                                                        Download Receipt
-                                                    </Button>
+                                                        Download
+                                                    </ReceiptDownload>
                                                 </PopoverContent>
                                             </Popover>
                                         </TableCell>

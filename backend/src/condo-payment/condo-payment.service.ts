@@ -436,8 +436,8 @@ export class CondoPaymentService {
             this.prisma.condoPayment.findMany({
                 where: where,
                 include: { 
-                    tenant: { select: { id: true, name: true } }, 
-                    condo: { select: { id: true, name: true } } 
+                    tenant: { select: { id: true, name: true, email: true } }, 
+                    condo: { select: { id: true, name: true, address: true } } 
                 },
                 take: take,
                 skip: skip,

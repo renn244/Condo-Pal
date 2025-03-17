@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Separator } from "@/components/ui/separator";
 import formatDate from "@/lib/formatDate";
 import formatToPesos from "@/lib/formatToPesos";
-import { CreditCard, Download, Eye, FileCheck, Smartphone, Wallet } from "lucide-react";
+import { CreditCard, Eye, FileCheck, Smartphone, Wallet } from "lucide-react";
 import { useState } from "react"
 import { Link } from "react-router-dom";
 import GetStatusBadge from "./GetStatusBadge";
@@ -38,7 +38,7 @@ const ViewReceipt = ({
                     View Receipt
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md md:min-w-[567px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-md md:min-w-[667px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         Payment Receipt - {payment.id}
@@ -143,22 +143,17 @@ const ViewReceipt = ({
                     </div>
                 </div>
                 <div className="w-full flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setOpen(false)}>
-                            Close
-                        </Button>
+                    <Button variant="outline" onClick={() => setOpen(false)}>
+                        Close
+                    </Button>
 
-                        {(payment.type === "GCASH" && payment.gcashStatus === "PENDING") && <Button asChild>
-                            <Link to={`/condoPayments/gcash/verify/${payment.id}`}>
-                                <FileCheck className="mr-2 h-4 w-4" />
-                                Verify Payment  
-                            </Link>
-                        </Button>}
-
-                        <Button variant="outline">
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                        </Button>
-                    </div>
+                    {(payment.type === "GCASH" && payment.gcashStatus === "PENDING") && <Button asChild>
+                        <Link to={`/condoPayments/gcash/verify/${payment.id}`}>
+                            <FileCheck className="mr-2 h-4 w-4" />
+                            Verify Payment  
+                        </Link>
+                    </Button>}
+                </div>
             </DialogContent>
         </Dialog>
     )

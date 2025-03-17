@@ -48,11 +48,13 @@ type CondoPayment = {
 type CondoPayments_Tenant = {
     tenant: {
         id: string
-        name: string
+        name: string,
+        email: string
     },
     condo: {
         id: string,
-        name: string
+        name: string,
+        address: string
     }
 } & CondoPayment
 
