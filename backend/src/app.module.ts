@@ -11,6 +11,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { MaintenanceModule } from './maintinance/maintinance.module';
 import { CondoPaymentModule } from './condo-payment/condo-payment.module';
 import { LeaseAgreementModule } from './lease-agreement/lease-agreement.module';
+import { ReminderModule } from './reminder/reminder.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { LeaseAgreementModule } from './lease-agreement/lease-agreement.module';
       isGlobal: true,
       ttl: 60 * 1000, // time to live of 60 seconds
     }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule
+    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule
   ],
   controllers: [],
   providers: [],
