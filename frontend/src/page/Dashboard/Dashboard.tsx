@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom"
 import Condo from "./Condo"
 import Maintenance from "./Maintenance"
 import Payments from "./Payments"
+import ViewCondo from "./ViewCondo"
 
 const Dashboard = () => {
     return (
@@ -12,6 +13,7 @@ const Dashboard = () => {
                 <Routes>
                     <Route path="/dashboard" element={undefined} />
                     <Route path="/condo" element={<Condo />} />
+                    <Route path="/condo/:condoId" element={<ViewCondo />} />
                     <Route path="/maintenance" element={<Maintenance />} />
                     <Route path="/payments" element={<Payments />} />
                 </Routes>

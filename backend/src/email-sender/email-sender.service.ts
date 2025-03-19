@@ -42,7 +42,7 @@ export class EmailSenderService{
     this.sendEmail(
       email,
       "Condo Bill Due Reminder",
-      "Condo Bill DUe Reminder",
+      "Condo Bill Due Reminder",
       `
         <div style="font-family: Helvetica, Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
           <div style="text-align: center; padding-bottom: 10px; border-bottom: 2px solid #00466a;">

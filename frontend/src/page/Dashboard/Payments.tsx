@@ -161,7 +161,7 @@ const Payments = () => {
                                                             </Link>
                                                         </Button>
                                                     )}
-                                                    <Separator className="mny-1" />
+                                                    <Separator className="my-1" />
                                                     <ReceiptDownload payment={payment}>
                                                         <Download className="mr-2 h-4 w-4" />
                                                         Download
