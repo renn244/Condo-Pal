@@ -7,6 +7,7 @@ import { PaymongoModule } from 'src/paymongo/paymongo.module';
 @Module({
   controllers: [CondoPaymentController],
   providers: [CondoPaymentService],
-  imports: [FileUploadModule, PaymongoModule]
+  imports: [FileUploadModule, PaymongoModule],
+  exports: [CondoPaymentService]
 })
 export class CondoPaymentModule {}

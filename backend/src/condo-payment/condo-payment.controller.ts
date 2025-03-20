@@ -61,8 +61,13 @@ export class CondoPaymentController {
         return this.condoPaymentService.getCondoPaymentsSummary(user);
     }
 
+    @Get('condoPaymentsStats')
+    async getCondoPaymentsStats(@Query('condoId') condoId: string) {
+        return this.condoPaymentService.getCondoPaymentStatistic(condoId);
+    }
+
     @Get('condoPayments')
-    async getCondoPaymentsLandLord(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, paymentType: string }) {
+    async getCondoPaymentsLandLord(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, paymentType: string, condoId: string | undefined }) {
         return this.condoPaymentService.getCondoPaymentsLandlord(user, query);
     }
 }

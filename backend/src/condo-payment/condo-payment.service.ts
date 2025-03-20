@@ -14,6 +14,13 @@ export class CondoPaymentService {
         private readonly paymongoService: PaymongoService,
     ) {}
 
+    private getBillingMonthOfDate(date: Date) {
+        const month = date.getMonth() + 1; // base 1 means january is 1
+        const year = date.getFullYear();
+
+        return `${month.toString().padStart(2, '0')}-${year.toString()}`;
+    }
+
     private async getBillingMonth(condoId: string, userId: string) {
         const latestPayment = await this.prisma.condoPayment.findFirst({
             where: {
@@ -55,9 +62,7 @@ export class CondoPaymentService {
 
         if(!latestPayment) {
             // First-time payer: Use lease start month as the first billing month
-            const leaseMonth = leaseStartDate.getMonth() + 1; // base 1 means january is 1
-            const leaseYear = leaseStartDate.getFullYear();
-            billingMonth = `${leaseMonth.toString().padStart(2, '0')}-${leaseYear}`;
+            billingMonth = this.getBillingMonthOfDate(leaseStartDate);
 
             return billingMonth
         }
@@ -80,7 +85,7 @@ export class CondoPaymentService {
         return billingMonth 
     }
 
-    private async getTotalPayment(condoId: string, user: UserJwt) {
+    async getTotalPayment(condoId: string, user: UserJwt) {
         const billingMonth = await this.getBillingMonth(condoId, user.id); 
         const [month, year] = billingMonth.split('-').map((data) => Number(data));
 
@@ -391,12 +396,41 @@ export class CondoPaymentService {
         }
     }
 
-    async getCondoPaymentsLandlord(user: UserJwt, query: { search: string, page: string, status: string, paymentType: string }) {
+    async getCondoPaymentStatistic(condoId: string) {
+        const [payments, landlordMaintenance] = await Promise.all([
+            this.prisma.condoPayment.findMany({
+                where: { condoId },
+                select: { id: true, billingMonth: true, additionalCost: true, totalPaid: true },
+            }),
+            this.prisma.maintenance.findMany({
+                where: { condoId, paymentResponsibility: 'LANDLORD', Status: 'COMPLETED' },
+                select: { completionDate: true, totalCost: true },
+            }),
+        ]);
+    
+        // Create a Map for maintenance costs per billing month
+        const maintenanceByMonth = new Map<string, number>();
+        landlordMaintenance.forEach(({ completionDate, totalCost }) => {
+            if (completionDate) {
+                const month = this.getBillingMonthOfDate(completionDate);
+                maintenanceByMonth.set(month, (maintenanceByMonth.get(month) || 0) + (totalCost || 0));
+            }
+        });
+    
+        return payments.map((payment) => ({
+            ...payment,
+            additionalCost: (payment.additionalCost || 0) + (maintenanceByMonth.get(payment.billingMonth) || 0),
+        }));
+    }
+
+    async getCondoPaymentsLandlord(user: UserJwt, query: { 
+        search: string, page: string, status: string, paymentType: string, condoId: string | undefined
+    }) {
         const getCondoIds = await this.prisma.condo.findMany({
             where: { ownerId: user.id },
             select: { id: true }
         });
-        const condoIds = getCondoIds.flatMap((condo) => condo.id)
+        const condoIds = query.condoId ? [query.condoId] : getCondoIds.flatMap((condo) => condo.id)
 
         const page = parseInt(query.page || '1');
         const take = 10;

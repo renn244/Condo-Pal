@@ -76,3 +76,10 @@ type CondoPaymentsSummaryDashboard = {
     },
     pendingVerification: number
 }
+
+type billingMonth = {
+    rentCost: number;
+    additionalCost: number;
+    totalCost: number;
+    billingMonth: string;
+}

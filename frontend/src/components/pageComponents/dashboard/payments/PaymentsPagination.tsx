@@ -1,16 +1,18 @@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import usePaymentsParams from "@/hooks/usePaymentsParams"
 
 type PaymentsPaginationProps = {
     totalPages: number,
-    hasNext: boolean
+    hasNext: boolean,
+    page: number,
+    setPage: (value: number) => void,
 }
 
 const PaymentsPagination = ({
     totalPages,
-    hasNext
+    hasNext,
+    page,
+    setPage
 }: PaymentsPaginationProps) => {
-    const { page, setPage } = usePaymentsParams();
     const availablePages = Array.from({ length: 5 }, (_, i) => page - 2 + i).filter((n) => n > 0 && (totalPages || 1) >= n)
 
     return (

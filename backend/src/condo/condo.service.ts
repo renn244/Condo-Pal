@@ -1,15 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryResponse } from 'src/file-upload/cloudinary/cloudinary-response';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCondoDto } from './dto/condo.dto';
+import { CondoPaymentService } from 'src/condo-payment/condo-payment.service';
 
 @Injectable()
 export class CondoService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly fileUploadService: FileUploadService
+        private readonly fileUploadService: FileUploadService,
+        private readonly condoPaymentService: CondoPaymentService,
     ) {}
 
     async createCondo(user: UserJwt, condoInfo: CreateCondoDto, condoPhoto: Express.Multer.File) {
@@ -111,6 +113,55 @@ export class CondoService {
         })
 
         return Condo
+    }
+
+
+    async getCondoPaymentSummary(condoId: string) {
+        const [totalMaintenanceCost, totalExpenses, totalIncome] = await Promise.all([
+            this.prisma.maintenance.aggregate({
+                where: { condoId: condoId, paymentResponsibility: 'LANDLORD' },
+                _sum: { totalCost: true }
+            }),
+            new Promise(resolve => resolve(0)), // calculate expenses later when there is a model
+            this.prisma.condoPayment.aggregate({
+                where: { 
+                    condoId: condoId,
+                    OR: [{ gcashStatus: 'APPROVED' }, { isPaid: true } ]
+                },
+                _sum: { totalPaid: true },
+                _count: { id: true }
+            }) 
+        ])
+
+
+        return {
+            totalMaintenanceCost: totalMaintenanceCost._sum.totalCost || 0,
+            totalExpenses: totalExpenses || 0,
+            totalIncome: totalIncome._sum.totalPaid || 0,
+            totalPaymentCount: totalIncome._count.id || 0,
+        }
+    }
+
+    async getViewCondo(condoId: string, user: UserJwt) {
+        const [Condo, condoSummary, latestBilling] = await Promise.all([
+            this.prisma.condo.findUnique({
+                where: { id: condoId },
+                include: {
+                    owner: { select: { id: true, name: true, profile: true } },
+                    tenant: { select: { id: true, name: true, profile: true } }
+                }
+            }),
+            this.getCondoPaymentSummary(condoId),
+            this.condoPaymentService.getTotalPayment(condoId, user),
+        ])
+
+        if(!Condo) throw new NotFoundException("condo not found!") 
+
+        return {
+            ...Condo,
+            condoSummary: condoSummary,
+            latestBill: latestBilling
+        }
     }
 
     async updateCondo(

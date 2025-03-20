@@ -22,7 +22,7 @@ import toast from "react-hot-toast"
 import { Link } from "react-router-dom"
 
 const Payments = () => {
-    const { page, search, status, paymentType } = usePaymentsParams();
+    const { page, setPage, search, status, paymentType } = usePaymentsParams();
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['getPayments', page, search, status, paymentType],
@@ -183,7 +183,7 @@ const Payments = () => {
                 </CardContent>
             </Card>
 
-            <PaymentsPagination totalPages={data?.totalPages || 1} hasNext={data?.hasNext || false} />
+            <PaymentsPagination page={page} setPage={setPage} totalPages={data?.totalPages || 1} hasNext={data?.hasNext || false} />
         </div>
     )
 }

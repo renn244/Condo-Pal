@@ -33,6 +33,11 @@ export class CondoController {
         return this.condoService.getMyCondosForManualPayment(user, page);
     }
 
+    @Get('getViewCondo')
+    async getViewCondo(@Query('condoId') condoId: string, @User() user: UserJwt) {
+        return this.condoService.getViewCondo(condoId, user);
+    }
+
     @Get()
     async getCondo(@Query('condoId') condoId: string) {
         return this.condoService.getCondo(condoId);

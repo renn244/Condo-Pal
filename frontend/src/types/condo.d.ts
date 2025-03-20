@@ -54,3 +54,25 @@ type CondoBillInformation = {
         name: user['name']
     }
 }
+
+type CondoSummary = {
+    totalMaintenanceCost: number,
+    totalExpenses: number,
+    totalIncome: number,
+    totalPaymentCount: number,
+}
+
+type ViewCondoInformation = {
+    tenant?: {
+        id: user['id'],
+        name: user['name'],
+        profile: user['profile']
+    },
+    owner: {
+        id: user['id'],
+        name: user['name'],
+        profile: user['profile']
+    },
+    condoSummary: CondoSummary,
+    latestBill: billingMonth,
+} & condo
