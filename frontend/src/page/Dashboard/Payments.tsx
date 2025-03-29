@@ -1,15 +1,12 @@
-import ReceiptDownload from "@/components/common/receiptDownload/ReceiptDownload"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
 import ManualPaymentDialog from "@/components/pageComponents/dashboard/payments/ManualPaymentDialog"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
+import PaymentsOptions from "@/components/pageComponents/dashboard/payments/PaymentsOptions"
 import PaymentsPagination from "@/components/pageComponents/dashboard/payments/PaymentsPagination"
 import PaymentsSummary from "@/components/pageComponents/dashboard/payments/PaymentsSummary"
-import ViewReceipt from "@/components/pageComponents/dashboard/payments/ViewReceipt"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import usePaymentsParams from "@/hooks/usePaymentsParams"
 import axiosFetch from "@/lib/axios"
@@ -17,9 +14,8 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowUpDown, CreditCard, Download, Eye, FileCheck, MoreHorizontal, Smartphone, Wallet } from "lucide-react"
+import { ArrowUpDown, CreditCard, Smartphone, Wallet } from "lucide-react"
 import toast from "react-hot-toast"
-import { Link } from "react-router-dom"
 
 const Payments = () => {
     const { page, setPage, search, status, paymentType } = usePaymentsParams();
@@ -141,33 +137,7 @@ const Payments = () => {
                                             {formatToPesos(payment.totalPaid)}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent align="end" className="w-56 p-1">
-                                                    <ViewReceipt payment={payment} />
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View Condo
-                                                    </Button>
-                                                    {(payment.type === "GCASH" && payment.gcashStatus !== "APPROVED") && (
-                                                        <Button variant="ghost" className="w-full justify-start" asChild>
-                                                            <Link to={`/condoPayments/gcash/verify/${payment.id}`}>
-                                                                <FileCheck className="mr-2 h-4 w-4" />
-                                                                Verify Payment
-                                                            </Link>
-                                                        </Button>
-                                                    )}
-                                                    <Separator className="my-1" />
-                                                    <ReceiptDownload payment={payment}>
-                                                        <Download className="mr-2 h-4 w-4" />
-                                                        Download
-                                                    </ReceiptDownload>
-                                                </PopoverContent>
-                                            </Popover>
+                                            <PaymentsOptions payment={payment} />
                                         </TableCell>
                                     </TableRow>
                                 ))

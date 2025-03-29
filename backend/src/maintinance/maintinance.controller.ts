@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
@@ -21,11 +21,16 @@ export class MaintenanceController {
         return this.maintenanceService.TenantMaintenanceRequest(user, body, files);
     }
 
-    @Get('')
-    async getMaintenaneRequest(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, priority: string }) {
+    @Get()
+    async getMaintenanceRequestsLandlord(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, priority: string, condoId?: string }) {
         return this.maintenanceService.getMaintenanceRequestsLandlord(user, query);
     }
 
+    @Get('stats/:condoId')
+    async getMaintenanceStats(@User() user: UserJwt, @Param('condoId') condoId: string) {
+        return this.maintenanceService.getMaintenanceStats(user, condoId);
+    }
+    
     @Get('getRequest')
     async getMaintenanceRequest(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
         return this.maintenanceService.getMaintenanceRequest(maintenanceId, user);

@@ -59,3 +59,23 @@ type maintenanceCard = {
         address: condo['address']
     }
 } & maintenance
+
+type MaintenanceRequest = {
+    maintenanceRequests: maintenanceCard[],
+    hasNext: boolean,
+    totalPages: number
+}
+
+type MaintenanceRequestStats = {
+    costDistributionStats: {
+        month: string,
+        landlord: number,
+        tenant: number,
+    }[],
+    statusStatistics: {
+        status: "Pending" | "In Progress" | "Completed" | "Canceled",
+        value: number,
+    }[],
+    totalRequests: number,
+    pendingMaintenances: maintenance[],
+}

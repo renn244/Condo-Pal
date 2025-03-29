@@ -7,14 +7,8 @@ import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 
-export type MaintenanceRequest = {
-    maintenanceRequests: maintenanceCard[],
-    hasNext: boolean,
-    totalPages: number
-}
-
 const Maintenance = () => {
-    const { search, status, priority, page } = useMaintenanceParams();
+    const { search, status, priority, page, setPage } = useMaintenanceParams();
 
     const { data: getMaintenance } = useQuery({
         queryKey: ['maintenance', page, search, status, priority],
@@ -56,7 +50,7 @@ const Maintenance = () => {
             )}
 
             {/* Pagination */}
-            <MaintenancePagination totalPages={getMaintenance?.totalPages || 1} hasNext={getMaintenance?.hasNext || false} />
+            <MaintenancePagination page={page} setPage={setPage} totalPages={getMaintenance?.totalPages || 1} hasNext={getMaintenance?.hasNext || false} />
         </div>
     )
 }

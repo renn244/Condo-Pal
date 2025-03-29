@@ -1,14 +1,11 @@
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Calendar, Clock, DollarSign, Home, MoreVertical, Pencil, PenTool } from "lucide-react"
-import CancelMaintenance from "./CancelMaintenance"
-import ViewDetails from "./ViewDetails"
+import { Calendar, Clock, DollarSign, Home, PenTool } from "lucide-react"
+import MaintenanceOptions from "./MaintenanceOptions"
+import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 
 type MaintenanceCardProps = {
     maintenance: maintenanceCard
@@ -17,6 +14,7 @@ type MaintenanceCardProps = {
 const MaintenanceCard = ({
     maintenance
 }: MaintenanceCardProps) => {
+    const { page, search, status, priority } = useMaintenanceParams()
 
     return (
         <Card key={maintenance.id} className="overflow-hidden">
@@ -26,30 +24,7 @@ const MaintenanceCard = ({
                         <Badge variant={getStatusBadgeVariant(maintenance.Status)}>{maintenance.Status.replace(/_/g, " ")}</Badge>
                         <Badge variant={getPriorityBadgeVariant(maintenance.priorityLevel)}>{maintenance.priorityLevel}</Badge>
                     </div>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="end" className="w-56 p-1">
-                            <ViewDetails maintenance={maintenance} />
-                            <Button variant="ghost" className="w-full justify-start">
-                                <Clock className="mr-2 h-4 w-4" />
-                                Update Status
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start">
-                                <Pencil className="mr-2 h-4 w-4" />
-                                Edit maintenance
-                            </Button>
-                            {maintenance.Status !== "CANCELED" && (
-                                <>
-                                    <Separator className="my-1" />
-                                    <CancelMaintenance maintenanceId={maintenance.id} />
-                                </>
-                            )}
-                        </PopoverContent>
-                    </Popover>
+                    <MaintenanceOptions queryKey={['maintenance', page, search, status, priority]} maintenance={maintenance} />
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-2">

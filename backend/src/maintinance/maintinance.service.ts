@@ -4,6 +4,7 @@ import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 
 @Injectable()
 export class MaintenanceService {
@@ -47,19 +48,24 @@ export class MaintenanceService {
         return createMaintinanceRequest;
     }
 
-    async getMaintenanceRequestsLandlord(user: UserJwt, query: { search: string, page: string, status: string, priority: string }) {
+    async getMaintenanceRequestsLandlord(user: UserJwt, query: { search: string, page: string, status: string, priority: string, condoId?: string }) {
         const take = 6;
         const skip = (parseInt(query.page || '1') - 1) * take;
 
         const where: Prisma.MaintenanceWhereInput = {
             condo: {
-                ownerId: user.id
+                // if condo is specified then only show that condo
+                ...(query.condoId ? {
+                    id: query.condoId
+                } : {
+                    ownerId: user.id
+                })
             },
             ...(query.search && {
-                title: {
-                    contains: query.search,
-                    mode: 'insensitive'
-                }
+                OR: [
+                    {title: { contains: query.search, mode: 'insensitive' }},
+                    {id: { contains: query.search, mode: 'insensitive' }},
+                ]
             }),
             ...(query.status && query.status !== 'ALL' && {
                 Status: query.status as MaintenanceStatus
@@ -91,20 +97,65 @@ export class MaintenanceService {
         }
     }
 
+    async getMaintenanceCostDistributionStats(user: UserJwt, condoId: string, year?: number) {
+        const currentYear = year || new Date().getFullYear();
+        const startYear = startOfYear(new Date(currentYear, 0, 1));
+        const endYear = new Date(currentYear, 11, 1); // January of December, representing the start of the month
+
+        const maintenanceCost = await this.prisma.maintenance.findMany({
+            where: { completionDate: { not: null, gte: startYear },  condoId: condoId },
+            select: { completionDate: true, paymentResponsibility: true, totalCost: true }
+        });
+
+        const months = eachMonthOfInterval({ start: startYear, end: endYear }).map(date => format(date, 'yyyy-MM'));
+        const data = months.reduce<Record<string, { month: string; landlord: number; tenant: number }>>((acc, month) => {
+            acc[month] = { month, landlord: 0, tenant: 0 };
+            return acc;
+        }, {});
+
+        maintenanceCost.forEach(({ completionDate, paymentResponsibility, totalCost }) => {
+            if (!completionDate || !paymentResponsibility) return;
+            const month = format(completionDate, 'yyyy-MM');
+            const responsible = paymentResponsibility.toLowerCase(); // expects "landlord" or "tenant"
+
+            if (data[month]) {
+              data[month][responsible] += totalCost || 0;
+            }
+        });
+
+        return Object.values(data);
+    }
+    
+    async getMaintenanceStats(user: UserJwt, condoId: string) {
+        const [
+            pendingMaintenances, totalInProgress, totalCompleted, totalCanceled,
+            costDistributionStats
+        ] = await Promise.all([
+            this.prisma.maintenance.findMany({ where: { condoId, Status: MaintenanceStatus.PENDING }}),
+            this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.IN_PROGRESS } }),
+            this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.COMPLETED } }),
+            this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.CANCELED } }),
+            this.getMaintenanceCostDistributionStats(user, condoId),
+        ])
+
+        return {
+            costDistributionStats: costDistributionStats,
+            statusStatistics: [
+                { name: "Pending", value: pendingMaintenances.length },
+                { name: "In Progress", value: totalInProgress },
+                { name: "Completed", value: totalCompleted },
+                { name: "Canceled", value: totalCanceled }
+            ].filter((stat) => stat.value > 0),
+            totalRequest: (totalInProgress + totalCompleted + totalCanceled + pendingMaintenances.length),
+            pendingMaintenances: pendingMaintenances
+        }
+    }
+
     async getMaintenanceRequest(maintinanceId: string, user: UserJwt) {
         const maintenanceRequest = await this.prisma.maintenance.findFirst({
-            where: {
-                id: maintinanceId
-            },
+            where: { id: maintinanceId },
             include: {
-                condo: {
-                    select: {
-                        id: true,
-                        address: true,
-                        tenantId: true,
-                        ownerId: true,
-                    }
-                }
+                condo: { select: { id: true, address: true, tenantId: true, ownerId: true, } }
             }
         })
 

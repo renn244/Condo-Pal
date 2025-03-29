@@ -1,16 +1,18 @@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 
 type MaintenancePaginationProps = {
     totalPages: number,
-    hasNext: boolean
+    hasNext: boolean,
+    page: number,
+    setPage: (value: number) => void,
 }
 
 const MaintenancePagination = ({
     totalPages,
     hasNext,
+    page, 
+    setPage
 }: MaintenancePaginationProps) => {
-    const { page, setPage } = useMaintenanceParams();
     const availablePages = Array.from({ length: 5 }, (_, i) => page - 2 + i).filter((n) => n > 0 && (totalPages || 1) >= n)
 
     return (
@@ -18,7 +20,7 @@ const MaintenancePagination = ({
             <Pagination>
                 <PaginationContent>
                     <PaginationItem>
-                        {page === 1 && (
+                        {page > 1 && (
                             <PaginationPrevious onClick={() => setPage(page - 1)} className="cursor-pointer" />
                         )}
                     </PaginationItem>

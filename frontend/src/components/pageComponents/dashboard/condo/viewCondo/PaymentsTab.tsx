@@ -7,8 +7,6 @@ import {
     ChartTooltip,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
 import useViewCondoParams from "@/hooks/useViewCondoParams"
@@ -16,12 +14,13 @@ import axiosFetch from "@/lib/axios"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { CreditCard, DollarSign, Download, Eye, MoreHorizontal, Smartphone, Wallet } from "lucide-react"
+import { CreditCard, DollarSign, Smartphone, Wallet } from "lucide-react"
 import toast from "react-hot-toast"
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import GetStatusBadge from "../../payments/GetStatusBadge"
 import PaymentsPagination from "../../payments/PaymentsPagination"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
+import PaymentsOptions from "../../payments/PaymentsOptions"
 
 
 const chartConfig = {
@@ -33,7 +32,7 @@ const chartConfig = {
       label: "additionalCost",
       color: "hsl(var(--chart-2))",
     },
-  } satisfies ChartConfig
+} satisfies ChartConfig
 
 type PaymentsTabProps = {
     condoId: string
@@ -131,28 +130,7 @@ const PaymentsTab = ({
                                         </TableCell>
                                         <TableCell className="font-medium">{formatToPesos(payment.totalPaid)}</TableCell>
                                         <TableCell className="text-right">
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent align="end" className="w-56 p-1">
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View Receipt
-                                                    </Button>
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View Condo
-                                                    </Button>
-                                                    <Separator className="my-1" />
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <Download className="mr-2 h-4 w-4" />
-                                                        Download
-                                                    </Button>
-                                                </PopoverContent>
-                                            </Popover>
+                                            <PaymentsOptions payment={payment} />
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -199,10 +177,6 @@ const PaymentsTab = ({
                                         labelFormatter={(label: any) => `BillingMonth: ${label}`}
                                         indicator="dot" />
                                     }
-                                    />
-                                    <Tooltip
-                                    formatter={(value) => [`$${value}`, undefined]}
-                                    labelFormatter={(label: any) => `Month: ${label}`}
                                     />
                                     <Area 
                                     type="natural"

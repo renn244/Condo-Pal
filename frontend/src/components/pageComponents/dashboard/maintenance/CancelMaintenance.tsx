@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import axiosFetch from "@/lib/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { XCircle } from "lucide-react"
@@ -11,15 +10,16 @@ import { useAuthContext } from "@/context/AuthContext"
 import { MaintenanceRequest } from "@/page/Dashboard/Maintenance"
 
 type CancelMaintenanceProps = {
-    maintenanceId: string
+    maintenanceId: string,
+    queryKey: any[]
 }
 
 const CancelMaintenance = ({
-    maintenanceId
+    maintenanceId,
+    queryKey
 }: CancelMaintenanceProps) => {
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
-    const { search, status, priority, page } = useMaintenanceParams();
     const [open, setOpen] = useState<boolean>(false);
 
     const { mutate, isPending } = useMutation({
@@ -38,7 +38,7 @@ const CancelMaintenance = ({
         },
         onSuccess: async () => {
             toast.success("maintenance canceled")
-            await queryClient.setQueryData(['maintenance', page, search, status, priority], (oldData: MaintenanceRequest) => ({
+            await queryClient.setQueryData(queryKey, (oldData: MaintenanceRequest) => ({
                 ...oldData,
                 maintenanceRequests: oldData.maintenanceRequests.map(maintenance => {
                     if(maintenance.id === maintenanceId) {
