@@ -19,6 +19,8 @@ import GcashPayment from './page/TenantDashboard/CondoPayment/GcashPayment';
 import PaymongoPayment from './page/TenantDashboard/CondoPayment/PaymongoPayment';
 import VerifyPaymongoPayment from './page/TenantDashboard/CondoPayment/VerifyPaymongoPayment';
 import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
+import TenantRoute from './components/common/Authorization/TenantRoute';
+import TenantDashboard from './page/TenantDashboard/TenantDashboard';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -60,6 +62,11 @@ const App = () => {
         {/* Dashboard Tenant */}
         <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
         <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
+        <Route path='/tenant' element={
+          <TenantRoute>
+            <TenantDashboard />
+          </TenantRoute>
+        } />
 
         {/* we still need to put these pages to their proper url like dashboard of tenant or landlord  */}
         <Route path='/condoPayments/manual/:condoId' element={<ManualPayment />} />
