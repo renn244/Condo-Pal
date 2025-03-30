@@ -3,10 +3,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Separator } from "@/components/ui/separator";
 import formatDate from "@/lib/formatDate";
 import formatToPesos from "@/lib/formatToPesos";
-import { CreditCard, Eye, FileCheck, Smartphone, Wallet } from "lucide-react";
+import { Eye, FileCheck} from "lucide-react";
 import { useState } from "react"
 import { Link } from "react-router-dom";
 import GetStatusBadge from "./GetStatusBadge";
+import GetPaymentType from "./GetPaymentType";
 
 type ViewReceiptProps = {
     payment: CondoPayments_Tenant
@@ -18,17 +19,6 @@ const ViewReceipt = ({
     const [open, setOpen] = useState<boolean>(false);
 
     const totalAmount = payment.rentCost + (payment.additionalCost || 0);
-
-    const getPaymentMethod = (method: CondoPaymentType) => {
-        switch(method) {
-            case "GCASH":
-                return <Smartphone className="h-4 w-4 text-blue-500" />
-            case "MANUAL":
-                return <Wallet className="h-4 w-4" />
-            case "PAYMONGO":
-                return <CreditCard className="h-4 w-4 text-green-500" />
-        }
-    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -115,7 +105,7 @@ const ViewReceipt = ({
                                     Method:
                                 </span>
                                 <div className="flex items-center gap-1">
-                                    {getPaymentMethod(payment.type)}
+                                    <GetPaymentType method={payment.type} />
                                     <span>{payment.type}</span>
                                 </div>
                             </div>

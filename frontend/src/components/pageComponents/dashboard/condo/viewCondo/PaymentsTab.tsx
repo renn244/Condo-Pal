@@ -14,13 +14,14 @@ import axiosFetch from "@/lib/axios"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { CreditCard, DollarSign, Smartphone, Wallet } from "lucide-react"
+import { DollarSign } from "lucide-react"
 import toast from "react-hot-toast"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import GetStatusBadge from "../../payments/GetStatusBadge"
 import PaymentsPagination from "../../payments/PaymentsPagination"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import PaymentsOptions from "../../payments/PaymentsOptions"
+import GetPaymentType from "../../payments/GetPaymentType"
 
 
 const chartConfig = {
@@ -71,17 +72,6 @@ const PaymentsTab = ({
         }
     })
 
-    const getPaymentMethod = (method: CondoPaymentType) => {
-        switch(method) {
-            case "GCASH":
-                return <Smartphone className="h-4 w-4 text-blue-500" />
-            case "MANUAL":
-                return <Wallet className="h-4 w-4" />
-            case "PAYMONGO":
-                return <CreditCard className="h-4 w-4 text-green-500" />
-        }
-    }
-
     if(!payments && !isLoading) return <NotFound />
 
     if(!payments) return <NotFound />
@@ -120,7 +110,7 @@ const PaymentsTab = ({
                                         <TableCell>{formatBillingMonth(payment.billingMonth)}</TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                {getPaymentMethod(payment.type)}
+                                                <GetPaymentType method={payment.type} />
                                                 <span>{payment.type}</span>
                                                 {payment.type === "GCASH" && <GetStatusBadge status={payment.gcashStatus || "UNKNOWN"} />}
                                             </div>

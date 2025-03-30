@@ -1,4 +1,5 @@
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import GetPaymentType from "@/components/pageComponents/dashboard/payments/GetPaymentType"
 import GetStatusBadge from "@/components/pageComponents/dashboard/payments/GetStatusBadge"
 import ManualPaymentDialog from "@/components/pageComponents/dashboard/payments/ManualPaymentDialog"
 import PaymentsHeader from "@/components/pageComponents/dashboard/payments/PaymentsHeader"
@@ -14,7 +15,7 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowUpDown, CreditCard, Smartphone, Wallet } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import toast from "react-hot-toast"
 
 const Payments = () => {
@@ -34,18 +35,6 @@ const Payments = () => {
         },
         refetchOnWindowFocus: false
     })
-
-
-    const getPaymentMethod = (method: CondoPaymentType) => {
-        switch(method) {
-            case "GCASH":
-                return <Smartphone className="h-4 w-4 text-blue-500" />
-            case "MANUAL":
-                return <Wallet className="h-4 w-4" />
-            case "PAYMONGO":
-                return <CreditCard className="h-4 w-4 text-green-500" />
-        }
-    }
 
     if(error || (!isLoading && !data)) {
         return <SomethingWentWrong reset={refetch} />
@@ -125,7 +114,7 @@ const Payments = () => {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                {getPaymentMethod(payment.type)}
+                                                <GetPaymentType method={payment.type} />
                                                 <span>{payment.type}</span>
                                                 {payment.type === "GCASH" && <GetStatusBadge status={payment.gcashStatus || "UNKNOWN"} /> }
                                             </div>
