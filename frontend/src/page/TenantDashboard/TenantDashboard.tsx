@@ -82,9 +82,9 @@ const TenantDashboard = () => {
                                 <Bell className="h-4 w-4 mr-2" />
                                 Notifications
                                 {unreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {unreadCount}
-                                </span>
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {unreadCount}
+                                    </span>
                                 )}
                             </Button>
                         </DropdownMenuTrigger>
@@ -92,37 +92,37 @@ const TenantDashboard = () => {
                             <div className="flex items-center justify-between px-4 py-2 border-b">
                                 <h3 className="font-medium">Notifications</h3>
                                 <Button variant="ghost" size="sm" onClick={() => undefined}>
-                                Mark all as read
+                                    Mark all as read
                                 </Button>
                             </div>
                             <div className="max-h-[400px] overflow-y-auto">
                                 {notifications.map((notification) => (
-                                <div
+                                    <div
                                     key={notification.id}
                                     className={`px-4 py-3 border-b hover:bg-muted/50 ${!notification.isRead ? "bg-blue-50/50" : ""}`}
-                                >
-                                    <div className="flex gap-3">
-                                        <div className="mt-1">{getNotificationIcon(notification.type)}</div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <h4 className="font-medium text-sm">{notification.title}</h4>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {new Date(notification.date).toLocaleDateString()}
-                                                </span>
+                                    >
+                                        <div className="flex gap-3">
+                                            <div className="mt-1">{getNotificationIcon(notification.type)}</div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="font-medium text-sm">{notification.title}</h4>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {new Date(notification.date).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                                                {notification.actionUrl && (
+                                                <Link
+                                                    to={notification.actionUrl}
+                                                    className="text-sm text-primary flex items-center mt-2 hover:underline"
+                                                >
+                                                    View Details
+                                                    <ChevronRight className="h-3 w-3 ml-1" />
+                                                </Link>
+                                                )}
                                             </div>
-                                            <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                                            {notification.actionUrl && (
-                                            <Link
-                                                to={notification.actionUrl}
-                                                className="text-sm text-primary flex items-center mt-2 hover:underline"
-                                            >
-                                                View Details
-                                                <ChevronRight className="h-3 w-3 ml-1" />
-                                            </Link>
-                                            )}
                                         </div>
                                     </div>
-                                </div>
                                 ))}
                             </div>
                             <div className="p-2 text-center border-t">
@@ -174,8 +174,8 @@ const TenantDashboard = () => {
                 </div>
             </div>
 
-            <Tabs>
-                <TabsList className="grid grid-cols-3 mb-6">
+            <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid grid-cols-3 mb-6 w-full">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="payments">Payments</TabsTrigger>
                     <TabsTrigger value="maintenance">Maintenance</TabsTrigger>

@@ -19,7 +19,7 @@ const MaintenanceTab = ({
         queryKey: ['maintenance', 'table', maintenancePage, status, priority, maintenanceSearch, condo.id],
         queryFn: async () => {  
             const response = await axiosFetch.get(
-                `/maintenance?page=${maintenancePage}&search=${maintenanceSearch}&status=${status}&priority=${priority}&condoId=${condo.id}`
+                `/maintenance?page=${maintenancePage}&search=${maintenanceSearch}&status=${status}&priority=${priority}&condoId=${condo.id}&take=10`
             )
 
             return response.data as MaintenanceRequest

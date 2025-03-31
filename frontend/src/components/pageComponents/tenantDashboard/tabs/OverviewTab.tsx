@@ -60,6 +60,8 @@ const notifications: any[] = [
 
 const OverviewTab = () => {
 
+    
+
     // Get notification icon
     const getNotificationIcon = (type: any) => {
         switch (type) {

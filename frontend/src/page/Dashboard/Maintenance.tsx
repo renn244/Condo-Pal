@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 
 const Maintenance = () => {
-    const { search, status, priority, page, setPage } = useMaintenanceParams();
+    const { search, status, priority, page, setPage, setStatus, setPriority, setSearch } = useMaintenanceParams();
 
     const { data: getMaintenance } = useQuery({
         queryKey: ['maintenance', page, search, status, priority],
@@ -34,7 +34,10 @@ const Maintenance = () => {
             </header>
 
             <div className="flex flex-col gap-4 mb-6">
-                <MaintenanceHeader />
+                <MaintenanceHeader 
+                search={search} status={status} priority={priority}
+                setSearch={setSearch} setStatus={setStatus} setPriority={setPriority}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,13 +1,21 @@
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useDebounceValue from "@/hooks/useDebounceValue"
-import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
 
-const MaintenanceHeader = () => {
-    const { status, priority, search, setPriority, setStatus, setSearch } = useMaintenanceParams();
+type MaintenanceHeaderProps = {
+    status: string,
+    priority: string,
+    search: string,
+    setStatus: (value: MaintenanceStatus | "ALL") => void,
+    setPriority: (value: PriorityLevel | "ALL") => void,
+    setSearch: (value: string) => void,
+}
 
+const MaintenanceHeader = ({
+    status, priority, search, setStatus, setPriority, setSearch
+}: MaintenanceHeaderProps) => {
     const [inputSearch, setInputSearch] = useState<string>(search || "")
     const debounceValue = useDebounceValue(inputSearch, 500);
     

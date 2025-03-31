@@ -61,7 +61,8 @@ export class AuthService {
                     orderBy: {
                         createdAt: 'desc'
                     }
-                }
+                },
+                condo: { select: { id: true } }
             }
         })
 

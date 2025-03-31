@@ -48,8 +48,10 @@ export class MaintenanceService {
         return createMaintinanceRequest;
     }
 
-    async getMaintenanceRequestsLandlord(user: UserJwt, query: { search: string, page: string, status: string, priority: string, condoId?: string }) {
-        const take = 6;
+    async getMaintenanceRequestsLandlord(user: UserJwt, query: { 
+        search: string, page: string, status: string, priority: string, condoId?: string, take?: string
+    }) {
+        const take = parseInt(query.take || '6') || 6;
         const skip = (parseInt(query.page || '1') - 1) * take;
 
         const where: Prisma.MaintenanceWhereInput = {

@@ -18,6 +18,11 @@ type checkUser = {
     profile?: string,
     name?: string,
     
+    // this is only for tenant
+    condo: { 
+        id: string,
+    }
+
     role: role,
     isOauth: boolean,
 

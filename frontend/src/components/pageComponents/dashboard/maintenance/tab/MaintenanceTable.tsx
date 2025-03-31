@@ -9,7 +9,7 @@ import { MoreHorizontal, Wrench } from "lucide-react"
 import MaintenanceOptions from "../../maintenance/MaintenanceOptions"
 import MaintenancePagination from "../../maintenance/MaintenancePagination"
 import useViewCondoParams from "@/hooks/useViewCondoParams"
-import MaintenanceHeader from "./MaintenanceHeader"
+import MaintenanceHeader from "../MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 
 type MaintenanceTablProps = {
@@ -23,7 +23,7 @@ const MaintenanceTable = ({
     isLoading,
     condoId
 }: MaintenanceTablProps) => {
-    const { maintenancePage, status, priority, maintenanceSearch, setPage } = useViewCondoParams();
+    const { maintenancePage, status, priority, maintenanceSearch, setPage, setSearch, setStatus, setPriority } = useViewCondoParams();
 
     return (
         <Card id="maintenance-table" className="mb-6 h-[800px]">
@@ -40,7 +40,10 @@ const MaintenanceTable = ({
                 </CardDescription>
             </CardHeader>
             <CardContent className="h-[616px]">
-                <MaintenanceHeader />
+                <MaintenanceHeader 
+                search={maintenanceSearch} status={status} priority={priority}
+                setSearch={(value) => setSearch('maintenance', value)} setStatus={setStatus} setPriority={setPriority}
+                />
                 <Table>
                     <TableHeader>
                         <TableRow>
