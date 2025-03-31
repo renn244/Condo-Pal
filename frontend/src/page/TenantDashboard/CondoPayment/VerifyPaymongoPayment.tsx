@@ -169,7 +169,7 @@ const VerifyPaymongoPayment = () => {
 
                     {data?.status === "paid" && (
                         <Button asChild>
-                            <Link to="/condo">
+                            <Link to="/tenant">
                                 <ArrowLeft className="h-4 w-4" />
                                 Return to Dashboard
                             </Link>
@@ -199,7 +199,7 @@ const VerifyPaymongoPayment = () => {
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <p className="text-sm text-muted-foreground">Total Cost</p>
-                                <p className="font-medium text-primary">{formatToPesos(3000)}</p>
+                                <p className="font-medium text-primary">{formatToPesos(condoBillInfo.totalCost)}</p>
                             </div>
                         </div>
 

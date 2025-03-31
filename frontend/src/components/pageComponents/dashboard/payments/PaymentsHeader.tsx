@@ -1,16 +1,22 @@
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useDebounceValue from "@/hooks/useDebounceValue"
-import usePaymentsParams from "@/hooks/usePaymentsParams"
 import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
 
-const PaymentsHeader = () => {
-    const { 
-        search, paymentType, status,
-        setSearch, setPaymentType, setStatus
-    } = usePaymentsParams();
+type PaymentsHeaderProps = {
+    search: string;
+    paymentType: string;
+    status: string;
+    setSearch: (search: string) => void;
+    setPaymentType: (paymentType: CondoPaymentType | "ALL") => void;
+    setStatus: (status: GcashPaymentStatus | "ALL") => void;
+}
 
+const PaymentsHeader = ({
+    search, paymentType, status,
+    setSearch, setPaymentType, setStatus
+}: PaymentsHeaderProps) => {
     const [searchInput, setSearchInput] = useState(search || "");
     const debounceSearch = useDebounceValue(searchInput, 500);
     

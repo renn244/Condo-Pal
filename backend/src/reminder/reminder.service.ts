@@ -50,9 +50,11 @@ export class ReminderService {
             // send email reminders if it is 1 week before (might want to have a queing system for it not to have a timeout)
             const isLastDayofMonthDue = leaseAgreement.due_date === -1;
             const is1WeekBeforeDue = isLastDayofMonthDue 
-                ? this.getLastDayOftheMonth() === new Date().getDate() + 7 
+                ? this.getLastDayOftheMonth() === new Date().getDate() + 7
                 : leaseAgreement.due_date === new Date().getDate() + 7;
             
+            // TODOLATER: check if already paid
+
             if(is1WeekBeforeDue) {
                 this.emailSender.sendDueReminderEmail(leaseAgreement.tenant.email, leaseAgreement);
             }

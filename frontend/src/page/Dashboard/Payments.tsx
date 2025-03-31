@@ -19,12 +19,17 @@ import { ArrowUpDown } from "lucide-react"
 import toast from "react-hot-toast"
 
 const Payments = () => {
-    const { page, setPage, search, status, paymentType } = usePaymentsParams();
+    const { 
+        page, search, status, paymentType,
+        setPage, setSearch, setStatus, setPaymentType
+    } = usePaymentsParams();
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['getPayments', page, search, status, paymentType],
         queryFn: async () => {
-            const response = await axiosFetch.get(`/condo-payment/condoPayments?page=${page}&search=${search}&status=${status}&paymentType=${paymentType}`);
+            const response = await axiosFetch.get(
+                `/condo-payment/condoPayments?page=${page}&search=${search}&status=${status}&paymentType=${paymentType}`
+            );
 
             if(response.status >= 400) {
                 toast.error('Something have gone wrong!')
@@ -53,7 +58,10 @@ const Payments = () => {
 
             <PaymentsSummary />
 
-            <PaymentsHeader />
+            <PaymentsHeader 
+            search={search} paymentType={paymentType} status={status}
+            setSearch={setSearch} setPaymentType={setPaymentType} setStatus={setStatus}
+            />
             
             {/* Payments Table */}
             <Card className="mb-6 h-[700px]">

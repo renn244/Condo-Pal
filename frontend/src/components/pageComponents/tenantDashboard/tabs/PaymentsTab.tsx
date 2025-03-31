@@ -2,72 +2,80 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
+import { useAuthContext } from "@/context/AuthContext"
+import axiosFetch from "@/lib/axios"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { CreditCard, Eye } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import { Link } from "react-router-dom"
 import GetPaymentType from "../../dashboard/payments/GetPaymentType"
 import GetStatusBadge from "../../dashboard/payments/GetStatusBadge"
-import { Link } from "react-router-dom"
+import { formatBillingMonth } from "@/lib/formatBillingMonth"
+import toast from "react-hot-toast"
+import useTenantDashboardParams from "@/hooks/useTenantDashboardParams"
+import PaymentsPagination from "../../dashboard/payments/PaymentsPagination"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Download, MoreHorizontal } from "lucide-react"
+import ViewReceipt from "../../dashboard/payments/ViewReceipt"
+import ReceiptDownload from "@/components/common/receiptDownload/ReceiptDownload"
+import PaymentsHeader from "../../dashboard/payments/PaymentsHeader"
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 
-const recentPayments = [
-    {
-      id: "payment-1",
-      date: "2024-03-01T00:00:00Z",
-      dueDate: "2024-03-01T00:00:00Z",
-      amount: 2500,
-      status: "PAID",
-      description: "March 2024 Rent",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      type: "MANUAL" as CondoPaymentType,
-    },
-    {
-      id: "payment-2",
-      date: "2024-02-01T00:00:00Z",
-      dueDate: "2024-02-01T00:00:00Z",
-      amount: 2500,
-      status: "PAID",
-      description: "February 2024 Rent",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      type: "PAYMONGO" as CondoPaymentType,
-    },
-    {
-      id: "payment-3",
-      date: "2024-01-01T00:00:00Z",
-      dueDate: "2024-01-01T00:00:00Z",
-      amount: 2500,
-      status: "PAID",
-      description: "January 2024 Rent",
-      receiptUrl: "/placeholder.svg?height=600&width=400",
-      type: "GCASH" as CondoPaymentType,
-      gcashStatus: "APPROVED",
-    },
-    {
-      id: "payment-4",
-      date: "2024-04-01T00:00:00Z",
-      dueDate: "2024-04-01T00:00:00Z",
-      amount: 2500,
-      status: "UPCOMING",
-      description: "April 2024 Rent",
-      type: "GCASH" as CondoPaymentType,
-      gcashStatus: "PENDING",
-    },
-]
-
-const currentLease = {
-    id: "lease-1",
-    propertyName: "Seaside Retreat",
-    propertyAddress: "123 Ocean View Dr, Miami, FL 33101",
-    startDate: "2023-06-01T00:00:00Z",
-    endDate: "2024-05-31T00:00:00Z",
-    monthlyRent: 2500,
-    securityDeposit: 3000,
-    status: "ACTIVE",
-    nextPaymentDate: "2024-04-01T00:00:00Z",
-    nextPaymentAmount: 2500,
-    documentUrl: "#",
-}
-
+//TODO LATER: REFACTOR ALL LOGIC TO INDIVIDUAL COMPONENTS
 const PaymentsTab = () => {
+    const { user } = useAuthContext();
+    const { 
+        paymentType, paymentStatus: status, paymentPage: page, paymentSearch: search,
+        setPage, setSearch, setPaymentType, setPaymentStatus
+    } = useTenantDashboardParams();
+    const condoId = user!.condo.id;
+
+    const { data: paymentSummary } = useQuery({
+        queryKey: ["paymentSummary"],
+        queryFn: async () => {
+            const response = await axiosFetch.get(`/condo-payment/getBill?condoId=${condoId}`)
+
+            return response.data as CondoBillInformation;
+        },
+        refetchOnWindowFocus: false,
+    })
+
+    const { data: recentPayments, isLoading } = useQuery({
+        queryKey: ['recentPayments', page, search, status, paymentType, condoId],
+        enabled: !!condoId,
+        queryFn: async () => {
+            const response = await axiosFetch.get(
+                `/condo-payment/condoPayments?page=${page}&search=${search}&status=${status}&paymentType=${paymentType}&condoId=${condoId}`
+            );
+
+            if(response.status >= 400) {
+                toast.error('Something have gone wrong!')
+                throw new Error();
+            }
+
+            return response.data as CondoPaymentsDashboard;
+        },
+        refetchOnWindowFocus: false
+    })
+
+    if(!paymentSummary) return null;
+
+    const PaymentDate = new Date(paymentSummary.dueDate);
+    const today = new Date();
+    // Set the hours, minutes, seconds, and milliseconds to 0 for both dates
+    PaymentDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    // this handle even the month of payment (1000 * 60 * 60 * 24) = 1 day
+    const daysUntilNextPayment = Math.floor((PaymentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const isLate = daysUntilNextPayment < 0;
+
+    const isCurrentMonthPaid = () => {
+        const currentBillingMonth = today.getMonth();
+        const month = parseInt(paymentSummary.billingMonth.split("-")[0]);
+
+        return currentBillingMonth < month 
+    }
+
     return (
         <TabsContent value="payments" className="space-y-6">
             {/* Current Payment Status */}
@@ -79,44 +87,59 @@ const PaymentsTab = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-muted p-4 rounded-md">
                             <h3 className="text-sm font-medium text-muted-foreground mb-1">Next Payment</h3>
-                            <p className="text-2xl font-bold text-primary">{formatToPesos(currentLease.nextPaymentAmount)}</p>
-                        <div className="flex justify-between items-center mt-2">
-                            <span className="text-sm text-muted-foreground">Due Date</span>
-                            <span className="font-medium">{formatDate(new Date(currentLease.nextPaymentDate))}</span>
-                        </div>
-                        <div className="mt-2">
-                            <div className="text-sm text-muted-foreground">
-                            {/* {getDaysUntilNextPayment()} days until payment is due */}
+                            <p className="text-2xl font-bold text-primary">{formatToPesos(paymentSummary.totalCost)}</p>
+                            <div className="flex justify-between items-center mt-2">
+                                <span className="text-sm text-muted-foreground">Due Date</span>
+                                <span className="font-medium">{formatDate(new Date(PaymentDate))}</span>
                             </div>
+                            <div className="mt-2">
+                                <div className={`text-sm text-muted-foreground ${isLate && "text-red-500 font-medium"}`}>
+                                    {Math.abs(daysUntilNextPayment)} {" "}
+                                    {!isLate ? "Days until payment is due" : "Days late"}
+                                </div>
                                 <div className="h-2 bg-gray-200 rounded-full mt-1">
-                                <div
-                                    className="h-2 bg-primary rounded-full"
-                                    // style={{ width: `${Math.min(100, (30 - getDaysUntilNextPayment()) * 3.33)}%` }}
-                                ></div>
-                            </div>
-                        </div>
-                        </div>
-
-                        <div className="bg-muted p-4 rounded-md">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-1">Payment Methods</h3>
-                            <div className="flex items-center gap-3 mt-3">
-                                <CreditCard className="h-8 w-8 text-muted-foreground" />
-                                <div>
-                                    <p className="font-medium">Visa ending in 4242</p>
-                                    <p className="text-xs text-muted-foreground">Expires 12/25</p>
+                                    <div
+                                        className={`h-2 bg-primary rounded-full ${isLate ? "bg-red-500" : ""}`}
+                                        style={{ width: `${Math.min(100, (30 - daysUntilNextPayment) * 3.33)}%` }}
+                                    ></div>
                                 </div>
                             </div>
-                            <Button variant="outline" size="sm" className="w-full mt-4">
-                                Manage Payment Methods
-                            </Button>
                         </div>
 
                         <div className="bg-muted p-4 rounded-md">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-1">Quick Actions</h3>
+                            <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                                {isCurrentMonthPaid() ? "Next Month's Payment" : "Due Payment"}
+                            </h3>
+                            <div className="mt-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-muted-foreground">Month</span>
+                                    <span className="text-sm font-medium">{formatBillingMonth(paymentSummary.billingMonth)}</span>
+                                </div>
+                                <div className="flex justify-between items-center mt-2">
+                                    <span className="text-sm text-muted-foreground">Amount</span>
+                                    <span className="text-sm font-medium">{formatToPesos(paymentSummary.totalCost)}</span>
+                                </div>
+                                <div className="flex justify-between items-center mt-2">
+                                    <span className="text-sm text-muted-foreground">Due Date</span>
+                                    <span className="text-sm font-medium">{formatDate(new Date(paymentSummary.dueDate))}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-muted p-4 rounded-md">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-1">Payment Options</h3>
                             <div className="space-y-2 mt-3">
-                                <Button className="w-full">Make a Payment</Button>
-                                <Button variant="outline" className="w-full">
-                                    Set Up Auto-Pay
+                                <Button variant="outline" className="w-full" asChild>
+                                    <Link to={`/condoPayments/paymongo/${condoId}`}>
+                                        <img src="/paymongo.png" className="h-5 w-5 mr-1" />
+                                        Paymongo
+                                    </Link>
+                                </Button>
+                                <Button variant="outline" className="w-full" asChild>
+                                    <Link to={`/condoPayments/gcash/${condoId}`}>
+                                        <img src="/gcash.png" className="h-5 w-5 mr-1" />
+                                        Gcash (proof of payment)
+                                    </Link>
                                 </Button>
                             </div>
                         </div>
@@ -125,70 +148,95 @@ const PaymentsTab = () => {
             </Card>
 
             {/* Payment History */}
-            <Card>
-                <CardHeader>
+            <Card className="mb-6 min-h-[700px]">
+                <CardHeader className="pb-4">
                     <CardTitle>Payment History</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="min-h-[554px]">
+                    <PaymentsHeader 
+                    search={search} paymentType={paymentType} status={status}
+                    setSearch={(value) => setSearch('payment', value)} setPaymentType={setPaymentType} setStatus={setPaymentStatus}
+                    />
+
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Due Date</TableHead>
+                                <TableHead>Paid At</TableHead>
+                                <TableHead>Billing Month</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Type</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {recentPayments.map((payment) => (
-                                <TableRow key={payment.id}>
-                                    <TableCell className="font-medium">{payment.description}</TableCell>
-                                    <TableCell>{payment.date ? formatDate(new Date(payment.date)) : "-"}</TableCell>
-                                    <TableCell>{formatDate(new Date(payment.dueDate))}</TableCell>
-                                    <TableCell className="font-medium">{formatToPesos(payment.amount)}</TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <GetPaymentType method={payment.type} />
-                                            <span>{payment.type}</span>
-                                            {payment.type === "GCASH" && <GetStatusBadge status={payment.gcashStatus as GcashPaymentStatus || "UNKNOWN"} />}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {payment.id}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end items-center gap-2">
-                                        {payment.receiptUrl && payment.status === "PAID" && (
-                                            <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-8 px-2 flex items-center gap-1"
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                                <span className="hidden sm:inline">Receipt</span>
-                                            </Button>
-                                        )}
-                                        {payment.status === "UPCOMING" && (
-                                            <Button size="sm" className="h-8 px-2">
-                                                Pay Now
-                                            </Button>
-                                        )}
-                                        </div>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="py-10">
+                                        <LoadingSpinner />
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                recentPayments?.getCondoPayments.map((payment) => (
+                                        <TableRow key={payment.id}>
+                                            <TableCell>{formatDate(new Date(payment.payedAt))}</TableCell>
+                                            <TableCell className="font-medium">
+                                                {formatBillingMonth(payment.billingMonth)}
+                                            </TableCell>
+                                            <TableCell className="font-medium">{formatToPesos(payment.totalPaid)}</TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <GetPaymentType method={payment.type} />
+                                                    <span>{payment.type}</span>
+                                                    {payment.type === "GCASH" && <GetStatusBadge status={payment.gcashStatus as GcashPaymentStatus || "UNKNOWN"} />}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    {payment.id}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <TenantPaymentOptions payment={payment} />
+                                            </TableCell>
+                                        </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
-                <CardFooter>
-                    <Button variant="outline" className="w-full" asChild>
-                        <Link to="/tenant/payments/history">View Complete History</Link>
-                    </Button>
+                <CardFooter className="justify-center">
+                    {recentPayments?.totalPages && (
+                        <PaymentsPagination 
+                        page={page} totalPages={recentPayments.totalPages}
+                        setPage={(value) => setPage("payment", value)} hasNext={recentPayments.hasNext}
+                        />
+                    )}
                 </CardFooter>
             </Card>
         </TabsContent>
+    )
+}
+
+type TenantPaymentOptionsProps = {
+    payment: CondoPayments_Tenant
+}
+
+const TenantPaymentOptions = ({
+    payment
+}: TenantPaymentOptionsProps) => {
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 p-1">
+                <ViewReceipt payment={payment} />
+                <ReceiptDownload payment={payment}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                </ReceiptDownload>
+            </PopoverContent>
+        </Popover>
     )
 }
 

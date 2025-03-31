@@ -48,7 +48,7 @@ model LeaseAgreement {
 
   leaseStart  DateTime
   leaseEnd    DateTime?
-  due_date    Int     // Day of the month or (-1) for end of the month
+  due_date    Int     // Day of the month or (-1) for end of the month. maximum(28 for all month)
 
   condoId     String   
   condo       Condo    @relation(fields: [condoId], references: [id])

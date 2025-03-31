@@ -63,7 +63,7 @@ const GcashPayment = () => {
                         Your payment for {condoBillInfo.name} ({getCurrentMonth()}) has been recorded and is pending verification from the landlord. You will receive a confirmation once it has been processed.
                     </AlertDescription>
                     <div className="mt-4">
-                        <Button onClick={() => (window.location.href = "/condoBillInfo")}>
+                        <Button onClick={() => (window.location.href = "/tenant")}>
                             Return To condoBillInfo Dashboard
                         </Button>
                     </div>
@@ -80,6 +80,7 @@ const GcashPayment = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Label className="text-sm text-muted-foreground">Gcash Number</Label>
+                                    {/* Replace this with landlord */}
                                     <p className="font-medium">0917-123-4567</p>
                                 </div>
                                 <div>
@@ -91,7 +92,7 @@ const GcashPayment = () => {
 
                             <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
                                 <li>Open your Gcash app and log-in</li>
-                                <li>Tap on "Send Money" and select "Send to Gcash Accoutn"</li>
+                                <li>Tap on "Send Money" and select "Send to Gcash Account"</li>
                                 <li>Enter Gcash number shown above</li>
                                 <li>Enter the exact amount: {formatToPesos(condoBillInfo.totalCost)}</li>
                                 <li>Include your condo ID ({condoBillInfo.id}) in the message</li>

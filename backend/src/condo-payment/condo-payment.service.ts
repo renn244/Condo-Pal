@@ -22,36 +22,27 @@ export class CondoPaymentService {
     }
 
     private async getBillingMonth(condoId: string, userId: string) {
-        const latestPayment = await this.prisma.condoPayment.findFirst({
-            where: {
-                AND: [
-                    { condoId: condoId },
-                    { 
-                        OR: [
-                            { tenantId: userId },
-                            { condo: { ownerId: userId } }
-                        ]
-                    }
-                ]
-            },
-            select: { billingMonth: true },
-            orderBy: { payedAt: 'desc' }, // getting the most recent payment
-        })
-
-        const tenantLease = await this.prisma.leaseAgreement.findFirst({
-            where: { 
-                AND: [
-                    { condoId: condoId },
-                    { 
-                        OR: [
-                            { condo: { ownerId: userId } },
-                            { tenantId: userId },
-                        ]
-                    }
-                ],
-            },
-            select: { leaseStart: true }
-        })
+        const [latestPayment, tenantLease] = await Promise.all([
+            this.prisma.condoPayment.findFirst({
+                where: {
+                    AND: [
+                        { condoId: condoId },
+                        { OR: [ { tenantId: userId }, { condo: { ownerId: userId } } ] }
+                    ]
+                },
+                select: { billingMonth: true },
+                orderBy: { payedAt: 'desc' }, // getting the most recent payment
+            }),
+            this.prisma.leaseAgreement.findFirst({
+                where: { 
+                    AND: [
+                        { condoId: condoId },
+                        { OR: [ { condo: { ownerId: userId } }, { tenantId: userId }, ]}
+                    ],
+                },
+                select: { leaseStart: true, due_date: true }
+            })
+        ])
         
         if(!tenantLease) {
             throw new NotFoundException("Lease not found for tenant")
@@ -63,8 +54,9 @@ export class CondoPaymentService {
         if(!latestPayment) {
             // First-time payer: Use lease start month as the first billing month
             billingMonth = this.getBillingMonthOfDate(leaseStartDate);
+            const dueDate = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}-${tenantLease.due_date}`;
 
-            return billingMonth
+            return { billingMonth, dueDate }
         }
 
         const lastBillingMonth = latestPayment.billingMonth;
@@ -79,15 +71,17 @@ export class CondoPaymentService {
             nextMonth = 1; 
             nextYear += 1;
         }
-        
-        billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;
 
-        return billingMonth 
+        // TODO LATER: should also find out if it's an advanced payment
+        billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;
+        const dueDate = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-${tenantLease.due_date}`;
+
+        return { billingMonth, dueDate };
     }
 
     async getTotalPayment(condoId: string, user: UserJwt) {
         const billingMonth = await this.getBillingMonth(condoId, user.id); 
-        const [month, year] = billingMonth.split('-').map((data) => Number(data));
+        const [month, year] = billingMonth.billingMonth.split('-').map((data) => Number(data));
 
         const startOfMonth = new Date(year, month - 1, 1);
         
@@ -121,7 +115,7 @@ export class CondoPaymentService {
             rentCost: getCondoPayment.rentAmount,
             additionalCost: getAdditionalCost._sum.totalCost || 0,
             totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0),
-            billingMonth: billingMonth,
+            ...billingMonth,
         }
     }
 
@@ -174,7 +168,7 @@ export class CondoPaymentService {
                 gcashStatus: 'PENDING',
                 isVerified: false,
 
-                billingMonth: billingMonth
+                billingMonth: billingMonth.billingMonth
             }
         })
 
@@ -261,7 +255,7 @@ export class CondoPaymentService {
                 isPaid: true,
                 tenantId: getCondo.tenantId,
 
-                billingMonth: billingMonth
+                billingMonth: billingMonth.billingMonth
             }
         })
 
