@@ -6,7 +6,7 @@ import { useAuthContext } from "@/context/AuthContext"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Bell, DollarSign, ExternalLink, FileText, Info, MessageSquare, Receipt, Wrench } from "lucide-react"
+import { Bell, DollarSign, ExternalLink, FileText, Info, MessageSquare, Wrench } from "lucide-react"
 import { Link } from "react-router-dom"
 import PaymentDueMeter from "../../dashboard/payments/PaymentDueMeter"
 
@@ -128,14 +128,6 @@ const OverviewTab = ({
                                 </div>
                                 <PaymentDueMeter dueDate={paymentSummary.dueDate} />
                             </div>
-
-                            <div className="flex gap-2">
-                                <Button className="flex-1">Make a Payment</Button>
-                                <Button variant="outline" className="flex-1">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    View Lease
-                                </Button>
-                            </div>
                         </div>
                     </div>
                 </CardContent>
@@ -186,18 +178,18 @@ const OverviewTab = ({
                 </CardFooter>
             </Card>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="p-6">
-                        <div className="flex flex-col items-center text-center">
+                        <div className="flex flex-col items-center text-center h-full">
                             <div className="p-3 bg-primary/10 rounded-full mb-4">
                                 <MessageSquare className="h-6 w-6 text-primary" />
                             </div>
                             <h3 className="font-medium mb-1">Contact Management</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
+                            <p className="text-sm text-muted-foreground h-8 mb-4">
                                 Questions or concerns? Reach out to your property manager.
                             </p>
-                            <Button variant="outline" size="sm" className="w-full">
+                            <Button variant="outline" size="sm" className="mt-auto w-full">
                                 Send Message
                             </Button>
                         </div>
@@ -206,16 +198,18 @@ const OverviewTab = ({
 
                 <Card>
                     <CardContent className="p-6">
-                        <div className="flex flex-col items-center text-center">
+                        <div className="flex flex-col items-center text-center h-full">
                             <div className="p-3 bg-primary/10 rounded-full mb-4">
                                 <Wrench className="h-6 w-6 text-primary" />
                             </div>
                             <h3 className="font-medium mb-1">Maintenance Request</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
+                            <p className="text-sm text-muted-foreground h-8 mb-4">
                                 Submit a new maintenance request for your property.
                             </p>
-                            <Button variant="outline" size="sm" className="w-full">
-                                New Request
+                            <Button variant="outline" size="sm" className="mt-auto w-full" asChild>
+                                <Link to={`/maintenanceRequest`}>
+                                    New Request
+                                </Link>
                             </Button>
                         </div>
                     </CardContent>
@@ -223,30 +217,15 @@ const OverviewTab = ({
 
                 <Card>
                     <CardContent className="p-6">
-                        <div className="flex flex-col items-center text-center">
-                            <div className="p-3 bg-primary/10 rounded-full mb-4">
-                                <Receipt className="h-6 w-6 text-primary" />
-                            </div>
-                            <h3 className="font-medium mb-1">Payment History</h3>
-                            <p className="text-sm text-muted-foreground mb-4">View your complete payment history and receipts.</p>
-                            <Button variant="outline" size="sm" className="w-full" asChild>
-                                <Link to="/tenant/payments">View History</Link>
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex flex-col items-center text-center">
+                        <div className="flex flex-col items-center text-center h-full">
                             <div className="p-3 bg-primary/10 rounded-full mb-4">
                                 <Info className="h-6 w-6 text-primary" />
                             </div>
                             <h3 className="font-medium mb-1">Building Info</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
+                            <p className="text-sm text-muted-foreground mb-4 h-8">
                                 Access important information about your building.
                             </p>
-                            <Button variant="outline" size="sm" className="w-full">
+                            <Button variant="outline" size="sm" className="mt-auto w-full">
                                 View Details
                             </Button>
                         </div>

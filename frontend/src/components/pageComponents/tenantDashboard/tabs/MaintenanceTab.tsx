@@ -12,6 +12,7 @@ import { Plus, Wrench } from "lucide-react"
 import MaintenanceHeader from "../../dashboard/maintenance/MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import MaintenancePagination from "../../dashboard/maintenance/MaintenancePagination"
+import { Link } from "react-router-dom"
 
 const MaintenanceTab = () => {
     const { user } = useAuthContext();
@@ -43,9 +44,11 @@ const MaintenanceTab = () => {
                     <CardTitle>Maintenance Requests</CardTitle>
                     <CardDescription>View and manage your maintenance requests</CardDescription>
                 </div>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Request
+                <Button asChild>
+                    <Link to="/maintenanceRequest">
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Request
+                    </Link>
                 </Button>
                 </CardHeader>
                 <CardContent>
@@ -93,7 +96,11 @@ const MaintenanceTab = () => {
                                 <Wrench className="h-12 w-12 mx-auto text-muted-foreground opacity-20 mb-4" />
                                 <h3 className="font-medium text-lg mb-2">No Maintenance Requests</h3>
                                 <p className="text-muted-foreground mb-4">You don't have any maintenance requests at the moment.</p>
-                                <Button>Submit a Request</Button>
+                                <Button asChild>
+                                    <Link to="/maintenanceRequest">
+                                        Submit a Request
+                                    </Link>
+                                </Button>
                             </div>
                         )
                     )}
