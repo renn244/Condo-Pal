@@ -168,6 +168,7 @@ model CondoPayment {
 
 enum MaintenanceStatus {
   PENDING
+  SCHEDULED
   IN_PROGRESS
   COMPLETED
   CANCELED
@@ -212,6 +213,7 @@ model Maintenance {
   canceledBy        String? // "Tenant" and "Landlord"
 
   preferredSchedule DateTime? // if null then that means anytime
+  scheduledDate     DateTime? // if null then that means it has not been scheduled yet
   completionDate    DateTime? // if null then it means i has been cancelled
   createdAt         DateTime  @default(now())
 }

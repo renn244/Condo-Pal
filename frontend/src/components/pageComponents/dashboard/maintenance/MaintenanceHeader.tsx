@@ -39,6 +39,7 @@ const MaintenanceHeader = ({
                     <SelectContent>
                         <SelectItem value="ALL">All Priority</SelectItem>
                         <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                         <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                         <SelectItem value="COMPLETED">Completed</SelectItem>
                         <SelectItem value="CANCELED">Canceled</SelectItem>

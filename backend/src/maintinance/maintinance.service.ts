@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { MaintenanceStatus, PriorityLevel, Prisma } from '@prisma/client';
+import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
-import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 
 @Injectable()
 export class MaintenanceService {
@@ -130,10 +130,11 @@ export class MaintenanceService {
     
     async getMaintenanceStats(user: UserJwt, condoId: string) {
         const [
-            pendingMaintenances, totalInProgress, totalCompleted, totalCanceled,
+            pendingMaintenances, totalScheduled, totalInProgress, totalCompleted, totalCanceled,
             costDistributionStats
         ] = await Promise.all([
             this.prisma.maintenance.findMany({ where: { condoId, Status: MaintenanceStatus.PENDING }}),
+            this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.SCHEDULED } }),
             this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.IN_PROGRESS } }),
             this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.COMPLETED } }),
             this.prisma.maintenance.count({ where: { condoId, Status: MaintenanceStatus.CANCELED } }),
@@ -144,11 +145,12 @@ export class MaintenanceService {
             costDistributionStats: costDistributionStats,
             statusStatistics: [
                 { name: "Pending", value: pendingMaintenances.length },
+                { name: "Scheduled", value: totalScheduled },
                 { name: "In Progress", value: totalInProgress },
                 { name: "Completed", value: totalCompleted },
                 { name: "Canceled", value: totalCanceled }
             ].filter((stat) => stat.value > 0),
-            totalRequest: (totalInProgress + totalCompleted + totalCanceled + pendingMaintenances.length),
+            totalRequest: (totalScheduled + totalInProgress + totalCompleted + totalCanceled + pendingMaintenances.length),
             pendingMaintenances: pendingMaintenances
         }
     }

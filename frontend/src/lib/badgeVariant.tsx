@@ -16,6 +16,8 @@ export const getStatusBadgeVariant = (status: MaintenanceStatus) => {
     switch(status) {
         case MaintenanceStatus.PENDING:
             return "secondary";
+        case MaintenanceStatus.SCHEDULED:
+            return "outline"
         case MaintenanceStatus.IN_PROGRESS:
             return "default";
         case MaintenanceStatus.COMPLETED:

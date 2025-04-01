@@ -1,6 +1,7 @@
 
 const MaintenanceStatus = {
     PENDING: "PENDING",
+    SCHEDULED: "SCHEDULED",
     IN_PROGRESS: "IN_PROGRESS",
     COMPLETED: "COMPLETED",
     CANCELED: "CANCELED"
@@ -73,7 +74,7 @@ type MaintenanceRequestStats = {
         tenant: number,
     }[],
     statusStatistics: {
-        status: "Pending" | "In Progress" | "Completed" | "Canceled",
+        status: "Pending" | "Scheduled" | "In Progress" | "Completed" | "Canceled",
         value: number,
     }[],
     totalRequests: number,

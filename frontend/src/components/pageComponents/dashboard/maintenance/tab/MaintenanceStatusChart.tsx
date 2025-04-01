@@ -14,6 +14,10 @@ const chartConfig = {
         label: "Pending",
         color: "#f59e0b",
     },
+    Scheduled: {
+        label: "Scheduled",
+        color: "#fbbf24",
+    },
     InProgress: {
         label: "In Progress",
         color: "#8b5cf6",

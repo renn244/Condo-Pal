@@ -5,7 +5,7 @@ import { TabsContent } from "@/components/ui/tabs"
 import { useAuthContext } from "@/context/AuthContext"
 import useTenantDashboardParams from "@/hooks/useTenantDashboardParams"
 import axiosFetch from "@/lib/axios"
-import { getStatusBadgeVariant } from "@/lib/badgeVariant"
+import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import { useQuery } from "@tanstack/react-query"
 import { Plus, Wrench } from "lucide-react"
@@ -73,11 +73,14 @@ const MaintenanceTab = () => {
                                                 <h3 className="font-medium">{request.title}</h3>
                                                 <p className="text-sm text-muted-foreground mt-1">{request.description}</p>
                                             </div>
-                                            <Badge
-                                            variant={getStatusBadgeVariant(request.Status)}
-                                            >
-                                                {request.Status}
-                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant={getPriorityBadgeVariant(request.priorityLevel)}>
+                                                    {request.priorityLevel}
+                                                </Badge>
+                                                <Badge variant={getStatusBadgeVariant(request.Status)}>
+                                                    {request.Status}
+                                                </Badge>
+                                            </div>
                                         </div>
                                         <div className="flex justify-between items-center mt-4 text-sm">
                                             <div className="flex gap-4">
@@ -86,6 +89,10 @@ const MaintenanceTab = () => {
                                             </div>
                                             <Button variant="outline" size="sm">
                                                 View Details
+                                            </Button>
+                                            {/* Edit maybe?? */}
+                                            <Button variant='destructive'>
+                                                Cancel Maintenance
                                             </Button>
                                         </div>
                                     </div>
