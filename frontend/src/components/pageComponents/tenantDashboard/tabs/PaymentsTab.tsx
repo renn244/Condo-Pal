@@ -20,25 +20,22 @@ import ViewReceipt from "../../dashboard/payments/ViewReceipt"
 import ReceiptDownload from "@/components/common/receiptDownload/ReceiptDownload"
 import PaymentsHeader from "../../dashboard/payments/PaymentsHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import PaymentDueMeter from "../../dashboard/payments/PaymentDueMeter"
+
+type PaymentsTabProps = {
+    paymentSummary: CondoBillInformation 
+}
 
 //TODO LATER: REFACTOR ALL LOGIC TO INDIVIDUAL COMPONENTS
-const PaymentsTab = () => {
+const PaymentsTab = ({
+    paymentSummary
+}: PaymentsTabProps) => {
     const { user } = useAuthContext();
     const { 
         paymentType, paymentStatus: status, paymentPage: page, paymentSearch: search,
         setPage, setSearch, setPaymentType, setPaymentStatus
     } = useTenantDashboardParams();
     const condoId = user!.condo.id;
-
-    const { data: paymentSummary } = useQuery({
-        queryKey: ["paymentSummary"],
-        queryFn: async () => {
-            const response = await axiosFetch.get(`/condo-payment/getBill?condoId=${condoId}`)
-
-            return response.data as CondoBillInformation;
-        },
-        refetchOnWindowFocus: false,
-    })
 
     const { data: recentPayments, isLoading } = useQuery({
         queryKey: ['recentPayments', page, search, status, paymentType, condoId],
@@ -60,17 +57,8 @@ const PaymentsTab = () => {
 
     if(!paymentSummary) return null;
 
-    const PaymentDate = new Date(paymentSummary.dueDate);
-    const today = new Date();
-    // Set the hours, minutes, seconds, and milliseconds to 0 for both dates
-    PaymentDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    // this handle even the month of payment (1000 * 60 * 60 * 24) = 1 day
-    const daysUntilNextPayment = Math.floor((PaymentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    const isLate = daysUntilNextPayment < 0;
-
     const isCurrentMonthPaid = () => {
-        const currentBillingMonth = today.getMonth();
+        const currentBillingMonth = new Date().getMonth();
         const month = parseInt(paymentSummary.billingMonth.split("-")[0]);
 
         return currentBillingMonth < month 
@@ -90,20 +78,9 @@ const PaymentsTab = () => {
                             <p className="text-2xl font-bold text-primary">{formatToPesos(paymentSummary.totalCost)}</p>
                             <div className="flex justify-between items-center mt-2">
                                 <span className="text-sm text-muted-foreground">Due Date</span>
-                                <span className="font-medium">{formatDate(new Date(PaymentDate))}</span>
+                                <span className="font-medium">{formatDate(new Date(paymentSummary.dueDate))}</span>
                             </div>
-                            <div className="mt-2">
-                                <div className={`text-sm text-muted-foreground ${isLate && "text-red-500 font-medium"}`}>
-                                    {Math.abs(daysUntilNextPayment)} {" "}
-                                    {!isLate ? "Days until payment is due" : "Days late"}
-                                </div>
-                                <div className="h-2 bg-gray-200 rounded-full mt-1">
-                                    <div
-                                        className={`h-2 bg-primary rounded-full ${isLate ? "bg-red-500" : ""}`}
-                                        style={{ width: `${Math.min(100, (30 - daysUntilNextPayment) * 3.33)}%` }}
-                                    ></div>
-                                </div>
-                            </div>
+                            <PaymentDueMeter dueDate={paymentSummary.dueDate} />
                         </div>
 
                         <div className="bg-muted p-4 rounded-md">

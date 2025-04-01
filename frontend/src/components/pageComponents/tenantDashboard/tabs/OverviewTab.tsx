@@ -1,24 +1,14 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { TabsContent } from "@/components/ui/tabs"
+import { useAuthContext } from "@/context/AuthContext"
+import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
 import { Bell, DollarSign, ExternalLink, FileText, Info, MessageSquare, Receipt, Wrench } from "lucide-react"
 import { Link } from "react-router-dom"
-
-const currentLease = {
-    id: "lease-1",
-    propertyName: "Seaside Retreat",
-    propertyAddress: "123 Ocean View Dr, Miami, FL 33101",
-    startDate: "2023-06-01T00:00:00Z",
-    endDate: "2024-05-31T00:00:00Z",
-    monthlyRent: 2500,
-    securityDeposit: 3000,
-    status: "ACTIVE",
-    nextPaymentDate: "2024-04-01T00:00:00Z",
-    nextPaymentAmount: 2500,
-    documentUrl: "#",
-}
+import PaymentDueMeter from "../../dashboard/payments/PaymentDueMeter"
 
 const notifications: any[] = [
     {
@@ -58,10 +48,18 @@ const notifications: any[] = [
     },
 ]
 
-const OverviewTab = () => {
+type OverviewTabProps = {
+    paymentSummary: CondoBillInformation
+}
 
+const OverviewTab = ({
+    paymentSummary,
+}: OverviewTabProps) => {
+    const { user } = useAuthContext();
+
+    // we use the user.created at date to determine the lease start date because it is created when the lease is created
+    const leaseStarted = user!.createdAt; // we already check this in the parent component
     
-
     // Get notification icon
     const getNotificationIcon = (type: any) => {
         switch (type) {
@@ -84,7 +82,7 @@ const OverviewTab = () => {
                     <div className="flex justify-between items-start">
                         <div>
                             <CardTitle>Lease Summary</CardTitle>
-                            <CardDescription>{currentLease.status}</CardDescription>
+                            <CardDescription>{paymentSummary.name}</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
@@ -92,27 +90,27 @@ const OverviewTab = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <div>
+                                <h3 className="text-sm font-medium text-muted-foreground mb-1">Property Owner</h3>
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-9 w-9 border border-border">
+                                        <AvatarImage className="h-9 w-9 select-none" src={paymentSummary.owner.profile} />
+                                        <AvatarFallback>{paymentSummary.owner.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <p className="font-medium">{paymentSummary.owner.name}</p>
+                                </div>
+                            </div>
+                            <div className="max-w-[603px]">
                                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Property</h3>
-                                <p className="font-medium">{currentLease.propertyAddress}</p>
+                                <p className="font-medium">{paymentSummary.name}, {paymentSummary.address}</p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <h3 className="text-sm font-medium text-muted-foreground mb-1">Lease Start</h3>
-                                    <p className="font-medium">{formatDate(new Date(currentLease.startDate))}</p>
+                                    <p className="font-medium">{formatDate(new Date(leaseStarted))}</p>
                                 </div>
-                                <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Lease End</h3>
-                                    <p className="font-medium">{formatDate(new Date(currentLease.endDate))}</p>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <h3 className="text-sm font-medium text-muted-foreground mb-1">Monthly Rent</h3>
-                                    <p className="font-medium">{formatToPesos(currentLease.monthlyRent)}</p>
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Security Deposit</h3>
-                                    <p className="font-medium">{formatToPesos(currentLease.securityDeposit)}</p>
+                                    <p className="font-medium">{formatToPesos(paymentSummary.rentCost)}</p>
                                 </div>
                             </div>
                         </div>
@@ -121,24 +119,14 @@ const OverviewTab = () => {
                             <div className="bg-muted p-4 rounded-md">
                                 <div className="flex justify-between items-center mb-2">
                                     <h3 className="font-medium">Next Payment</h3>
-                                    {/* {getPaymentStatusBadge("UPCOMING")} */}
+                                    <span className="font-medium">{formatBillingMonth(paymentSummary.billingMonth)}</span>
                                 </div>
-                                <p className="text-2xl font-bold text-primary">{formatToPesos(currentLease.nextPaymentAmount)}</p>
+                                <p className="text-2xl font-bold text-primary">{formatToPesos(paymentSummary.totalCost)}</p>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-sm text-muted-foreground">Due Date</span>
-                                    <span className="font-medium">{formatDate(new Date(currentLease.nextPaymentDate))}</span>
+                                    <span className="font-medium">{formatDate(new Date(paymentSummary.dueDate))}</span>
                                 </div>
-                                <div className="mt-2">
-                                    <div className="text-sm text-muted-foreground">
-                                        {/* {getDaysUntilNextPayment()} days until payment is due */}
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full mt-1">
-                                        <div
-                                        className="h-2 bg-primary rounded-full"
-                                        // style={{ width: `${Math.min(100, (30 - getDaysUntilNextPayment()) * 3.33)}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
+                                <PaymentDueMeter dueDate={paymentSummary.dueDate} />
                             </div>
 
                             <div className="flex gap-2">
@@ -161,33 +149,33 @@ const OverviewTab = () => {
                 <CardContent>
                     <div className="space-y-4">
                         {notifications.slice(0, 3).map((notification) => (
-                        <div
-                        key={notification.id}
-                        className={`p-4 rounded-md border ${!notification.isRead ? "bg-blue-50/50" : ""}`}
-                        >
-                            <div className="flex gap-4">
-                                <div className="mt-1">{getNotificationIcon(notification.type)}</div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-start">
-                                        <h3 className="font-medium">{notification.title}</h3>
-                                        <span className="text-xs text-muted-foreground">
-                                            {new Date(notification.date).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                                    {notification.actionUrl && (
-                                        <div className="mt-2">
-                                            <Button variant="outline" size="sm" asChild>
-                                            <Link to={notification.actionUrl}>
-                                                View Details
-                                                <ExternalLink className="ml-2 h-3 w-3" />
-                                            </Link>
-                                            </Button>
+                            <div
+                            key={notification.id}
+                            className={`p-4 rounded-md border ${!notification.isRead ? "bg-blue-50/50" : ""}`}
+                            >
+                                <div className="flex gap-4">
+                                    <div className="mt-1">{getNotificationIcon(notification.type)}</div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start">
+                                            <h3 className="font-medium">{notification.title}</h3>
+                                            <span className="text-xs text-muted-foreground">
+                                                {new Date(notification.date).toLocaleDateString()}
+                                            </span>
                                         </div>
-                                    )}
+                                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                                        {notification.actionUrl && (
+                                            <div className="mt-2">
+                                                <Button variant="outline" size="sm" asChild>
+                                                <Link to={notification.actionUrl}>
+                                                    View Details
+                                                    <ExternalLink className="ml-2 h-3 w-3" />
+                                                </Link>
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         ))}
                     </div>
                 </CardContent>

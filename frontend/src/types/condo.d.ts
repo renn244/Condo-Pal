@@ -53,7 +53,12 @@ type CondoBillInformation = {
     tenant?: {
         id: user['id']
         name: user['name']
-    }
+    },
+    owner: {
+        id: user['id']
+        name: user['name'],
+        profile: user['profile']
+    },
 }
 
 type CondoSummary = {

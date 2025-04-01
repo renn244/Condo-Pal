@@ -134,7 +134,8 @@ export class CondoPaymentService {
                 ]},
                 select: { 
                     id: true, name: true, address: true, photo: true, 
-                    tenant: { select: { id: true, name: true } }
+                    tenant: { select: { id: true, name: true } },
+                    owner: { select: { id: true, name: true, profile: true } }
                 }
             }),
             this.getTotalPayment(condoId, user)

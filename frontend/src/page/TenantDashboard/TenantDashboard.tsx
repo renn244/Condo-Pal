@@ -1,3 +1,6 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import NotFound from "@/components/common/NotFound";
+import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import MaintenanceTab from "@/components/pageComponents/tenantDashboard/tabs/MaintenanceTab";
 import OverviewTab from "@/components/pageComponents/tenantDashboard/tabs/OverviewTab";
 import PaymentsTab from "@/components/pageComponents/tenantDashboard/tabs/PaymentsTab";
@@ -6,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/AuthContext"
+import axiosFetch from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 import { Bell, ChevronRight, DollarSign, FileText, LogOut, Settings, User, Wrench } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -48,24 +53,48 @@ const notifications: any[] = [
     },
 ]
 
+const getNotificationIcon = (type: any) => {
+    switch (type) {
+        case "PAYMENT":
+            return <DollarSign className="h-5 w-5 text-blue-500" />
+        case "MAINTENANCE":
+            return <Wrench className="h-5 w-5 text-purple-500" />
+        case "ANNOUNCEMENT":
+            return <Bell className="h-5 w-5 text-amber-500" />
+        case "LEASE":
+            return <FileText className="h-5 w-5 text-green-500" />
+    }
+}
+
 const TenantDashboard = () => {
     const [unreadCount] = useState(notifications.filter((notification) => !notification.isRead).length)
 
     const { user } = useAuthContext();
     if(!user) return null // this is already checked by the TenantRoute
 
-    const getNotificationIcon = (type: any) => {
-        switch (type) {
-            case "PAYMENT":
-                return <DollarSign className="h-5 w-5 text-blue-500" />
-            case "MAINTENANCE":
-                return <Wrench className="h-5 w-5 text-purple-500" />
-            case "ANNOUNCEMENT":
-                return <Bell className="h-5 w-5 text-amber-500" />
-            case "LEASE":
-                return <FileText className="h-5 w-5 text-green-500" />
-        }
-    }
+    const { data: paymentSummary, isLoading, refetch, error } = useQuery({
+        queryKey: ["paymentSummary"],
+        queryFn: async () => {
+            const response = await axiosFetch.get(`/condo-payment/getBill?condoId=${user!.condo.id}`)
+
+            if(response.status === 404) {
+                return null;
+            }
+
+            if(response.status >= 400) {
+                throw new Error("Error fetching payment summary");
+            }
+
+            return response.data as CondoBillInformation;
+        },
+        refetchOnWindowFocus: false,
+    })
+
+    if(isLoading) return <LoadingSpinner />
+
+    if(error) return <SomethingWentWrong reset={refetch} />
+
+    if(!paymentSummary) return <NotFound />;
 
     return (
         <div className="container py-6 mx-auto">
@@ -145,8 +174,8 @@ const TenantDashboard = () => {
                         <DropdownMenuContent align="end">
                             <div className="flex items-center justify-start gap-2 p-2">
                                 <div className="flex flex-col space-y-1 leading-none">
-                                <p className="font-medium">{user.name}</p>
-                                <p className="w-[200px] truncate text-sm text-muted-foreground">{user.email}</p>
+                                    <p className="font-medium">{user.name}</p>
+                                    <p className="w-[200px] truncate text-sm text-muted-foreground">{user.email}</p>
                                 </div>
                             </div>
                             <DropdownMenuSeparator />
@@ -182,10 +211,10 @@ const TenantDashboard = () => {
                 </TabsList>
 
                 {/* Overview Tab */}
-                <OverviewTab />
+                <OverviewTab paymentSummary={paymentSummary} />
 
                 {/* Payments Tab */}
-                <PaymentsTab />
+                <PaymentsTab paymentSummary={paymentSummary} />
 
                 {/* Maintenance Tab */}
                 <MaintenanceTab />
