@@ -7,7 +7,6 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { useAuthContext } from "@/context/AuthContext"
-import { MaintenanceRequest } from "@/page/Dashboard/Maintenance"
 
 type CancelMaintenanceProps = {
     maintenanceId: string,
@@ -40,7 +39,7 @@ const CancelMaintenance = ({
             toast.success("maintenance canceled")
             await queryClient.setQueryData(queryKey, (oldData: MaintenanceRequest) => ({
                 ...oldData,
-                maintenanceRequests: oldData.maintenanceRequests.map(maintenance => {
+                maintenanceRequests: oldData.maintenanceRequests.map((maintenance) => {
                     if(maintenance.id === maintenanceId) {
                         return {
                             ...maintenance,

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
-import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
@@ -45,6 +45,12 @@ export class MaintenanceController {
     async editMaintenanceRequest(@Query('maintenanceId') maintenanceId: string, @User() user: UserJwt, @Body() body: TenantEditMaintenanceRequest,
     @UploadedFiles() photos: Array<Express.Multer.File>) {
         return this.maintenanceService.editMaintenanceRequest(maintenanceId, user, body, photos);
+    }
+
+    @Patch('schedule')
+    async scheduleMaintenance(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string, 
+    @Body() body: ScheduleMaintenanceRequestDto) {
+        return this.maintenanceService.scheduleMaintenanceRequest(maintenanceId, user, body);
     }
 
     @Patch('cancel')

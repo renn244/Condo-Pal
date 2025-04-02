@@ -4,7 +4,7 @@ import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 
 @Injectable()
 export class MaintenanceService {
@@ -215,6 +215,41 @@ export class MaintenanceService {
         })
 
         return editedMaintenance
+    }
+
+    async scheduleMaintenanceRequest(maintenanceId: string, user: UserJwt, body: ScheduleMaintenanceRequestDto,) {
+        const condoOfMaintenance = await this.prisma.maintenance.findFirst({
+            where: {
+                id: maintenanceId
+            },
+            include: {
+                condo: {
+                    select: { tenantId: true, ownerId: true }
+                }
+            }
+        })
+        
+        if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
+
+        const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
+        if(!isOwnerOrTenant) throw new ForbiddenException('you are not allowed to update this!')
+
+        const scheduleMaintenance = await this.prisma.maintenance.update({
+            where: {
+                id: maintenanceId,
+            },
+            data: {
+                Status: 'SCHEDULED',
+                scheduledDate: body.scheduledDate,
+                estimatedCost: body.estimatedCost,
+                paymentResponsibility: body.paymentResponsibility,
+            }
+        })
+
+        // if manualLink is false then we should send email to the worker with the additional Notes
+        
+
+        return scheduleMaintenance
     }
 
     // landlord // maybe add message why later?

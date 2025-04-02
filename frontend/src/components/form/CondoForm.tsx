@@ -167,7 +167,8 @@ const CondoForm = ({
                             <FormItem>
                                 <FormLabel>Is Active</FormLabel>
                                 <FormControl className='flex-row items-center'>
-                                    <Checkbox className='mb-0 size-4 ml-1' ref={field.ref} name={field.name} checked={field.value} onCheckedChange={field.onChange} />
+                                    <Checkbox className='mb-0 size-4 ml-1' 
+                                    ref={field.ref} name={field.name} checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
                                 <FormDescription>
                                     This is to know whether the condo is occupied (isActive)

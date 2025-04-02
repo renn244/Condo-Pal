@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Clock, MoreVertical, Pencil } from 'lucide-react'
+import { MoreVertical, Pencil } from 'lucide-react'
 import ViewDetails from './ViewDetails'
 import { Separator } from '@/components/ui/separator'
 import CancelMaintenance from './CancelMaintenance'
+import ScheduleMaintenance from './ScheduleMaintenance'
 
 type MaintenanceOptionProps = {
     maintenance: maintenanceCard,
@@ -25,10 +26,12 @@ const MaintenanceOptions = ({
             </PopoverTrigger>
             <PopoverContent align="end" className="w-56 p-1">
                 <ViewDetails maintenance={maintenance} />
-                <Button variant="ghost" className="w-full justify-start">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Update Status
-                </Button>
+                <ScheduleMaintenance 
+                maintenancePrefferredSchedule={maintenance.preferredSchedule}
+                maintenanceId={maintenance.id} 
+                maintenanceTitle={maintenance.title}
+                queryKey={queryKey}
+                />
                 <Button variant="ghost" className="w-full justify-start">
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit maintenance

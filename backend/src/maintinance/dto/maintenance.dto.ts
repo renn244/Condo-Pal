@@ -1,5 +1,5 @@
-import { MaintenanceType, PriorityLevel } from "@prisma/client";
-import { IsArray, IsDateString, IsEnum, IsOptional, IsString } from "class-validator";
+import { MaintenanceType, PaymentResponsibility, PriorityLevel } from "@prisma/client";
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class TenantMaintenaceRequestDto {
     // @IsString()
@@ -29,4 +29,30 @@ export class TenantEditMaintenanceRequest extends TenantMaintenaceRequestDto {
     @IsArray()
     @IsOptional()
     previousPhotos?: string[];
+}
+
+export class ScheduleMaintenanceRequestDto {
+    @IsNumber()
+    estimatedCost: number;
+
+    @IsString()
+    @IsDateString()
+    scheduledDate: string;
+
+    @IsEnum(PaymentResponsibility, {
+        message: "Payment responsibility must be either tenant or landlord"
+    })
+    paymentResponsibility: PaymentResponsibility;
+
+    @IsBoolean()
+    manualLink: boolean;
+
+    // only for automated email / manualLink = false
+    @IsOptional()
+    @IsString()
+    workerEmail?: string;
+
+    @IsOptional()
+    @IsString()
+    additionalNotes?: string;
 }
