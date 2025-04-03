@@ -21,6 +21,7 @@ import VerifyPaymongoPayment from './page/TenantDashboard/CondoPayment/VerifyPay
 import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import TenantRoute from './components/common/Authorization/TenantRoute';
 import TenantDashboard from './page/TenantDashboard/TenantDashboard';
+import MaintenanceWorker from './page/MaintenanceWorker';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -67,6 +68,9 @@ const App = () => {
             <TenantDashboard />
           </TenantRoute>
         } />
+
+        {/* Worker Page */}
+        <Route path='/maintenance/worker/:maintenanceId' element={<MaintenanceWorker />} />
 
         {/* we still need to put these pages to their proper url like dashboard of tenant or landlord  */}
         <Route path='/condoPayments/manual/:condoId' element={<ManualPayment />} />

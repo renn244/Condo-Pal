@@ -48,8 +48,13 @@ type maintenance = {
     canceledBy?: string,
     paymentResponsibility?: PaymentResponsibility,
 
+    // messages // add later
+
     preferredSchedule?: string,
+    scheduledDate?: string,
     completionDate?: string,
+    proofOfCompletion: string[],
+
     createdAt: string,
 }
 
@@ -66,6 +71,24 @@ type MaintenanceRequest = {
     hasNext: boolean,
     totalPages: number
 }
+
+type MaintenanceGetRequest = {
+    condo: {
+        id: condo['id'],
+        name: condo['name'],
+        address: condo['address']
+        tenantId: condo['tenantId'],
+        tenant: {
+            name: user['name'],
+            profile: user['profile']
+        },
+        ownerId: condo['ownerId'],
+        owner: {
+            name: user['name'],
+            profile: user['profile']
+        }
+    }
+} & maintenance
 
 type MaintenanceRequestStats = {
     costDistributionStats: {

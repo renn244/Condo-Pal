@@ -1,5 +1,5 @@
 import { MaintenanceType, PaymentResponsibility, PriorityLevel } from "@prisma/client";
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
 
 export class TenantMaintenaceRequestDto {
     // @IsString()
@@ -55,4 +55,12 @@ export class ScheduleMaintenanceRequestDto {
     @IsOptional()
     @IsString()
     additionalNotes?: string;
+}
+
+export class CompleteMaintenanceRequestDto {
+    @IsNumberString()
+    totalCost: string;
+
+    @IsString()
+    message: string;
 }

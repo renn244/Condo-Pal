@@ -39,6 +39,8 @@ model User {
   payments      CondoPayment[]
   agreement     LeaseAgreement? // if it's a landlord then this should be null
 
+  maintenanceMessage MaintenanceMessage[] // this is the message that the user sent to the maintenance
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -212,8 +214,39 @@ model Maintenance {
   paymentResponsibility PaymentResponsibility?
   canceledBy        String? // "Tenant" and "Landlord"
 
+  messages         MaintenanceMessage[] // this is only used for the onProgress status
+
   preferredSchedule DateTime? // if null then that means anytime
   scheduledDate     DateTime? // if null then that means it has not been scheduled yet
   completionDate    DateTime? // if null then it means i has been cancelled
+  proofOfCompletion String[] // this is the proof of completion of the maintenance
+
   createdAt         DateTime  @default(now())
+}
+
+enum SenderType {
+  TENANT
+  LANDLORD
+  WORKER // No senderId means it's the assigned worker
+}
+
+model MaintenanceMessage {
+  id            String   @id @default(cuid())
+
+  // this is where the message is being sent like a group
+  maintenanceId String 
+  maintenance   Maintenance @relation(fields: [maintenanceId], references: [id])
+
+  // only tenant and landlord. no senderId means it's the assigned worker
+  senderId      String?
+  sender        User?     @relation(fields: [senderId], references: [id])
+  
+  workerName    String? // this is the name of the worker that is assigned to the maintenance
+
+  senderType    SenderType // this is the type of sender
+
+  message       String
+  attachment    String[] // Optional: If message can include photos/documents
+
+  createdAt     DateTime @default(now())
 }

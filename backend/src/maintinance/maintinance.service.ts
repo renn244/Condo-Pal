@@ -4,7 +4,7 @@ import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 
 @Injectable()
 export class MaintenanceService {
@@ -159,7 +159,13 @@ export class MaintenanceService {
         const maintenanceRequest = await this.prisma.maintenance.findFirst({
             where: { id: maintinanceId },
             include: {
-                condo: { select: { id: true, address: true, tenantId: true, ownerId: true, } }
+                condo: { 
+                    select: { 
+                        id: true, name: true, address: true, 
+                        tenantId: true, tenant: { select: { name: true, profile: true } }, 
+                        ownerId: true, owner: { select: { name: true, profile: true } }, 
+                    }   
+                }
             }
         })
 
@@ -252,6 +258,48 @@ export class MaintenanceService {
         return scheduleMaintenance
     }
 
+    // maybe add a token later becuase the workjer is not authenticated 
+    // so we need to find a way to authenticate the user
+    async inProgressMaintenanceRequest(maintenanceId: string) {
+        // find a way to authenticate the user because the worker is not authenticated
+
+        const maintenanceRequest = await this.prisma.maintenance.update({
+            where: { id: maintenanceId },
+            data: { Status: 'IN_PROGRESS' },
+        })
+
+        // notify the tenant and the landlord using email and build in notification in our app
+        
+
+        return maintenanceRequest
+    }
+
+    // maybe add a token later becuase the workjer is not authenticated
+    // also get photo that the worker took to prove that he completed the work
+    async completeMaintenanceRequest(maintenanceId: string, body: CompleteMaintenanceRequestDto, proof: Array<Express.Multer.File>) {
+        const photoUrls = await Promise.all(
+            proof.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url;
+            })
+        );
+        
+        const maintenanceRequest = await this.prisma.maintenance.update({
+            where: { id: maintenanceId },
+            data: { 
+                Status: 'COMPLETED', 
+                proofOfCompletion: photoUrls, 
+                totalCost: parseInt(body.totalCost),
+                completionDate: new Date(),
+            },
+        })
+
+        // notify the tenant and the landlord using email and build in notification in our app
+        
+
+        return maintenanceRequest
+    }
+
     // landlord // maybe add message why later?
     async cancelMaintenanceRequest(maintenanceId: string, user: UserJwt) {
         // make sure he owns the condo
@@ -283,5 +331,5 @@ export class MaintenanceService {
         })
 
         return cancelMaintenance
-    }    
+    }
 }

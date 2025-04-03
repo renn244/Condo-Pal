@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Ban, Calendar, CheckCircle, Clock, DollarSign, Eye, PenTool, User } from "lucide-react"
+import { Ban, Calculator, Calendar, CheckCircle, Clock, Eye, PenTool, ReceiptText, User } from "lucide-react"
 
 type ViewDetailsProps = {
     maintenance: maintenanceCard
@@ -100,13 +100,13 @@ const ViewDetails = ({
                             <div className="space-y-2 text-sm">
                                 {maintenance.estimatedCost && (
                                     <div className="flex items-center gap-2">
-                                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                        <Calculator className="h-4 w-4 text-muted-foreground" />
                                         <span>Estimated Cost: {formatToPesos(maintenance.estimatedCost)}</span>
                                     </div>
                                 )}
                                 {maintenance.totalCost && (
                                     <div className="flex items-center gap-2">
-                                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                        <ReceiptText className="h-4 w-4 text-muted-foreground" />
                                         <span>Total Cost: {formatToPesos(maintenance.totalCost)}</span>
                                     </div>
                                 )}

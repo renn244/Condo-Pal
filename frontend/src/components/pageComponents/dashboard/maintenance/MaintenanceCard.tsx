@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Calendar, Clock, DollarSign, Home, PenTool } from "lucide-react"
+import { Calculator, Calendar, CalendarCheck, CheckCircle, Clock, Home, PenTool } from "lucide-react"
 import MaintenanceOptions from "./MaintenanceOptions"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
+import formatDateTime from "@/lib/formatDateTime"
 
 type MaintenanceCardProps = {
     maintenance: maintenanceCard
@@ -62,9 +63,9 @@ const MaintenanceCard = ({
 
                     {maintenance.estimatedCost && (
                         <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            <Calculator className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                            Estimated: 
+                            Estimated: {" "}
                             {formatToPesos(maintenance.estimatedCost)}
                             {maintenance.paymentResponsibility && (
                                 <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
@@ -74,10 +75,30 @@ const MaintenanceCard = ({
                     )}
 
                     <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Preferred Scheduled: {
-                            maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
-                        }</span>
+                        {maintenance.Status === 'PENDING' && (
+                            <>
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Preferred Scheduled: {
+                                    maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
+                                }</span>
+                            </>
+                        )}
+                        {maintenance.Status === 'SCHEDULED' && (
+                            <>
+                                <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Scheduled: {
+                                    maintenance.scheduledDate ? formatDateTime(new Date(maintenance.scheduledDate)) : 'anytime'
+                                }</span>
+                            </>
+                        )}
+                        {maintenance.Status === 'COMPLETED' && (
+                            <>
+                                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Completed: {
+                                    maintenance.completionDate ? formatDateTime(new Date(maintenance.completionDate)) : 'anytime'
+                                }</span>
+                            </>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">

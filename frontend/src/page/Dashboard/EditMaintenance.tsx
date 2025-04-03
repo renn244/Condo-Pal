@@ -58,7 +58,7 @@ const EditMaintenance = () => {
                 throw new Error(response.data.message)
             }
 
-            return response.data
+            return response.data as MaintenanceGetRequest;
         },
         refetchOnWindowFocus: false,
         retry: false

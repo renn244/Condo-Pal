@@ -100,6 +100,7 @@ const ScheduleMaintenance = ({
                                 Status: 'SCHEDULED',
                                 scheduledDate: values.scheduledDate,
                                 paymentResponsibility: values.paymentResponsibility,
+                                estimatedCost: values.estimatedCost,
                             }
                         }
                         return maintenance
