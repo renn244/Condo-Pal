@@ -231,22 +231,23 @@ enum SenderType {
 }
 
 model MaintenanceMessage {
-  id            String   @id @default(cuid())
+  id              String   @id @default(cuid())
 
   // this is where the message is being sent like a group
-  maintenanceId String 
-  maintenance   Maintenance @relation(fields: [maintenanceId], references: [id])
+  maintenanceId   String 
+  maintenance     Maintenance @relation(fields: [maintenanceId], references: [id])
 
   // only tenant and landlord. no senderId means it's the assigned worker
-  senderId      String?
-  sender        User?     @relation(fields: [senderId], references: [id])
+  senderId        String?
+  sender          User?     @relation(fields: [senderId], references: [id])
   
-  workerName    String? // this is the name of the worker that is assigned to the maintenance
+  workerName      String? // this is the name of the worker that is assigned to the maintenance
+  senderType      SenderType // this is the type of sender
 
-  senderType    SenderType // this is the type of sender
+  message         String
+  attachment      String[] // Optional: If message can include photos/documents
 
-  message       String
-  attachment    String[] // Optional: If message can include photos/documents
+  isStatusUpdate  Boolean? // if this is true then this is a status update
 
-  createdAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
 }

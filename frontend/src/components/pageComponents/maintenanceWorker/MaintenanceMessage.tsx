@@ -4,13 +4,7 @@ import { useAuthContext } from "@/context/AuthContext"
 import formatDateTime from "@/lib/formatDateTime"
 
 type MaintenanceMessageProps = {
-    message: any,
-}
-  
-enum UserRole {
-    WORKER = "WORKER",
-    TENANT = "TENANT",
-    LANDLORD = "LANDLORD",
+    message: MaintenanceMessageWithSender,
 }
 
 const MaintenanceMessage = ({
@@ -29,8 +23,8 @@ const MaintenanceMessage = ({
             >
                 {message.senderId !== "system" && (
                     <Avatar className="h-8 w-8 mt-6">
-                        <AvatarImage src={message.senderAvatar} alt={message.senderName} />
-                        <AvatarFallback>{message.senderName.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={message.sender?.profile} alt={message.sender?.name} />
+                        <AvatarFallback>{(message.sender?.name || message.workerName || "W").charAt(0)}</AvatarFallback>
                     </Avatar>
                 )}
 
@@ -39,12 +33,12 @@ const MaintenanceMessage = ({
                     className={`flex items-center gap-2 mb-1 ${message.senderId === userId ? "justify-end" : "justify-start"}`}
                     >
                         <span className="text-xs font-medium">
-                        {message.senderId === "system" ? "System" : message.senderName}
+                            {message.sender ? message.sender.name : message.workerName}
                         </span>
-                        <span className="text-xs text-muted-foreground">{formatDateTime(new Date(message.timestamp))}</span>
+                        <span className="text-xs text-muted-foreground">{formatDateTime(new Date(message.createdAt))}</span>
                         {message.senderId !== userId && (
-                            <Badge variant="outline" className="text-xs">
-                                {message.senderRole === UserRole.TENANT ? "Tenant" : "Landlord"}
+                            <Badge variant="outline" className="text-xs capitalize">
+                                {message.senderType.toLowerCase()}
                             </Badge>
                         )}
                     </div>
@@ -58,12 +52,12 @@ const MaintenanceMessage = ({
                             : "bg-muted"
                     }`}
                     >
-                        <p className="whitespace-pre-wrap">{message.content}</p>
+                        <p className="whitespace-pre-wrap">{message.message}</p>
                     </div>
 
-                    {message.attachments && message.attachments.length > 0 && (
+                    {message.attachment && message.attachment.length > 0 && (
                         <div className={`flex flex-wrap gap-2 mt-2 ${message.senderId === userId ? "justify-end" : "justify-start"}`}>
-                            {message.attachments.map((attachment: any, index: number) => (
+                            {message.attachment.map((attachment: any, index: number) => (
                                 <img
                                 key={index}
                                 src={attachment || "/placeholder.svg"}
