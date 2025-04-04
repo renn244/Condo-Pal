@@ -4,12 +4,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMaintenanceMessageDto, CreateMaintenanceMessageWithFileDto } from './dto/maintenance.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { SenderType } from '@prisma/client';
+import { MaintenanceMessageGateway } from './maintenance-message.gateway';
 
 @Injectable()
 export class MaintenanceMessageService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly fileUploadService: FileUploadService,
+        private readonly maintenanceMessageGateway: MaintenanceMessageGateway,
     ) {}
 
     async createMaintenanceMessage(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageDto) {
@@ -23,9 +25,13 @@ export class MaintenanceMessageService {
                 senderId: user?.id,
                 senderType: senderType
             },
+            include: {
+                sender: { select: { id: true, name: true, profile: true, } }
+            }
         });
 
         // update the socket room for the maintenance
+        this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
 
         return maintenanceMessage;
     }

@@ -1,11 +1,12 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosFetch from "@/lib/axios";
-import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
+import { InfiniteData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { io } from "socket.io-client";
 import MaintenanceMessage from "./MaintenanceMessage";
 import MaintenanceMessageInput from "./MaintenanceMessageInput";
-import { useEffect } from "react";
 
 type MaintenanceChatProps = {
     maintenanceId: string;
@@ -14,6 +15,8 @@ type MaintenanceChatProps = {
 const MaintenanceChat = ({
     maintenanceId
 }: MaintenanceChatProps) => {
+    const queryClient = useQueryClient();
+
     const fetchMaintenanceMessages = async ({ pageParam: cursor = null }: { pageParam: string | null }) => {
         const response = await axiosFetch.get(`/maintenance-message/getMessages?maintenanceId=${maintenanceId}&cursor=${cursor || ''}`);
 
@@ -24,18 +27,11 @@ const MaintenanceChat = ({
         return response.data as MaintenanceGetMessages;
     }
 
-    // useinfinite query
     const { 
         data,
         fetchNextPage,
         hasNextPage,
-    } = useInfiniteQuery<
-        MaintenanceGetMessages, 
-        Error, 
-        InfiniteData<MaintenanceGetMessages>, 
-        ['maintenanceChat', string], 
-        string | null
-    >({
+    } = useInfiniteQuery<MaintenanceGetMessages, Error, InfiniteData<MaintenanceGetMessages>, ['maintenanceChat', string], string | null>({
         queryKey: ['maintenanceChat', maintenanceId],
         queryFn: fetchMaintenanceMessages,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -44,9 +40,42 @@ const MaintenanceChat = ({
         refetchOnReconnect: false,
     })
 
-    // listen to socket messages
     useEffect(() => {
+        // Define the socket connection in the effect
+        const socket = io("http://localhost:5000/maintenance-message", {
+            autoConnect: true,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            transports: ["websocket"],
+            query: {
+                maintenanceId: maintenanceId,
+            }
+        });
 
+        // Handle the message event
+        socket.on('newMessage', async (message: MaintenanceMessageWithSender) => {
+            await queryClient.setQueryData(['maintenanceChat', maintenanceId], (oldData: InfiniteData<MaintenanceGetMessages, unknown> | undefined) => {
+                return {
+                    ...oldData,
+                    pages: oldData?.pages.map((page, idx) => {
+                        if(idx === 0) {
+                            return {
+                                ...page,
+                                messages: [message, ...page.messages],
+                            }
+                        }
+                        return page
+                    }),
+                }
+            });
+        });
+
+        // Cleanup function (off the 'newMessage' event)
+        return () => {
+            socket.off('newMessage');
+            console.log('Cleanup called');
+            socket.disconnect(); // It's a good practice to call disconnect to close the connection properly
+        };
     }, [maintenanceId])
 
     const chatMessages = data?.pages.flatMap((page) =>

@@ -34,6 +34,7 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceStats(user, condoId);
     }
     
+    // make a public api dedicated for assigned worker
     @Get('getRequest')
     async getMaintenanceRequest(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
         return this.maintenanceService.getMaintenanceRequest(maintenanceId, user);

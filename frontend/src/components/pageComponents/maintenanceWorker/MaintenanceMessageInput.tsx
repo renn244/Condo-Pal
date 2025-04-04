@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -66,8 +67,14 @@ const MaintenanceMessageInput = ({
             disabled={newMessage.trim() === "" || isPending}
             onClick={() => sendMessage()}
             >
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Send message</span>
+                {isPending ? (
+                    <LoadingSpinner />
+                ) : (
+                    <>
+                        <Send className="h-4 w-4" />
+                        <span className="sr-only">Send message</span>
+                    </>
+                )}
             </Button>
         </div>
     )
