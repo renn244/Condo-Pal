@@ -55,6 +55,14 @@ export class ScheduleMaintenanceRequestDto {
     @IsOptional()
     @IsString()
     additionalNotes?: string;
+
+    @IsString()
+    generatedToken: string;
+}
+
+export class InProgressMaintenanceRequestDto {
+    @IsString()
+    workerName: string;
 }
 
 export class CompleteMaintenanceRequestDto {

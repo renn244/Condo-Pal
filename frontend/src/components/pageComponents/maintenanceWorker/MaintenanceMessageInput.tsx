@@ -8,6 +8,7 @@ import { toFormData } from "axios"
 import { Paperclip, Send, X } from "lucide-react"
 import { useRef, useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router-dom"
 
 type MaintenanceMessageInputProps = {
     maintenanceId: string
@@ -19,13 +20,15 @@ const MaintenanceMessageInput = ({
     const [newMessage, setNewMessage] = useState("");
     const [attachmentPreviews, setAttachmentPreviews] = useState<string[]>([]);
     const [attachments, setAttachments] = useState<File[]>([]);
-    
+    const [searchParams] = useSearchParams();
+
+    const token = searchParams.get('token');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { mutate: sendMessage, isPending } = useMutation({
         mutationKey: ['maintenance-message', 'sendMessage', maintenanceId],
         mutationFn: async () => {
-            const formData = toFormData({ message: newMessage })
+            const formData = toFormData({ message: newMessage, token: token })
             attachments.forEach((file) => formData.append("attachments", file));
             
             const response = await axiosFetch.post(`/maintenance-message/sendMessage?maintenanceId=${maintenanceId}`,

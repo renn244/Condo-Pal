@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
 type ScheduleMaintenanceProps = {
     maintenanceId: string,
@@ -68,7 +69,9 @@ const ScheduleMaintenance = ({
     })
 
     const isManualLink = form.getValues("manualLink");
-    const magicLink = `https://condopal.com/maintenance/worker/${maintenanceId}?token=maint_${Math.random().toString(36).substring(2, 15)}`;
+
+    const generatedToken = uuidv4();
+    const magicLink = `https://condopal.com/maintenance/worker/${maintenanceId}?token=${generatedToken}`;
 
     const copyMagicLink = () => {
         navigator.clipboard.writeText(magicLink)
@@ -78,7 +81,10 @@ const ScheduleMaintenance = ({
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsLoading(true)
         try {
-            const response = await axiosFetch.patch(`/maintenance/schedule?maintenanceId=${maintenanceId}`, values)
+            const response = await axiosFetch.patch(`/maintenance/schedule?maintenanceId=${maintenanceId}`, {
+                ...values,
+                generatedToken, // only needed if manual link is true
+            })
 
             if(response.status === 400) {
                 throw new ValidationError(response);

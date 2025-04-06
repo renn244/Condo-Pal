@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateMaintenanceMessageDto, CreateMaintenanceMessageWithFileDto } from './dto/maintenance.dto';
+import { CreateMaintenanceMessageDto, CreateMaintenanceMessageWithFileDto, CreateMaintenanceStatusUpdateDto } from './dto/maintenance.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { SenderType } from '@prisma/client';
 import { MaintenanceMessageGateway } from './maintenance-message.gateway';
+import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
 
 @Injectable()
 export class MaintenanceMessageService {
@@ -12,6 +13,7 @@ export class MaintenanceMessageService {
         private readonly prisma: PrismaService,
         private readonly fileUploadService: FileUploadService,
         private readonly maintenanceMessageGateway: MaintenanceMessageGateway,
+        private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
     ) {}
 
     async createMaintenanceMessageWithFile(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageWithFileDto, 
@@ -26,17 +28,39 @@ export class MaintenanceMessageService {
             })
         ) || [];
 
+        const getWorkerName = senderType === 'WORKER' ?
+        (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token})).workerName
+        : null
+
         const maintenanceMessage = await this.prisma.maintenanceMessage.create({
             data: {
                 maintenanceId,
                 message: body.message,
-                workerName: body.workerName,
+                workerName: getWorkerName,
                 senderId: user?.id,
                 senderType: senderType,
                 attachment: photoUrls
             }
         })
 
+        // update the socket room for the maintenance
+        this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
+
+        return maintenanceMessage;
+    }
+
+    async createMaintenanceStatusUpdate(maintenanceId: string, body: CreateMaintenanceStatusUpdateDto, attachments: string[]=[]) {
+        const maintenanceMessage = await this.prisma.maintenanceMessage.create({
+            data: {
+                isStatusUpdate: true,
+                maintenanceId,
+                message: body.message || "",
+                senderType: 'WORKER',
+                statusUpdate: body.status,
+                attachment: attachments,
+            }
+        })
+ 
         // update the socket room for the maintenance
         this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
 

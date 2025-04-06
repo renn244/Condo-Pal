@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
-import { CompleteMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
@@ -57,8 +57,8 @@ export class MaintenanceController {
 
     @Public()
     @Patch('in-progress')
-    async inProgressMaintenance(@Query('maintenanceId') maintenanceId: string) {
-        return this.maintenanceService.inProgressMaintenanceRequest(maintenanceId);
+    async inProgressMaintenance(@Query('maintenanceId') maintenanceId: string, @Body() body: InProgressMaintenanceRequestDto) {
+        return this.maintenanceService.inProgressMaintenanceRequest(maintenanceId, body);
     }
 
     @Public()

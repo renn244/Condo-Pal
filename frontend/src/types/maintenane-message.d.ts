@@ -5,7 +5,14 @@ const SenderType = {
     ADMIN: 'ADMIN',
 } as const;
 
+const StatusUpdate = {
+    IN_PROGRESS: 'IN_PROGRESS',
+    COMPLETED: 'COMPLETED',
+    NOT_COMPLETED: 'NOT_COMPLETED',
+} as const;
+
 type SenderType = typeof SenderType[keyof typeof SenderType];
+type StatusUpdate = typeof StatusUpdate[keyof typeof StatusUpdate];
 
 type MaintenanceMessage = {
     id: string;
@@ -21,6 +28,7 @@ type MaintenanceMessage = {
     attachment: string[];
 
     isStatusUpdate?: boolean;
+    statusUpdate: StatusUpdate;
 
     createdAt: string;
 }

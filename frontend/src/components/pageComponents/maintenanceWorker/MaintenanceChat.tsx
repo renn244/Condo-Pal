@@ -18,8 +18,8 @@ const MaintenanceChat = ({
 }: MaintenanceChatProps) => {
     const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
     const queryClient = useQueryClient();
-    
-    const { 
+
+    const {
         data,
         fetchNextPage,
         hasNextPage,

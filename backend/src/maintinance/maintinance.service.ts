@@ -4,13 +4,18 @@ import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CompleteMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { MaintenanceMessageService } from 'src/maintenance-message/maintenance-message.service';
+import { v4 as uuidv4 } from 'uuid';
+import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
 
 @Injectable()
 export class MaintenanceService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly fileUploadService: FileUploadService
+        private readonly fileUploadService: FileUploadService,
+        private readonly maintenanceMessageService: MaintenanceMessageService,
+        private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
     ) {}
 
     async TenantMaintenanceRequest(tenantUser: UserJwt, body: TenantMaintenaceRequestDto, photos: Array<Express.Multer.File>) {
@@ -224,6 +229,8 @@ export class MaintenanceService {
     }
 
     async scheduleMaintenanceRequest(maintenanceId: string, user: UserJwt, body: ScheduleMaintenanceRequestDto,) {
+        const token = body.manualLink ? body.generatedToken : uuidv4();
+
         const condoOfMaintenance = await this.prisma.maintenance.findFirst({
             where: {
                 id: maintenanceId
@@ -234,7 +241,7 @@ export class MaintenanceService {
                 }
             }
         })
-        
+
         if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
 
         const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
@@ -252,30 +259,36 @@ export class MaintenanceService {
             }
         })
 
+        this.maintenanceWorkerTokenService.createMaintenanceWorkerToken(maintenanceId, token);
+
         // if manualLink is false then we should send email to the worker with the additional Notes
-        
+        if(!body.manualLink) {
+            // body.workerEmail
+            // send the email to the worker email or company 
+        }
 
         return scheduleMaintenance
     }
 
     // maybe add a token later becuase the workjer is not authenticated 
     // so we need to find a way to authenticate the user
-    async inProgressMaintenanceRequest(maintenanceId: string) {
+    async inProgressMaintenanceRequest(maintenanceId: string, body: InProgressMaintenanceRequestDto) {
         // find a way to authenticate the user because the worker is not authenticated
-
         const maintenanceRequest = await this.prisma.maintenance.update({
             where: { id: maintenanceId },
             data: { Status: 'IN_PROGRESS' },
         })
 
         // notify the tenant and the landlord using email and build in notification in our app
-        
+        this.maintenanceMessageService.createMaintenanceStatusUpdate(maintenanceId, {
+            status: 'IN_PROGRESS',
+            workerName: body.workerName,
+        })
 
         return maintenanceRequest
     }
 
     // maybe add a token later becuase the workjer is not authenticated
-    // also get photo that the worker took to prove that he completed the work
     async completeMaintenanceRequest(maintenanceId: string, body: CompleteMaintenanceRequestDto, proof: Array<Express.Multer.File>) {
         const photoUrls = await Promise.all(
             proof.map(async (photo) => {
@@ -295,7 +308,11 @@ export class MaintenanceService {
         })
 
         // notify the tenant and the landlord using email and build in notification in our app
-        
+        this.maintenanceMessageService.createMaintenanceStatusUpdate(maintenanceId, {
+            status: 'COMPLETED',
+            message: body.message,
+            workerName: "Carl Michael Dungon",
+        }, photoUrls)
 
         return maintenanceRequest
     }
