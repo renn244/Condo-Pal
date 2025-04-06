@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { OptionalAuthGuard } from 'src/lib/guards/OptionalAuth.guard';
-import { CreateMaintenanceMessageDto } from './dto/maintenance.dto';
+import { CreateMaintenanceMessageDto, CreateMaintenanceMessageWithFileDto } from './dto/maintenance.dto';
 import { MaintenanceMessageService } from './maintenance-message.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 @Controller('maintenance-message')
 export class MaintenanceMessageController {
@@ -11,10 +13,13 @@ export class MaintenanceMessageController {
     ) {}
 
     @UseGuards(OptionalAuthGuard)
+    @UseInterceptors(FilesInterceptor('attachments', undefined, {
+        storage: multer.memoryStorage()
+    }))
     @Post('sendMessage')
     async createMaintenanceMessage(@Query('maintenanceId') maintenanceId: string, @User() user: UserJwt, 
-    @Body() body: CreateMaintenanceMessageDto) {
-        return this.maintenanceMessageService.createMaintenanceMessage(maintenanceId, user, body);
+    @Body() body: CreateMaintenanceMessageWithFileDto, @UploadedFiles() attachments: Array<Express.Multer.File>) {
+        return this.maintenanceMessageService.createMaintenanceMessageWithFile(maintenanceId, user, body, attachments);
     }
 
     @UseGuards(OptionalAuthGuard)

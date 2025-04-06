@@ -52,7 +52,6 @@ const MaintenanceChat = ({
             }
         });
 
-        // Handle the message event
         socket.on('newMessage', async (message: MaintenanceMessageWithSender) => {
             await queryClient.setQueryData(['maintenanceChat', maintenanceId], (oldData: InfiniteData<MaintenanceGetMessages, unknown> | undefined) => {
                 return {
@@ -70,11 +69,10 @@ const MaintenanceChat = ({
             });
         });
 
-        // Cleanup function (off the 'newMessage' event)
         return () => {
             socket.off('newMessage');
             console.log('Cleanup called');
-            socket.disconnect(); // It's a good practice to call disconnect to close the connection properly
+            socket.disconnect();
         };
     }, [maintenanceId])
 
@@ -86,10 +84,10 @@ const MaintenanceChat = ({
         <Card>
             <CardHeader className="pb-2">
                 <CardTitle>Communication</CardTitle>
-                <CardDescription>Chat with tenant and landlord</CardDescription>
+                <CardDescription>Group chat with tenant, landlord and assigned worker</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col h-[400px]">
+                <div className="flex flex-col h-[700px]">
                     <div id="messageContainer" className="flex-1 overflow-y-auto flex flex-col-reverse">
                         <InfiniteScroll
                         style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
@@ -113,29 +111,7 @@ const MaintenanceChat = ({
                             ))}
                         </InfiniteScroll>
                     </div>
-
-                    {/* Attachment Previews */}
-                    {/* {attachmentPreviews.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-2">
-                            {attachmentPreviews.map((preview, index) => (
-                            <div key={index} className="relative h-16 w-16">
-                                <img
-                                src={preview || "/placeholder.svg"}
-                                alt={`Attachment preview ${index + 1}`}
-                                className="h-16 w-16 object-cover rounded-md border"
-                                />
-                                <button
-                                className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
-                                onClick={() => removeAttachment(index)}
-                                >
-                                <X className="h-3 w-3" />
-                                </button>
-                            </div>
-                            ))}
-                        </div>
-                    )} */}
-
-                    {/* Message Input */}
+                    
                     <MaintenanceMessageInput maintenanceId={maintenanceId} />
                 </div>
             </CardContent>

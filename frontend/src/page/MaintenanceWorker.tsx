@@ -40,7 +40,7 @@ const MaintenanceWorker = () => {
 
 
     return (
-        <div className="container max-w-4xl mx-auto py-4 px-4 md:py-6">
+        <div className="container max-w-7xl mx-auto py-4 px-4 md:py-6">
             {/* Header */}
             <div className="flex items-center gap-2 mb-6">
                 <Button variant="ghost" size="icon" onClick={() => window.history.back()} className="h-8 w-8">

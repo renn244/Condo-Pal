@@ -73,7 +73,6 @@ const MaintenanceUpdateCompleted = ({
         }
     });
 
-    // Handle file selection for proof
     const handleProofFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const newFiles = Array.from(e.target.files)

@@ -44,7 +44,7 @@ const MaintenanceMessage = ({
                             : "bg-muted"
                     }`}
                     >
-                        <p className="whitespace-pre-wrap ">{message.message}</p>
+                        <p className="whitespace-pre-wrap">{message.message}</p>
                     </div>
                     
                     {message.attachment && message.attachment.length > 0 && (
@@ -54,11 +54,12 @@ const MaintenanceMessage = ({
                                 key={index}
                                 src={attachment || "/placeholder.svg"}
                                 alt={`Attachment ${index + 1}`}
-                                className="h-24 w-24 object-cover rounded-md border"
+                                className="h-32 w-32 object-cover rounded-md border"
                                 />
                             ))}
                         </div>
                     )}
+                    
                     <div className={`flex items-center gap-2 mt-1 select-none ${message.senderId === userId ? "justify-end" : "justify-start"}`}>
                         <span className="text-xs text-muted-foreground">{formatDateTime(new Date(message.createdAt))}</span>
                     </div>

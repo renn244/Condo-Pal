@@ -14,28 +14,6 @@ export class MaintenanceMessageService {
         private readonly maintenanceMessageGateway: MaintenanceMessageGateway,
     ) {}
 
-    async createMaintenanceMessage(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageDto) {
-        const senderType = user?.role.toUpperCase() as SenderType || 'WORKER';
-
-        const maintenanceMessage = await this.prisma.maintenanceMessage.create({
-            data: {
-                maintenanceId,
-                message: body.message,
-                workerName: body.workerName,
-                senderId: user?.id,
-                senderType: senderType
-            },
-            include: {
-                sender: { select: { id: true, name: true, profile: true, } }
-            }
-        });
-
-        // update the socket room for the maintenance
-        this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
-
-        return maintenanceMessage;
-    }
-
     async createMaintenanceMessageWithFile(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageWithFileDto, 
     attachments: Array<Express.Multer.File>) {
         const senderType = user?.role.toUpperCase() as SenderType || 'WORKER';
@@ -46,7 +24,7 @@ export class MaintenanceMessageService {
                 })
                 return newPhoto.secure_url;
             })
-        )
+        ) || [];
 
         const maintenanceMessage = await this.prisma.maintenanceMessage.create({
             data: {
@@ -60,6 +38,7 @@ export class MaintenanceMessageService {
         })
 
         // update the socket room for the maintenance
+        this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
 
         return maintenanceMessage;
     }
