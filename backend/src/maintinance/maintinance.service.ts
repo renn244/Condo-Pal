@@ -270,26 +270,29 @@ export class MaintenanceService {
         return scheduleMaintenance
     }
 
-    // maybe add a token later becuase the workjer is not authenticated 
-    // so we need to find a way to authenticate the user
     async inProgressMaintenanceRequest(maintenanceId: string, body: InProgressMaintenanceRequestDto) {
-        // find a way to authenticate the user because the worker is not authenticated
+        const getWorker = await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token });
+
+        if(!getWorker) throw new ForbiddenException('you are not allowed to update this!')
+
         const maintenanceRequest = await this.prisma.maintenance.update({
             where: { id: maintenanceId },
             data: { Status: 'IN_PROGRESS' },
         })
 
-        // notify the tenant and the landlord using email and build in notification in our app
         this.maintenanceMessageService.createMaintenanceStatusUpdate(maintenanceId, {
             status: 'IN_PROGRESS',
-            workerName: body.workerName,
+            workerName: getWorker.workerName!,
         })
 
         return maintenanceRequest
     }
 
-    // maybe add a token later becuase the workjer is not authenticated
     async completeMaintenanceRequest(maintenanceId: string, body: CompleteMaintenanceRequestDto, proof: Array<Express.Multer.File>) {
+        const getWorker = await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token });
+        
+        if(!getWorker) throw new ForbiddenException('you are not allowed to update this!')
+
         const photoUrls = await Promise.all(
             proof.map(async (photo) => {
                 const newPhoto = await this.fileUploadService.upload(photo);
@@ -311,7 +314,7 @@ export class MaintenanceService {
         this.maintenanceMessageService.createMaintenanceStatusUpdate(maintenanceId, {
             status: 'COMPLETED',
             message: body.message,
-            workerName: "Carl Michael Dungon",
+            workerName: getWorker.workerName!,
         }, photoUrls)
 
         return maintenanceRequest

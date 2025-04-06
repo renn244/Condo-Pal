@@ -13,6 +13,7 @@ import { toFormData } from "axios"
 import { Camera, Upload, X } from "lucide-react"
 import { useRef, useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router-dom"
 
 type MaintenanceUpdateCompletedProps ={
     maintenanceRequest: MaintenanceGetRequest
@@ -28,7 +29,9 @@ const MaintenanceUpdateCompleted = ({
     const [proofFiles, setProofFiles] = useState<File[]>([]);
     const [message, setMessage] = useState<string>("");
     const [totalCost, setTotalcost] = useState<number | undefined>();
+    const [searchParams] = useSearchParams();
 
+    const token = searchParams.get('token');
     const proofFileInputRef = useRef<HTMLInputElement>(null)
 
     const { mutate: updateCompleted, isPending: isPendingCompleted } = useMutation({
@@ -38,7 +41,7 @@ const MaintenanceUpdateCompleted = ({
                 throw new Error("Please fill in all fields and upload proof files.");
             }
 
-            const formData = toFormData({ totalCost, message })
+            const formData = toFormData({ totalCost, message, token })
             proofFiles.forEach((file) => { formData.append("proof", file) });
 
             const response = await axiosFetch.patch(

@@ -6,6 +6,7 @@ import axiosFetch from "@/lib/axios";
 import formatDate from "@/lib/formatDate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 
 type MaintenanceUpdateInProgressProps = {
     maintenanceRequest: MaintenanceGetRequest
@@ -15,11 +16,15 @@ const MaintenanceUpdateInProgress = ({
     maintenanceRequest
 }: MaintenanceUpdateInProgressProps) => {
     const queryClient = useQueryClient();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
 
     const { mutate: updateInProgress, isPending: isPendingInProgress } = useMutation({
         mutationKey: ['maintenanceRequest', 'inProgress', maintenanceRequest.id],
         mutationFn: async () => {
-            const response = await axiosFetch.patch(`/maintenance/in-progress?maintenanceId=${maintenanceRequest.id}`)
+            const response = await axiosFetch.patch(`/maintenance/in-progress?maintenanceId=${maintenanceRequest.id}`, {
+                token: token
+            })
             
             if(response.status >= 400) {
                 throw new Error(response.data.message)

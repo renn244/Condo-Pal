@@ -62,7 +62,7 @@ export class ScheduleMaintenanceRequestDto {
 
 export class InProgressMaintenanceRequestDto {
     @IsString()
-    workerName: string;
+    token: string;
 }
 
 export class CompleteMaintenanceRequestDto {
@@ -71,4 +71,7 @@ export class CompleteMaintenanceRequestDto {
 
     @IsString()
     message: string;
+
+    @IsString()
+    token: string;
 }
