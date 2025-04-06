@@ -2,11 +2,12 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosFetch from "@/lib/axios";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { io } from "socket.io-client";
 import MaintenanceMessage from "./MaintenanceMessage";
 import MaintenanceMessageInput from "./MaintenanceMessageInput";
+import MaintenancePhotoViewer from "./MaintenancePhotoViewer";
 
 type MaintenanceChatProps = {
     maintenanceId: string;
@@ -15,25 +16,24 @@ type MaintenanceChatProps = {
 const MaintenanceChat = ({
     maintenanceId
 }: MaintenanceChatProps) => {
+    const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
     const queryClient = useQueryClient();
-
-    const fetchMaintenanceMessages = async ({ pageParam: cursor = null }: { pageParam: string | null }) => {
-        const response = await axiosFetch.get(`/maintenance-message/getMessages?maintenanceId=${maintenanceId}&cursor=${cursor || ''}`);
-
-        if(response.status >= 400) {
-            throw new Error(response.data.message);
-        }
-
-        return response.data as MaintenanceGetMessages;
-    }
-
+    
     const { 
         data,
         fetchNextPage,
         hasNextPage,
     } = useInfiniteQuery<MaintenanceGetMessages, Error, InfiniteData<MaintenanceGetMessages>, ['maintenanceChat', string], string | null>({
         queryKey: ['maintenanceChat', maintenanceId],
-        queryFn: fetchMaintenanceMessages,
+        queryFn: async ({ pageParam: cursor = null }: { pageParam: string | null }) => {
+            const response = await axiosFetch.get(`/maintenance-message/getMessages?maintenanceId=${maintenanceId}&cursor=${cursor || ''}`);
+            
+            if(response.status >= 400) {
+                throw new Error(response.data.message);
+            }
+
+            return response.data as MaintenanceGetMessages;
+        },
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         initialPageParam: null,
         refetchOnWindowFocus: false,
@@ -105,6 +105,7 @@ const MaintenanceChat = ({
                         >
                             {chatMessages?.map((message) => (
                                 <MaintenanceMessage 
+                                openPhotoViewer={(photo) => setSelectedPhotos(photo || [])}
                                 message={message}
                                 key={message.id}
                                 />
@@ -114,6 +115,9 @@ const MaintenanceChat = ({
                     
                     <MaintenanceMessageInput maintenanceId={maintenanceId} />
                 </div>
+
+                {/* Should be a component */}
+                <MaintenancePhotoViewer selectedPhotos={selectedPhotos} clearPhoto={() => setSelectedPhotos([])} />
             </CardContent>
         </Card>
     )

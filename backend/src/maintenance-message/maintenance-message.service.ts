@@ -56,7 +56,7 @@ export class MaintenanceMessageService {
                 }
             },
             orderBy: { createdAt: 'desc', },
-            take: 10,
+            take: 13,
             cursor: query.cursor ? { id: query.cursor } : undefined,
             skip: query.cursor ? 1 : 0,
         });

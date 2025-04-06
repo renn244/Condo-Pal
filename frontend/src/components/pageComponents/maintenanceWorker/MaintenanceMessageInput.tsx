@@ -117,7 +117,7 @@ const MaintenanceMessageInput = ({
                 <Button
                 type="button"
                 size="icon"
-                disabled={newMessage.trim() === "" || isPending}
+                disabled={(newMessage.trim() === "" && attachments.length === 0) || isPending}
                 onClick={() => sendMessage()}
                 >
                     {isPending ? (
