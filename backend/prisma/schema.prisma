@@ -215,6 +215,7 @@ model Maintenance {
   canceledBy        String? // "Tenant" and "Landlord"
 
   messages         MaintenanceMessage[] // this is only used for the onProgress status
+  maintenanceWorker MaintenanceWorkerToken[]
 
   preferredSchedule DateTime? // if null then that means anytime
   scheduledDate     DateTime? // if null then that means it has not been scheduled yet
@@ -224,10 +225,31 @@ model Maintenance {
   createdAt         DateTime  @default(now())
 }
 
+model MaintenanceWorkerToken {
+  id              String   @id @default(cuid())
+  token           String   // the random unique token
+  workerName      String? // the name of the worker that is assigned to the maintenance
+  used            Boolean @default(false)
+
+  maintenanceId   String
+  maintenance     Maintenance @relation(fields: [maintenanceId], references: [id])
+
+  createdAt       DateTime @default(now())
+
+  @@unique([token, maintenanceId])
+}
+
 enum SenderType {
   TENANT
   LANDLORD
   WORKER // No senderId means it's the assigned worker
+}
+
+enum MaintenanceMessageStatusUpdate {
+  IN_PROGRESS
+  COMPLETED
+  // this is the status of the maintenance message only becasue in maintenance status it would go back to pending
+  NOT_COMPLETED 
 }
 
 model MaintenanceMessage {
@@ -248,6 +270,7 @@ model MaintenanceMessage {
   attachment      String[] // Optional: If message can include photos/documents
 
   isStatusUpdate  Boolean? // if this is true then this is a status update
+  statusUpdate    MaintenanceMessageStatusUpdate? 
 
   createdAt       DateTime @default(now())
 }

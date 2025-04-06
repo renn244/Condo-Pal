@@ -13,6 +13,7 @@ import { CondoPaymentModule } from './condo-payment/condo-payment.module';
 import { LeaseAgreementModule } from './lease-agreement/lease-agreement.module';
 import { ReminderModule } from './reminder/reminder.module';
 import { MaintenanceMessageModule } from './maintenance-message/maintenance-message.module';
+import { MaintenanceWorkerTokenModule } from './maintenance-worker-token/maintenance-worker-token.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { MaintenanceMessageModule } from './maintenance-message/maintenance-mess
       isGlobal: true,
       ttl: 60 * 1000, // time to live of 60 seconds
     }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule
+    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule
   ],
   controllers: [],
   providers: [],

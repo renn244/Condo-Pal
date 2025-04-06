@@ -3,6 +3,7 @@ import NotFound from "@/components/common/NotFound"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import MaintenanceChat from "@/components/pageComponents/maintenanceWorker/MaintenanceChat"
 import MaintenanceDetails from "@/components/pageComponents/maintenanceWorker/MaintenanceDetails"
+import MaintenanceWorkerName from "@/components/pageComponents/maintenanceWorker/MaintenanceWorkerName"
 import { Button } from "@/components/ui/button"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
@@ -12,7 +13,7 @@ import { useParams } from "react-router-dom"
 
 const MaintenanceWorker = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
-    
+
     const { data: maintenanceRequest, isLoading, error, refetch } = useQuery({
         queryKey: ['maintenanceRequest', maintenanceId],
         queryFn: async () => {
@@ -38,7 +39,6 @@ const MaintenanceWorker = () => {
 
     if(!maintenanceRequest) return <NotFound />
 
-
     return (
         <div className="container max-w-7xl mx-auto py-4 px-4 md:py-6">
             {/* Header */}
@@ -61,6 +61,8 @@ const MaintenanceWorker = () => {
 
             {/* Chat Section */}
             <MaintenanceChat maintenanceId={maintenanceRequest.id} />
+
+            <MaintenanceWorkerName maintenanceId={maintenanceId || ''} />
         </div>
     )
 }
