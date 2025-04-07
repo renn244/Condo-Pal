@@ -34,10 +34,16 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceStats(user, condoId);
     }
     
-    // make a public api dedicated for assigned worker
     @Get('getRequest')
     async getMaintenanceRequest(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string) {
         return this.maintenanceService.getMaintenanceRequest(maintenanceId, user);
+    }
+
+    // public api that is dedicated for assigned worker with token authentication
+    @Public()
+    @Get('getRequestByToken')
+    async getMaintenanceRequestByToken(@Query() query: { maintenanceId: string, token: string }) {
+        return this.maintenanceService.getMaintenanceRequestByToken(query.maintenanceId, query.token);
     }
 
     @Patch('editMaintenanceRequest')

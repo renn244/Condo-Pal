@@ -58,13 +58,20 @@ const MaintenanceWorkerName = ({
             if(response.status === 404) {
                 return null
             }
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+            // setting the workerName to sessionStorage
+            if(response.data.workerName && !sessionStorage.getItem("workerName")) {
+                sessionStorage.setItem("workerName", response.data.workerName)
+                window.location.reload()
+            }
 
             return response.data as maintenanceWorker;
         },
         refetchOnWindowFocus: false
     })
 
-    if(maintenanceWorkerLoading) return <LoadingSpinner />
+    if(maintenanceWorkerLoading) return null
 
     if(!maintenanceWorker) return <NotAuthenticated refetch={refetch} isFetching={isFetching} />
     

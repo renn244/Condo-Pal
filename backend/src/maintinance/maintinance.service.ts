@@ -160,9 +160,9 @@ export class MaintenanceService {
         }
     }
 
-    async getMaintenanceRequest(maintinanceId: string, user: UserJwt) {
+    async getMaintenanceRequest(maintenanceId: string, user: UserJwt) {
         const maintenanceRequest = await this.prisma.maintenance.findFirst({
-            where: { id: maintinanceId },
+            where: { id: maintenanceId },
             include: {
                 condo: { 
                     select: { 
@@ -184,6 +184,31 @@ export class MaintenanceService {
             throw new ForbiddenException('you are not allowed to get this information')
         }
    
+        return maintenanceRequest
+    }
+
+    async getMaintenanceRequestByToken(maintenanceId: string, token: string) {
+        const getWorker = await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token });
+
+        if(!getWorker) throw new ForbiddenException('you are not allowed to maintenance information!');
+
+        const maintenanceRequest = await this.prisma.maintenance.findFirst({
+            where: { id: maintenanceId },
+            include: {
+                condo: { 
+                    select: { 
+                        id: true, name: true, address: true, 
+                        tenantId: true, tenant: { select: { name: true, profile: true } }, 
+                        ownerId: true, owner: { select: { name: true, profile: true } }, 
+                    }   
+                }
+            }
+        })
+
+        if(!maintenanceRequest) {
+            throw new NotFoundException("maintinance not found")
+        }
+        
         return maintenanceRequest
     }
 

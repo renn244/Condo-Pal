@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 import MaintenanceMessage from "./MaintenanceMessage";
 import MaintenanceMessageInput from "./MaintenanceMessageInput";
 import MaintenancePhotoViewer from "./MaintenancePhotoViewer";
+import { useSearchParams } from "react-router-dom";
 
 type MaintenanceChatProps = {
     maintenanceId: string;
@@ -18,6 +19,8 @@ const MaintenanceChat = ({
 }: MaintenanceChatProps) => {
     const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
     const queryClient = useQueryClient();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token') || null;
 
     const {
         data,
@@ -26,7 +29,7 @@ const MaintenanceChat = ({
     } = useInfiniteQuery<MaintenanceGetMessages, Error, InfiniteData<MaintenanceGetMessages>, ['maintenanceChat', string], string | null>({
         queryKey: ['maintenanceChat', maintenanceId],
         queryFn: async ({ pageParam: cursor = null }: { pageParam: string | null }) => {
-            const response = await axiosFetch.get(`/maintenance-message/getMessages?maintenanceId=${maintenanceId}&cursor=${cursor || ''}`);
+            const response = await axiosFetch.get(`/maintenance-message/getMessages?token=${token}&maintenanceId=${maintenanceId}&cursor=${cursor || ''}`);
             
             if(response.status >= 400) {
                 throw new Error(response.data.message);

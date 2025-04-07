@@ -14,7 +14,9 @@ const MaintenanceMessage = ({
     openPhotoViewer
 }: MaintenanceMessageProps) => {
     const { user } = useAuthContext();
-    const userId = user!.id
+    const userId = user?.id || sessionStorage.getItem("workerName") || "";
+
+    const isMyMessage = user?.id ? message.senderId === userId : message.workerName === userId;
 
     return (
         message.isStatusUpdate ? (
@@ -99,18 +101,18 @@ const MaintenanceMessage = ({
             // Regular Message
             <div
             key={message.id}
-            className={`flex ${message.senderId === userId ? "justify-end" : "justify-start"}`}
+            className={`flex ${isMyMessage ? "justify-end" : "justify-start"}`}
             >
-                <div className={`flex gap-2 max-w-[80%] ${message.senderId === userId ? "flex-row-reverse" : "flex-row"}`}>
+                <div className={`flex gap-2 max-w-[80%] ${isMyMessage ? "flex-row-reverse" : "flex-row"}`}>
                     {message.senderId !== "system" && (
-                        <Avatar className={`h-8 w-8 ${message.senderId === userId ? "mt-2" : "mt-6"}`}>
+                        <Avatar className={`h-8 w-8 ${isMyMessage ? message.senderType === 'WORKER' ? "mt-6" : "mt-2" : "mt-6"}`}>
                             <AvatarImage src={message.sender?.profile} alt={message.sender?.name} />
                             <AvatarFallback>{(message.sender?.name || message.workerName || "W").charAt(0)}</AvatarFallback>
                         </Avatar>
                     )}
 
                     <div className="my-1">
-                        <div className={`flex items-center gap-2 mb-1 ${message.senderId === userId ? "justify-end" : "justify-start"}`}>
+                        <div className={`flex items-center gap-2 mb-1 ${isMyMessage ? "justify-end" : "justify-start"}`}>
                             {message.senderId !== userId && (
                                 <span className="text-xs font-medium">
                                     {message.sender ? message.sender.name : message.workerName} {" "}
@@ -124,7 +126,7 @@ const MaintenanceMessage = ({
                             className={`p-1 px-2 rounded-lg ${
                             message.senderId === "system"
                                 ? "bg-muted text-muted-foreground text-sm border"
-                                : message.senderId === userId
+                                : isMyMessage
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-muted"
                             }`}
@@ -135,11 +137,11 @@ const MaintenanceMessage = ({
                         
                         {message.attachment && message.attachment.length > 0 && (
                             <div
-                            className={`mt-2 ${message.senderId === userId ? "text-right" : "text-left"}`}
+                            className={`mt-2 ${isMyMessage ? "text-right" : "text-left"}`}
                             >
                                 {message.attachment.length <= 3 ? (
                                     <div
-                                    className={`flex flex-wrap gap-2 ${message.senderId === userId ? "justify-end" : "justify-start"}`}
+                                    className={`flex flex-wrap gap-2 ${isMyMessage ? "justify-end" : "justify-start"}`}
                                     >
                                         {message.attachment.map((attachment, index) => (
                                         <div
@@ -157,7 +159,7 @@ const MaintenanceMessage = ({
                                     </div>
                                     ) : (
                                     <div
-                                    className={`flex items-center gap-2 cursor-pointer ${message.senderId === userId ? "justify-end" : "justify-start"}`}
+                                    className={`flex items-center gap-2 cursor-pointer ${isMyMessage ? "justify-end" : "justify-start"}`}
                                     onClick={() => openPhotoViewer(message.attachment || [])}
                                     >
                                         <div className="relative h-24 w-24">
@@ -177,7 +179,7 @@ const MaintenanceMessage = ({
                             </div>
                         )}
 
-                        <div className={`flex items-center gap-2 mt-1 select-none ${message.senderId === userId ? "justify-end" : "justify-start"}`}>
+                        <div className={`flex items-center gap-2 mt-1 select-none ${isMyMessage ? "justify-end" : "justify-start"}`}>
                             <span className="text-xs text-muted-foreground">{formatDateTime(new Date(message.createdAt))}</span>
                         </div>
                     </div>

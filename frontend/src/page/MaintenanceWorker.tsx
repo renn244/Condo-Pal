@@ -9,15 +9,17 @@ import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { ArrowLeft } from "lucide-react"
 import toast from "react-hot-toast"
-import { useParams } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 
 const MaintenanceWorker = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
 
     const { data: maintenanceRequest, isLoading, error, refetch } = useQuery({
         queryKey: ['maintenanceRequest', maintenanceId],
         queryFn: async () => {
-            const response = await axiosFetch.get(`/maintenance/getRequest?maintenanceId=${maintenanceId}`);
+            const response = await axiosFetch.get(`/maintenance/getRequestByToken?maintenanceId=${maintenanceId}&token=${token}`);
 
             if(response.status === 404) {
                 toast.error("Maintenance request not found");

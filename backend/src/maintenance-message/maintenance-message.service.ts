@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMaintenanceMessageDto, CreateMaintenanceMessageWithFileDto, CreateMaintenanceStatusUpdateDto } from './dto/maintenance.dto';
@@ -67,7 +67,13 @@ export class MaintenanceMessageService {
         return maintenanceMessage;
     }
 
-    async getMaintenanceMessages(query: { maintenanceId: string, cursor?: string }) {
+    async getMaintenanceMessages(query: { maintenanceId: string, cursor?: string, token?: string }, user?: UserJwt) {
+        const isAuthenticated = user 
+            ? user.id 
+            : await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId: query.maintenanceId, token: query.token || '' })
+        
+        if(!isAuthenticated) throw new ForbiddenException('You are not authorized to view this maintenance message.')
+
         const maintenanceMessages = await this.prisma.maintenanceMessage.findMany({
             where: { maintenanceId: query.maintenanceId, },
             include: {
