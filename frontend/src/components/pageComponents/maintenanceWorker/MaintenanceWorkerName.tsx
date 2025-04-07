@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import useMaintenanceWorkerParams from "@/hooks/useMaintenanceWorkerParams"
 import axiosFetch from "@/lib/axios"
 import { QueryObserverResult, RefetchOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Home, RotateCcw, TriangleAlert } from "lucide-react"
 import { FormEvent, useState } from "react"
 import toast from "react-hot-toast"
-import { useSearchParams } from "react-router-dom"
 
 type MaintenanceWorkerNameProps = {
     maintenanceId: string;
@@ -18,10 +18,9 @@ const MaintenanceWorkerName = ({
     maintenanceId
 }: MaintenanceWorkerNameProps) => {
     const [workerName, setWorkerName] = useState<string>("");
-    const [searchParams] = useSearchParams();
     const queryClient = useQueryClient();
 
-    const token = searchParams.get('token');
+    const { token } = useMaintenanceWorkerParams();
 
     const { mutate: updateWorkerName, isPending } = useMutation({
         mutationKey: ['updateWorkerName'],

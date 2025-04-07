@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 import MaintenanceMessage from "./MaintenanceMessage";
 import MaintenanceMessageInput from "./MaintenanceMessageInput";
 import MaintenancePhotoViewer from "./MaintenancePhotoViewer";
-import { useSearchParams } from "react-router-dom";
+import useMaintenanceWorkerParams from "@/hooks/useMaintenanceWorkerParams";
 
 type MaintenanceChatProps = {
     maintenanceId: string;
@@ -19,8 +19,7 @@ const MaintenanceChat = ({
 }: MaintenanceChatProps) => {
     const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
     const queryClient = useQueryClient();
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get('token') || null;
+    const { token } = useMaintenanceWorkerParams();
 
     const {
         data,

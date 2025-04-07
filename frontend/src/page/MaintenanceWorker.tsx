@@ -5,16 +5,16 @@ import MaintenanceChat from "@/components/pageComponents/maintenanceWorker/Maint
 import MaintenanceDetails from "@/components/pageComponents/maintenanceWorker/MaintenanceDetails"
 import MaintenanceWorkerName from "@/components/pageComponents/maintenanceWorker/MaintenanceWorkerName"
 import { Button } from "@/components/ui/button"
+import useMaintenanceWorkerParams from "@/hooks/useMaintenanceWorkerParams"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { ArrowLeft } from "lucide-react"
 import toast from "react-hot-toast"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 const MaintenanceWorker = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get('token');
+    const { token } = useMaintenanceWorkerParams();
 
     const { data: maintenanceRequest, isLoading, error, refetch } = useQuery({
         queryKey: ['maintenanceRequest', maintenanceId],
