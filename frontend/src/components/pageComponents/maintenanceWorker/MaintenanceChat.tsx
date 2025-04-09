@@ -9,6 +9,7 @@ import MaintenanceMessage from "./MaintenanceMessage";
 import MaintenanceMessageInput from "./MaintenanceMessageInput";
 import MaintenancePhotoViewer from "./MaintenancePhotoViewer";
 import useMaintenanceWorkerParams from "@/hooks/useMaintenanceWorkerParams";
+import { playAudio } from "@/lib/playAudio";
 
 type MaintenanceChatProps = {
     maintenanceId: string;
@@ -56,6 +57,12 @@ const MaintenanceChat = ({
 
         socket.on('newMessage', async (message: MaintenanceMessageWithSender) => {
             await queryClient.setQueryData(['maintenanceChat', maintenanceId], (oldData: InfiniteData<MaintenanceGetMessages, unknown> | undefined) => {
+                if(document.hidden) {
+                    playAudio("/messages/messenger-notif-not-focus.mp3");
+                } else {
+                    playAudio("/messages/chat-audio-focus.mp3");
+                }
+
                 return {
                     ...oldData,
                     pages: oldData?.pages.map((page, idx) => {

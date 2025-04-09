@@ -8,6 +8,7 @@ import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, Schedul
 import { MaintenanceMessageService } from 'src/maintenance-message/maintenance-message.service';
 import { v4 as uuidv4 } from 'uuid';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Injectable()
 export class MaintenanceService {
@@ -16,6 +17,7 @@ export class MaintenanceService {
         private readonly fileUploadService: FileUploadService,
         private readonly maintenanceMessageService: MaintenanceMessageService,
         private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
+        private readonly emailSenderService: EmailSenderService,
     ) {}
 
     async TenantMaintenanceRequest(tenantUser: UserJwt, body: TenantMaintenaceRequestDto, photos: Array<Express.Multer.File>) {
@@ -281,15 +283,23 @@ export class MaintenanceService {
                 scheduledDate: body.scheduledDate,
                 estimatedCost: body.estimatedCost,
                 paymentResponsibility: body.paymentResponsibility,
+            },
+            include: { 
+                condo: {
+                    select: {
+                        name: true,
+                        address: true,
+                        tenant: { select: { name: true, profile: true } },
+                        owner: { select: { name: true, profile: true } },
+                    }
+                }  
             }
         })
 
         this.maintenanceWorkerTokenService.createMaintenanceWorkerToken(maintenanceId, token);
 
-        // if manualLink is false then we should send email to the worker with the additional Notes
         if(!body.manualLink) {
-            // body.workerEmail
-            // send the email to the worker email or company 
+            this.emailSenderService.sendAssignedWorkerMaintenanceEmail(body.workerEmail!, scheduleMaintenance, token);
         }
 
         return scheduleMaintenance

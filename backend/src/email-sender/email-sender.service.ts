@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
+import axios from 'axios';
 
 @Injectable()
 export class EmailSenderService{
@@ -105,7 +106,7 @@ export class EmailSenderService{
             style="background: #00466a;margin: 0 auto;width: max-content;padding: 10px 20px;color: #fff;border-radius: 4px;">
               resetPassword
             </a>
-            <p style="font-size:0.9em;">Regards,<br />STI-voting Team</p>
+            <p style="font-size:0.9em;">Regards,<br />CondoPal Team</p>
             <hr style="border:none;border-top:1px solid #eee" />
             <div style="float:center;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
               <p>CondoPal</p>
@@ -119,5 +120,51 @@ export class EmailSenderService{
     } catch (error) {
       throw new InternalServerErrorException('Error sending email')
     }
+  }
+
+  async sendAssignedWorkerMaintenanceEmail(email: string, maintenance: any, token: string) {
+    const baseUrl = process.env.CLIENT_BASE_URL;
+    const name = email.split('@')[0];
+    const taskLink = `${baseUrl}/maintenance/worker/${maintenance.id}?token=${token}`;
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "numeric" });
+    }
+  
+    this.sendEmail(
+      email,
+      "New Maintenance Request Assigned",
+      "New Maintenance Request Assigned",
+      `
+      <div style="font-family: Helvetica,Arial,sans-serif;width:600px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="${baseUrl}" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">CondoPal</a>
+          </div>
+          <p style="font-size:1.1em;margin: 8px 0 0 0;">Hi, ${name}</p>
+          <p style="margin: 5px 0 0 0; font-size: 15px;">You've been assigned to a new maintenance task. Please see the details below.</p>
+
+          <div style="background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0;">
+            <p style="margin: 2px 0;"><strong>Task:</strong> ${maintenance.title}</p>
+            <p style="margin: 2px 0;"><strong>Location:</strong> ${maintenance.condo.address}</p>
+            <p style="margin: 2px 0;"><strong>Requested Date:</strong> ${formatDate(new Date(maintenance.createdAt))}</p>
+            <p style="margin: 2px 0;"><strong>Scheduled Time:</strong> ${formatDate(new Date(maintenance.scheduledDate))}</p>
+            <p style="margin: 2px 0;"><strong>Description:</strong><br />${maintenance.description}</p>
+          </div>
+
+          <p style="margin: 5px 0;font-size: 14px;">Click the link so that you can see more details, chat the tenant and landlord as well as update the status in realtime</p>
+          <a href="${taskLink}" style="display:inline-block;padding:5px 10px;background-color:#00466a;color:#ffffff;text-decoration:none;border-radius:5px;font-size: 14px;">View Task</a>
+
+          <p style="font-size:0.9em;">Regards,<br />CondoPal Team</p>
+          <hr style="border:none;border-top:1px solid #eee" />
+          <div style="float:center;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+            <p>CondoPal</p>
+            <p>Poblacion Sta Maria, Bulacan</p>
+            <p>Philippines</p>
+          </div>
+        </div>
+      </div>
+      `,
+    )
   }
 }
