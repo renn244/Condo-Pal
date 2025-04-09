@@ -19,7 +19,7 @@ export class MaintenanceWorkerTokenService {
         return maintenanceWorkerToken;
     }
 
-    async getMaintenanceWorkerToken(query: { maintenanceId: string, token: string }) {
+    async getMaintenanceWorkerToken(query: { maintenanceId: string, token: string }, isRequired: boolean = true) {
         const maintenanceWorkerToken = await this.prisma.maintenanceWorkerToken.findUnique({
             where: {
                 token_maintenanceId: {
@@ -29,7 +29,7 @@ export class MaintenanceWorkerTokenService {
             }
         })
 
-        if(!maintenanceWorkerToken) {
+        if(!maintenanceWorkerToken && isRequired) {
             throw new NotFoundException("Maintenance worker token not found")
         }
 

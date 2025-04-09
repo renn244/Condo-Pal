@@ -29,7 +29,7 @@ export class MaintenanceMessageService {
         ) || [];
 
         const getWorkerName = senderType === 'WORKER' ?
-        (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token})).workerName
+            (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token || ''}))?.workerName
         : null
 
         const maintenanceMessage = await this.prisma.maintenanceMessage.create({
@@ -40,6 +40,15 @@ export class MaintenanceMessageService {
                 senderId: user?.id,
                 senderType: senderType,
                 attachment: photoUrls
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile: true,
+                    }
+                }
             }
         })
 
@@ -70,7 +79,7 @@ export class MaintenanceMessageService {
     async getMaintenanceMessages(query: { maintenanceId: string, cursor?: string, token?: string }, user?: UserJwt) {
         const isAuthenticated = user 
             ? user.id 
-            : await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId: query.maintenanceId, token: query.token || '' })
+            : await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId: query.maintenanceId, token: query.token || '' }, false)
         
         if(!isAuthenticated) throw new ForbiddenException('You are not authorized to view this maintenance message.')
 

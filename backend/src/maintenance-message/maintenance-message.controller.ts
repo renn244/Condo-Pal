@@ -25,6 +25,6 @@ export class MaintenanceMessageController {
     @UseGuards(OptionalAuthGuard)
     @Get('getMessages')
     async getMaintenanceMessages(@Query() query: { maintenanceId: string, cursor?: string, token?: string }, @User() user?: UserJwt) {
-        return this.maintenanceMessageService.getMaintenanceMessages(query);
+        return this.maintenanceMessageService.getMaintenanceMessages(query, user);
     }
 }

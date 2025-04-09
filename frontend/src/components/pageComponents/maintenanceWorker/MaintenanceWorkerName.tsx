@@ -36,13 +36,8 @@ const MaintenanceWorkerName = ({
 
             return response.data as maintenanceWorker;
         },
-        onSuccess: (data) => {
-            queryClient.setQueryData(['getWorkerName'], (oldData: maintenanceWorker): maintenanceWorker => {
-                return {
-                    ...oldData,
-                    workerName: data.workerName
-                }
-            })
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['getWorkerName']})
         },
         onError: (error) => {
             toast.error(error.message)
@@ -57,7 +52,6 @@ const MaintenanceWorkerName = ({
             if(response.status === 404) {
                 return null
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000))
 
             // setting the workerName to sessionStorage
             if(response.data.workerName && !sessionStorage.getItem("workerName")) {

@@ -6,6 +6,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { Public } from 'src/lib/decorators/isPublic.decorator';
+import { OptionalAuthGuard } from 'src/lib/guards/OptionalAuth.guard';
 
 @Controller('maintenance')
 @UseGuards(JwtAuthGuard)
@@ -41,9 +42,10 @@ export class MaintenanceController {
 
     // public api that is dedicated for assigned worker with token authentication
     @Public()
+    @UseGuards(OptionalAuthGuard)
     @Get('getRequestByToken')
-    async getMaintenanceRequestByToken(@Query() query: { maintenanceId: string, token: string }) {
-        return this.maintenanceService.getMaintenanceRequestByToken(query.maintenanceId, query.token);
+    async getMaintenanceRequestByToken(@Query() query: { maintenanceId: string, token: string }, @User() user?: UserJwt) {
+        return this.maintenanceService.getMaintenanceRequestByToken(query.maintenanceId, query.token, user);
     }
 
     @Patch('editMaintenanceRequest')

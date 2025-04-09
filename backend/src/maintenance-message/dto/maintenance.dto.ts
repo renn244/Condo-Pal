@@ -8,7 +8,8 @@ export class CreateMaintenanceMessageDto {
 
 export class CreateMaintenanceMessageWithFileDto extends CreateMaintenanceMessageDto {
     @IsString()
-    token: string;
+    @IsOptional()
+    token?: string;
 }
 
 export class CreateMaintenanceStatusUpdateDto {

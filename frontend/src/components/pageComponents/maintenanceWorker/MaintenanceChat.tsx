@@ -80,7 +80,7 @@ const MaintenanceChat = ({
 
         return () => {
             socket.off('newMessage');
-            console.log('Cleanup called');
+
             socket.disconnect();
         };
     }, [maintenanceId])

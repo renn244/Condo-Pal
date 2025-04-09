@@ -189,10 +189,10 @@ export class MaintenanceService {
         return maintenanceRequest
     }
 
-    async getMaintenanceRequestByToken(maintenanceId: string, token: string) {
-        const getWorker = await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token });
+    async getMaintenanceRequestByToken(maintenanceId: string, token: string, user?: UserJwt) {
+        const getWorker = await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token }, false);
 
-        if(!getWorker) throw new ForbiddenException('you are not allowed to maintenance information!');
+        if(!getWorker && !user) throw new ForbiddenException('you are not allowed to maintenance information!');
 
         const maintenanceRequest = await this.prisma.maintenance.findFirst({
             where: { id: maintenanceId },

@@ -5,6 +5,7 @@ import MaintenanceChat from "@/components/pageComponents/maintenanceWorker/Maint
 import MaintenanceDetails from "@/components/pageComponents/maintenanceWorker/MaintenanceDetails"
 import MaintenanceWorkerName from "@/components/pageComponents/maintenanceWorker/MaintenanceWorkerName"
 import { Button } from "@/components/ui/button"
+import { useAuthContext } from "@/context/AuthContext"
 import useMaintenanceWorkerParams from "@/hooks/useMaintenanceWorkerParams"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
@@ -15,6 +16,7 @@ import { useParams } from "react-router-dom"
 const MaintenanceWorker = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
     const { token } = useMaintenanceWorkerParams();
+    const { user } = useAuthContext();
 
     const { data: maintenanceRequest, isLoading, error, refetch } = useQuery({
         queryKey: ['maintenanceRequest', maintenanceId],
@@ -64,7 +66,7 @@ const MaintenanceWorker = () => {
             {/* Chat Section */}
             <MaintenanceChat maintenanceId={maintenanceRequest.id} />
 
-            <MaintenanceWorkerName maintenanceId={maintenanceId || ''} />
+            {!user && <MaintenanceWorkerName maintenanceId={maintenanceId || ''} />}
         </div>
     )
 }
