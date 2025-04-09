@@ -10,6 +10,7 @@ import MaintenanceUpdateInProgress from "./MaintenanceUpdateInProgress"
 import MaintenanceUpdateCompleted from "./MaintenanceUpdateCompleted"
 import formatDateTime from "@/lib/formatDateTime"
 import formatToPesos from "@/lib/formatToPesos"
+import { useAuthContext } from "@/context/AuthContext"
 
 type MaintenanceDetailsProps = {
     maintenanceRequest: MaintenanceGetRequest
@@ -18,6 +19,7 @@ type MaintenanceDetailsProps = {
 const MaintenanceDetails = ({
     maintenanceRequest,
 }: MaintenanceDetailsProps) => {
+    const { user } = useAuthContext();
     const [detailsVisible, setDetailsVisible] = useState(false);
     
     return (
@@ -124,58 +126,17 @@ const MaintenanceDetails = ({
                             </div>
                         )}
 
-                        {/* {maintenanceRequest.completionProof && maintenanceRequest.completionProof.length > 0 && (
-                            <div>
-                                <h3 className="text-sm font-medium text-muted-foreground mb-2">Completion Proof</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {maintenanceRequest.completionProof.map((photo, index) => (
-                                        <img
-                                        key={index}
-                                        src={photo || "/placeholder.svg"}
-                                        alt={`Completion proof ${index + 1}`}
-                                        className="h-20 w-20 object-cover rounded-md border"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="pt-2">
-                            <Button
-                            onClick={() => {
-                                setNewStatus(
-                                maintenanceRequest.status === MaintenanceStatus.SCHEDULED
-                                    ? MaintenanceStatus.IN_PROGRESS
-                                    : maintenanceRequest.status === MaintenanceStatus.IN_PROGRESS
-                                        ? MaintenanceStatus.COMPLETED
-                                        : maintenanceRequest.status,
-                                )
-                                setStatusUpdateDialogOpen(true)
-                            }}
-                            disabled={
-                                maintenanceRequest.status === MaintenanceStatus.COMPLETED ||
-                                maintenanceRequest.status === MaintenanceStatus.CANCELED
-                            }
-                            >
-                            {maintenanceRequest.status === MaintenanceStatus.SCHEDULED
-                                ? "Start Work"
-                                : maintenanceRequest.status === MaintenanceStatus.IN_PROGRESS
-                                    ? "Mark as Completed"
-                                    : "Update Status"
-                            }
-                            </Button>
-                        </div> */}
                     </div>
                 </CardContent>
             )}
 
             {/* If the Status is just scheduled */}
-            {(!detailsVisible && maintenanceRequest.Status === MaintenanceStatus.SCHEDULED) && (
+            {(!detailsVisible && maintenanceRequest.Status === MaintenanceStatus.SCHEDULED && !user) && (
                 <MaintenanceUpdateInProgress maintenanceRequest={maintenanceRequest} />
             )}
 
             {/* If the Status is In-Progress */}
-            {(!detailsVisible && maintenanceRequest.Status === MaintenanceStatus.IN_PROGRESS) && (
+            {(!detailsVisible && maintenanceRequest.Status === MaintenanceStatus.IN_PROGRESS && !user) && (
                 <MaintenanceUpdateCompleted maintenanceRequest={maintenanceRequest} />
             )}
         </Card>
