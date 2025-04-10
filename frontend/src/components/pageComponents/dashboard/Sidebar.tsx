@@ -1,4 +1,4 @@
-import { CreditCard, Hotel, LayoutDashboard, Wrench } from "lucide-react"
+import { CreditCard, Hotel, LayoutDashboard, MessageSquare, Wrench } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
 const DashboardSidebar = () => {
@@ -7,7 +7,8 @@ const DashboardSidebar = () => {
         { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard/dashboard' },
         { icon: Hotel, label: 'Condo', href: '/dashboard/condo' },
         { icon: Wrench , label: 'Maintenance', href: '/dashboard/maintenance' },
-        { icon: CreditCard, label: 'Payments', href: '/dashboard/payments'  }
+        { icon: CreditCard, label: 'Payments', href: '/dashboard/payments'  },
+        { icon: MessageSquare, label: 'Chats', href: '/dashboard/chats' }
     ]
 
     return (

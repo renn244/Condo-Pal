@@ -91,7 +91,7 @@ export class MaintenanceService {
                     condo: { select: { id: true, name: true, address: true, } }
                 },
                 take: take,
-                skip: skip
+                skip: skip,
             }),
             this.prisma.maintenance.count({ where: where })
         ])

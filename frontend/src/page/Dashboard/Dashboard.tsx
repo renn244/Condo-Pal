@@ -4,6 +4,7 @@ import Condo from "./Condo"
 import Maintenance from "./Maintenance"
 import Payments from "./Payments"
 import ViewCondo from "./ViewCondo"
+import Chat from "./Chat"
 
 const Dashboard = () => {
     return (
@@ -16,6 +17,7 @@ const Dashboard = () => {
                     <Route path="/condo/:condoId" element={<ViewCondo />} />
                     <Route path="/maintenance" element={<Maintenance />} />
                     <Route path="/payments" element={<Payments />} />
+                    <Route path="/chats" element={<Chat />} />
                 </Routes>
             </main>
         </div>

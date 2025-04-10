@@ -55,13 +55,12 @@ const MaintenanceMessageInput = ({
             const newFiles = Array.from(e.target.files)
             setAttachments([...attachments, ...newFiles])
 
-            // Create previews
             newFiles.forEach((file) => {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setAttachmentPreviews((prev) => [...prev, reader.result as string])
-            }
-            reader.readAsDataURL(file)
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    setAttachmentPreviews((prev) => [...prev, reader.result as string])
+                }
+                reader.readAsDataURL(file)
             })
         }
     }
@@ -77,19 +76,19 @@ const MaintenanceMessageInput = ({
             {attachmentPreviews.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
                     {attachmentPreviews.map((preview, index) => (
-                    <div key={index} className="relative h-16 w-16">
-                        <img
-                        src={preview || "/placeholder.svg"}
-                        alt={`Attachment preview ${index + 1}`}
-                        className="h-16 w-16 object-cover rounded-md border"
-                        />
-                        <button
-                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
-                        onClick={() => removeAttachment(index)}
-                        >
-                            <X className="h-3 w-3" />
-                        </button>
-                    </div>
+                        <div key={index} className="relative h-16 w-16">
+                            <img
+                            src={preview || "/placeholder.svg"}
+                            alt={`Attachment preview ${index + 1}`}
+                            className="h-16 w-16 object-cover rounded-md border"
+                            />
+                            <button
+                            className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
+                            onClick={() => removeAttachment(index)}
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </div>
                     ))}
                 </div>
             )}
