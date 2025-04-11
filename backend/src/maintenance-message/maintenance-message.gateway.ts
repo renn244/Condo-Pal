@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { WebSocketGateway, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from "@nestjs/websockets";
+import { WebSocketGateway, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io"
 
 @WebSocketGateway({ namespace: "maintenance-message" })

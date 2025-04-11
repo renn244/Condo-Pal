@@ -98,59 +98,58 @@ const initialMessages = [
 ]
 
 const Chat = () => {
-    const [selectedResident, setSelectedResident] = useState(residents[0])
-    const [messages] = useState(initialMessages)
-    const [showMobileChat, setShowMobileChat] = useState(false)
-    const [viewingPhotos, setViewingPhotos] = useState<string[]>([])
+  const [selectedResident, setSelectedResident] = useState(residents[0])
+  const [messages] = useState(initialMessages)
+  const [showMobileChat, setShowMobileChat] = useState(false)
+  const [viewingPhotos, setViewingPhotos] = useState<string[]>([])
 
-    const { mutate, isPending } = useMutation({
-        mutationKey: ["sendMessage"],
-        mutationFn: async ({ message, attachments }: { message: string, attachments: File[] }) => {
-            // make it multiform
-            // const response = await axiosFetch.post(`/chat/send/${selectedResident.id}`, {
-            //     message,
-            //     attachments
-            // })
-
-        },
-        onSuccess: (data) => {
-            // update the query here
-        },
-        onError: (error) => {
-            toast.error(error.message);
-        }
-    })
-
-    // Open photo viewer
-    const openPhotoViewer = (photos: string[]) => {
-        setViewingPhotos(photos)
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["sendMessage"],
+    mutationFn: async ({ message, attachments }: { message: string, attachments: File[] }) => {
+      // make it multiform
+      // const response = await axiosFetch.post(`/chat/send/${selectedResident.id}`, {
+      //     message,
+      //     attachments
+      // })
+    },
+    onSuccess: (data) => {
+      // update the query here
+    },
+    onError: (error) => {
+      toast.error(error.message);
     }
+  })
 
-    return (
-        <div className="h-full">
-            <div className="flex flex-1 h-full max-h-screen">
-                <ConversationList 
-                showMobileChat={showMobileChat}
-                setShowMobileChat={setShowMobileChat}
-                conversationList={residents}
-                selectedResidentId={selectedResident.id.toString()}
-                setSelectedResidentId={setSelectedResident as any} 
-                />
+  // Open photo viewer
+  const openPhotoViewer = (photos: string[]) => {
+    setViewingPhotos(photos)
+  }
 
-                <div className={`w-full md:w-2/3 flex flex-col ${showMobileChat ? "flex" : "hidden md:flex"}`}>
-                    <ChatHeader setShowMobile={setShowMobileChat} selectedResident={selectedResident} />
+  return (
+    <div className="h-full">
+      <div className="flex flex-1 h-full max-h-screen">
+        <ConversationList 
+        showMobileChat={showMobileChat}
+        setShowMobileChat={setShowMobileChat}
+        conversationList={residents}
+        selectedResidentId={selectedResident.id.toString()}
+        setSelectedResidentId={setSelectedResident as any} 
+        />
 
-                    <ChatView messages={messages} openPhotoViewer={openPhotoViewer} />
+        <div className={`w-full md:w-2/3 flex flex-col ${showMobileChat ? "flex" : "hidden md:flex"}`}>
+          <ChatHeader setShowMobile={setShowMobileChat} selectedResident={selectedResident} />
 
-                    <ChatInput isLoading={isPending} 
-                    sendMessage={(message, attachments) => mutate({ message, attachments })}  />
-                </div>
-            </div>
+          <ChatView messages={messages} openPhotoViewer={openPhotoViewer} />
 
-            {/* Photo Viewer */}
-            <MaintenancePhotoViewer selectedPhotos={viewingPhotos} clearPhoto={() => setViewingPhotos([])} />
+          <ChatInput isLoading={isPending} 
+          sendMessage={(message, attachments) => mutate({ message, attachments })}  />
         </div>
-    )
+      </div>
+
+      {/* Photo Viewer */}
+      <MaintenancePhotoViewer selectedPhotos={viewingPhotos} clearPhoto={() => setViewingPhotos([])} />
+    </div>
+  )
 }
 
 export default Chat

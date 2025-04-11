@@ -41,27 +41,32 @@ model User {
 
   maintenanceMessage MaintenanceMessage[] // this is the message that the user sent to the maintenance
 
+  messagesSent      Message[] @relation("SendMessages")
+  messagesReceived  Message[] @relation("ReceivedMessages")
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 model LeaseAgreement {
-  id          String   @id @default(cuid())
+  id            String   @id @default(cuid())
 
-  leaseStart  DateTime
-  leaseEnd    DateTime?
-  due_date    Int     // Day of the month or (-1) for end of the month. maximum(28 for all month)
+  leaseStart    DateTime
+  leaseEnd      DateTime?
+  due_date      Int     // Day of the month or (-1) for end of the month. maximum(28 for all month)
 
-  condoId     String   
-  condo       Condo    @relation(fields: [condoId], references: [id])
+  condoId       String   
+  condo         Condo    @relation(fields: [condoId], references: [id])
 
-  tenantId    String   @unique
-  tenant      User     @relation(fields: [tenantId], references: [id])
+  tenantId      String   @unique
+  tenant        User     @relation(fields: [tenantId], references: [id])
 
   isLeaseEnded  Boolean  @default(false)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt  
+  messages      Message[] // this is the message for tenant and landlord
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt  
 }
 
 model refreshToken {
@@ -252,6 +257,7 @@ enum MaintenanceMessageStatusUpdate {
   NOT_COMPLETED 
 }
 
+// for maintenance message within a group
 model MaintenanceMessage {
   id              String   @id @default(cuid())
 
@@ -273,4 +279,25 @@ model MaintenanceMessage {
   statusUpdate    MaintenanceMessageStatusUpdate? 
 
   createdAt       DateTime @default(now())
+}
+
+model Message {
+  id                  String   @id @default(cuid())
+  
+  leaseAgreementId    String
+  leaseAgreement      LeaseAgreement  @relation(fields: [leaseAgreementId], references: [id])
+
+  senderId            String
+  sender              User     @relation("SendMessages", fields: [senderId], references: [id])
+
+  receiverId          String
+  receiver            User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  message             String
+  attachment          String[]
+
+  isRead              Boolean @default(false)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
