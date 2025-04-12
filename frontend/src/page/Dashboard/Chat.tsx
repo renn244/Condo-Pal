@@ -1,61 +1,9 @@
 import ChatHeader from "@/components/pageComponents/chat/ChatHeader"
-import ChatInput from "@/components/pageComponents/chat/ChatInput"
 import ChatView from "@/components/pageComponents/chat/ChatView"
 import ConversationList from "@/components/pageComponents/chat/ConversationList"
+import ChatInputLandlord from "@/components/pageComponents/dashboard/chat/ChatInputLandlord"
 import MaintenancePhotoViewer from "@/components/pageComponents/maintenanceWorker/MaintenancePhotoViewer"
-import axiosFetch from "@/lib/axios"
-import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
-import toast from "react-hot-toast"
-
-// Mock data for residents
-const residents = [
-    {
-      id: 1,
-      name: "John Smith",
-      condo: "Palm Residences #1201",
-      online: true,
-      unreadCount: 3,
-      lastMessage: "When will the water interruption end?",
-      lastMessageTime: "10:42 AM",
-    },
-    {
-      id: 2,
-      name: "Maria Garcia",
-      condo: "Palm Residences #803",
-      online: false,
-      unreadCount: 0,
-      lastMessage: "Thank you for addressing the noise complaint.",
-      lastMessageTime: "Yesterday",
-    },
-    {
-      id: 3,
-      name: "Robert Chen",
-      condo: "Maple Tower #2204",
-      online: true,
-      unreadCount: 1,
-      lastMessage: "Is the gym open during the holiday?",
-      lastMessageTime: "Yesterday",
-    },
-    {
-      id: 4,
-      name: "Sarah Johnson",
-      condo: "Maple Tower #1105",
-      online: false,
-      unreadCount: 0,
-      lastMessage: "I've submitted the maintenance request.",
-      lastMessageTime: "Monday",
-    },
-    {
-      id: 5,
-      name: "David Kim",
-      condo: "Oak Residences #501",
-      online: true,
-      unreadCount: 0,
-      lastMessage: "When is the next association meeting?",
-      lastMessageTime: "Monday",
-    },
-]
 
 // Mock chat messages
 const initialMessages = [
@@ -98,27 +46,9 @@ const initialMessages = [
 ]
 
 const Chat = () => {
-  const [selectedResident, setSelectedResident] = useState(residents[0])
   const [messages] = useState(initialMessages)
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [viewingPhotos, setViewingPhotos] = useState<string[]>([])
-
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["sendMessage"],
-    mutationFn: async ({ message, attachments }: { message: string, attachments: File[] }) => {
-      // make it multiform
-      // const response = await axiosFetch.post(`/chat/send/${selectedResident.id}`, {
-      //     message,
-      //     attachments
-      // })
-    },
-    onSuccess: (data) => {
-      // update the query here
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    }
-  })
 
   // Open photo viewer
   const openPhotoViewer = (photos: string[]) => {
@@ -131,18 +61,14 @@ const Chat = () => {
         <ConversationList 
         showMobileChat={showMobileChat}
         setShowMobileChat={setShowMobileChat}
-        conversationList={residents}
-        selectedResidentId={selectedResident.id.toString()}
-        setSelectedResidentId={setSelectedResident as any} 
         />
 
         <div className={`w-full md:w-2/3 flex flex-col ${showMobileChat ? "flex" : "hidden md:flex"}`}>
-          <ChatHeader setShowMobile={setShowMobileChat} selectedResident={selectedResident} />
+          <ChatHeader setShowMobile={setShowMobileChat} />
 
           <ChatView messages={messages} openPhotoViewer={openPhotoViewer} />
 
-          <ChatInput isLoading={isPending} 
-          sendMessage={(message, attachments) => mutate({ message, attachments })}  />
+          <ChatInputLandlord />
         </div>
       </div>
 

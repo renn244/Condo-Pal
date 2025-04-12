@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { GeneralGateway } from 'src/general-gateway/general.gateway';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
@@ -17,9 +17,7 @@ export class MessageService {
         const senderId = user.id;
         const photoUrls = await Promise.all(
             attachments.map(async (file) => {
-                const newPhoto = await this.fileUploadService.upload(file, {
-                    folder: 'message-attachments'
-                })
+                const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments' })
                 return newPhoto.secure_url;
             })
         ) || [];
@@ -60,22 +58,45 @@ export class MessageService {
             },
             select: {
                 id: true,
-                tenant: {
+                condo: {
                     select: {
-                        id: true,
+                        tenant: {
+                            select: {
+                                id: true,
+                                name: true,
+                                profile: true,
+                            }
+                        },
                         name: true,
-                        profile: true,
-                        condo: { select: { name: true, address: true } }
+                        address: true,
                     }
                 },
                 messages: {
                     orderBy: { createdAt: 'desc' },
                     take: 1
+                },
+                _count: {
+                    select: { messages: { where: { isRead: false, receiverId: user.id, } } }
                 }
             }
         })
 
-        return conversations
+        // formatting data
+        const formattedConversatons = conversations.map((conversation) => {
+            return {
+                id: conversation.id,
+                sender: conversation.condo.tenant,
+                condo: {
+                    name: conversation.condo.name,
+                    address: conversation.condo.address
+                },
+                messages: conversation.messages,
+                online: false, // TODO: implement online status
+                unreadCount: conversation._count.messages,
+            }
+        })
+
+        return formattedConversatons
     }
 
     // active means the leaseAgreement has not yet ended
@@ -96,21 +117,79 @@ export class MessageService {
                                 id: true,
                                 name: true,
                                 profile: true,
-                                condo: { select: { name: true, address: true } }       
                             }
-                        }
+                        },
+                        name: true,
+                        address: true,
                     }
                 },
                 messages: {
                     orderBy: { createdAt: 'desc' },
                     take: 1
+                },
+                _count: {
+                    select: { messages: { where: { isRead: false, receiverId: user.id, } } }
                 }
+            },
+        })
+
+        // formatting data
+        const formattedConversatons = conversations.map((conversation) => {
+            return {
+                id: conversation.id,
+                sender: conversation.condo.owner,
+                condo: {
+                    name: conversation.condo.name,
+                    address: conversation.condo.address,
+                },
+                messages: conversation.messages,
+                online: false, // TODO: implement online status
+                unreadCount: conversation._count.messages,
             }
         })
 
-        return conversations
+        return formattedConversatons
     }
 
+    async getSelectedChatInfo(query: { leaseAgreementId: string }, user: UserJwt) {
+        const isLandlord = user.role === 'landlord';
+
+        const selectedChat = await this.prisma.leaseAgreement.findUnique({
+            where: { id: query.leaseAgreementId },
+            select: {
+                tenant: { select: { id: true, name: true, profile: true, } },
+                condo: {
+                    select: {
+                        owner: {
+                            select: {
+                                id: true,
+                                name: true,
+                                profile: true,
+                            }
+                        },
+                        name: true,
+                        address: true,
+                    },
+                },
+            }
+        })
+
+        if(!selectedChat) {
+            throw new NotFoundException("Conversation not found!")
+        }
+
+        const formattedData = {
+            id: query.leaseAgreementId,
+            name: isLandlord ? selectedChat?.tenant.name : selectedChat?.condo.owner.name,
+            profile: isLandlord ? selectedChat?.tenant.profile : selectedChat?.condo.owner.profile,
+            condoName: selectedChat?.condo.name,
+            address: selectedChat?.condo.address,
+            online: false, // TODO: implement online status
+        }
+
+        return formattedData;
+    }
+    
     async getMessages(query: { leaseAgreementId: string, cursor?: string }, user: UserJwt) {
         const messages = await this.prisma.message.findMany({
             where: { leaseAgreementId: query.leaseAgreementId },

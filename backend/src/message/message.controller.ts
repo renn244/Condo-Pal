@@ -33,6 +33,11 @@ export class MessageController {
         return this.messageService.getActiveConversationListTenant(user);
     }
 
+    @Get("getSelectedChatInfo")
+    async getSelectedChatInfo(@Query() query: { leaseAgreementId: string }, @User() user: UserJwt) {
+        return this.messageService.getSelectedChatInfo(query, user);
+    }
+
     @Get("getMessages")
     async getMessages(@Query() query: { leaseAgreementId: string, cursor?: string }, @User() user: UserJwt) {
         return this.messageService.getMessages(query, user);
