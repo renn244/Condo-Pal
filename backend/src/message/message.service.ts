@@ -15,8 +15,9 @@ export class MessageService {
     async createMessageWithFile(query: { leaseAgreementId: string, receiverId: string }, user: UserJwt, body: any, 
     attachments: Array<Express.Multer.File>) {
         const senderId = user.id;
+        console.log(attachments)
         const photoUrls = await Promise.all(
-            attachments.map(async (file) => {
+            attachments?.map(async (file) => {
                 const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments' })
                 return newPhoto.secure_url;
             })

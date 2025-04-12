@@ -13,6 +13,21 @@ type message = {
     updatedAt: string;
 }
 
+type messagewithSender = {
+    sender: {
+        id: string;
+        name: string;
+        profile: string;
+    }
+} & message
+
+type messageswithSender = messagewithSender[]
+
+type getMessageRequest = {
+    messages: messageswithSender;
+    nextCursor: string | null;
+}
+
 type conversation = {
     id: string;
     sender: {

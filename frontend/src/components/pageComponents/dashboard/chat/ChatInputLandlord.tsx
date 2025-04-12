@@ -3,13 +3,11 @@ import toast from "react-hot-toast";
 import ChatInput from "../../chat/ChatInput";
 import { toFormData } from "axios";
 import axiosFetch from "@/lib/axios";
-
-type ChatInputLandlordProps = {
-    
-}
+import useMessageParams from "@/hooks/useMessageParams";
 
 const ChatInputLandlord = () => {
     const queryClient = useQueryClient();
+    const { leaseAgreementId } = useMessageParams();
 
     const { mutate, isPending } = useMutation({
         mutationKey: ["sendMessage"],
@@ -17,10 +15,17 @@ const ChatInputLandlord = () => {
             const formData = toFormData({ message });
             attachments.forEach((file) => formData.append("attachments", file));
 
-            const response = await axiosFetch.post(`/message/send-message?leaseAgreementId=${'leaseAgreementId'}&receiverId=${'receiver'}`, {
-                message,
-                attachments
-            })
+            const receiverId = (queryClient.getQueryData(["conversationList", ""]) as conversationList)
+            ?.find((chat) => chat.id === leaseAgreementId)?.sender.id;
+
+            const response = await axiosFetch.post(
+                `/message/send-message?leaseAgreementId=${leaseAgreementId}&receiverId=${receiverId}`, 
+                formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    }
+                }
+            )
 
             if(response.status >= 400) {
                 throw new Error(response.data.message);
@@ -30,6 +35,7 @@ const ChatInputLandlord = () => {
         },
         onSuccess: (data) => {
             //update the query here
+            // find a way to clear the mesage also
         },
         onError: (error) => {
             toast.error(error.message);

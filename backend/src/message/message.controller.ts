@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 
@@ -13,7 +13,7 @@ export class MessageController {
     ) {}
 
     @Post("send-message")
-    @UseInterceptors(FileInterceptor('attachments', {
+    @UseInterceptors(FilesInterceptor('attachments', undefined, {
         storage: multer.memoryStorage(),
     }))
     async sendMessageWithFile(@Query() query: { leaseAgreementId: string, receiverId: string }, @User() user: UserJwt,

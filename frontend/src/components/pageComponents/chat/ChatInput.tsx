@@ -45,7 +45,7 @@ const ChatInput = ({
             {/* Attachment preview */}
             {previewAttachments.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
-                    {previewAttachments.map((preview, index) => (
+                    {previewAttachments?.map((preview, index) => (
                         <div key={index} className="relative h-16 w-16">
                             <img
                             src={preview || "/placeholder.svg"}
