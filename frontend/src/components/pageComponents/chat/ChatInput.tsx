@@ -3,20 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, Send, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 type ChatInputProps = {
     sendMessage: (message: string, attachments: File[]) => void;
     isLoading: boolean;
+    newMessage: string,
+    setNewMessage: (message: string) => void;
+    attachments: File[];
+    setAttachments: (attachments: File[]) => void;
+    previewAttachments: string[];
+    setPreviewAttachments: Dispatch<SetStateAction<string[]>>;
 }
 
 const ChatInput = ({
     sendMessage,
-    isLoading
+    isLoading,
+    newMessage,
+    
+    setNewMessage,
+    attachments,
+    setAttachments,
+    previewAttachments,
+    setPreviewAttachments,
 }: ChatInputProps) => {
-    const [newMessage, setNewMessage] = useState("")
-    const [attachments, setAttachments] = useState<File[]>([])
-    const [previewAttachments, setPreviewAttachments] = useState<string[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +38,7 @@ const ChatInput = ({
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const previewUrl = reader.result as string;
-                    setPreviewAttachments((prev) => [...prev, previewUrl]);
+                    setPreviewAttachments(prev => [...prev, previewUrl]);
                 }
                 reader.readAsDataURL(file);
             })
@@ -69,7 +79,7 @@ const ChatInput = ({
                     <Paperclip className="h-5 w-5" />
                     <span className="sr-only">Attach file</span>
                 </Button>
-                <Input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelect} multiple />
+                <Input type="file" accept="image" ref={fileInputRef} className="hidden" onChange={handleFileSelect} multiple />
 
 
                 <Textarea

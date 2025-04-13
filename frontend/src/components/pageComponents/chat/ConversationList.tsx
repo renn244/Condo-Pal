@@ -2,12 +2,13 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { useAuthContext } from "@/context/AuthContext"
+import { useSocketContext } from "@/context/SocketContext"
 import useMessageParams from "@/hooks/useMessageParams"
 import axiosFetch from "@/lib/axios"
 import formatSmartDate from "@/lib/formatSmartDate"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type ConversationListProps = {
     showMobileChat: boolean
@@ -18,7 +19,9 @@ const ConversationList = ({
     showMobileChat,
     setShowMobileChat,
 }: ConversationListProps) => {
+    const queryClient = useQueryClient();
     const { user } = useAuthContext();
+    const { socket } = useSocketContext();
     const [searchTerm, setSearchTerm] = useState("");
     const { leaseAgreementId, setLeaseAgreementId } = useMessageParams();
 
@@ -38,6 +41,35 @@ const ConversationList = ({
         refetchOnWindowFocus: false,
     })
 
+    useEffect(() => {
+        if(!socket) return;
+
+        // this is for the sender
+        socket.on("newMessageConversation", async (message: any) => {
+            queryClient.setQueryData(['conversationList', searchTerm], (oldData: conversationList) => {
+                if(!oldData) return oldData;
+
+                const isSender = user?.id === message.senderId
+                const newData = oldData.map((conversation) => {
+                    if(conversation.id === message.leaseAgreementId) {
+                        return {
+                            ...conversation,
+                            messages: [message],
+                            unreadCount: isSender ? conversation.unreadCount : conversation.unreadCount + 1,
+                        }
+                    }
+                    return conversation;
+                })
+
+                return newData;
+            })
+        })
+
+        return () => {
+            socket.off("newMessageTenant");
+        }
+    }, [socket, searchTerm])
+    
     if(!conversationList && !isLoading) return
 
     const sortedConversations = conversationList?.sort((a, b) => {
@@ -73,6 +105,7 @@ const ConversationList = ({
                         `}
                         onClick={() => {
                             setLeaseAgreementId(conversation.id) // this should be a parameter
+                            setSearchTerm("")
                             setShowMobileChat(true)
                         }}
                         >

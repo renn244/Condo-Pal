@@ -25,7 +25,7 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
         this.userIdToSocketId[userId] = client.id;
         this.socketIdToUserId[client.id] = userId;
 
-        this.logger.log(`User ${userId} connected with socker ${client.id}`);
+        this.logger.log(`User ${userId} connected with socket ${client.id}`);
     }
 
     handleDisconnect(client: any) {

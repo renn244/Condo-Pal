@@ -19,10 +19,11 @@ const ChatView = ({
 }: ChatViewProps) => {
     const { user } = useAuthContext();
     const userId = user!.id;
-
+    
     return (
-        <div id="messageContainer" className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div id="messageContainer" className="flex-1 overflow-y-auto flex flex-col-reverse">
             <InfiniteScroll
+            className="gap-2"
             style={{ display: 'flex', flexDirection: 'column-reverse' }}
             dataLength={messages.length}
             next={() => fetchNextPage()}

@@ -16,7 +16,7 @@ const Chat = () => {
 
   return (
     <div className="h-full">
-      <div className="flex flex-1 h-full max-h-screen">
+      <div className="flex flex-1 h-full max-h-[843px]">
         <ConversationList 
         showMobileChat={showMobileChat}
         setShowMobileChat={setShowMobileChat}

@@ -15,7 +15,7 @@ export class MessageService {
     async createMessageWithFile(query: { leaseAgreementId: string, receiverId: string }, user: UserJwt, body: any, 
     attachments: Array<Express.Multer.File>) {
         const senderId = user.id;
-        console.log(attachments)
+
         const photoUrls = await Promise.all(
             attachments?.map(async (file) => {
                 const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments' })
@@ -42,8 +42,13 @@ export class MessageService {
             }
         })
 
+        const receiverSocketId = this.generalGateway.getSocketIdByUserId(query.receiverId);
+        const senderSocketId = this.generalGateway.getSocketIdByUserId(senderId);
+
         // notification for both leaseAgreement listenter (the active chat)
-        // and the conversationList listener (the list of conversations)
+        this.generalGateway.io.to(receiverSocketId).emit('newMessageCondo', message);
+        // and the conversationList listener (the list of conversations) // update both to not complicate things
+        this.generalGateway.io.to([receiverSocketId, senderSocketId]).emit('newMessageConversation', message);
 
         return message;
     }

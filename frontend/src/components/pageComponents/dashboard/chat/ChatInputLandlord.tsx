@@ -1,11 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import ChatInput from "../../chat/ChatInput";
 import { toFormData } from "axios";
 import axiosFetch from "@/lib/axios";
 import useMessageParams from "@/hooks/useMessageParams";
+import { useState } from "react";
 
 const ChatInputLandlord = () => {
+    const [newMessage, setNewMessage] = useState("");
+    const [attachments, setAttachments] = useState<File[]>([]);
+    const [previewAttachments, setPreviewAttachments] = useState<string[]>([]);
+
     const queryClient = useQueryClient();
     const { leaseAgreementId } = useMessageParams();
 
@@ -34,16 +39,36 @@ const ChatInputLandlord = () => {
             return response.data;
         },
         onSuccess: (data) => {
+            setNewMessage("");
+            setAttachments([]);
+            setPreviewAttachments([]);
+
             //update the query here
-            // find a way to clear the mesage also
+            queryClient.setQueryData(["chatMessages", leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page, idx) => {
+                        if(idx === 0) {
+                            return {
+                                ...page,
+                                messages: [data, ...page.messages],
+                            }
+                        }
+                        return page;
+                    })
+                }
+            })
         },
         onError: (error) => {
             toast.error(error.message);
         }
     })
-
+    
     return (
         <ChatInput isLoading={isPending} 
+        newMessage={newMessage} setNewMessage={setNewMessage}
+        attachments={attachments} setAttachments={setAttachments}
+        previewAttachments={previewAttachments} setPreviewAttachments={setPreviewAttachments}
         sendMessage={(message, attachments) => mutate({ message, attachments })}  />
     )
 }

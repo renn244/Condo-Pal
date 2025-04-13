@@ -1,4 +1,4 @@
-import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query"
+import { InfiniteData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import ChatHeader from "../../chat/ChatHeader"
 import ChatView from "../../chat/ChatView"
 import axiosFetch from "@/lib/axios"
@@ -15,6 +15,7 @@ const ChatListAndHeader = ({
     openPhotoViewer,
     setShowMobileChat,
 }: ChatListAndHeaderProps) => {
+    const queryClient = useQueryClient();
     const { socket } = useSocketContext();
     const { leaseAgreementId } = useMessageParams();
 
@@ -42,8 +43,25 @@ const ChatListAndHeader = ({
     useEffect(() => {
         if(!socket) return;
 
+        // this is for the receiver
         socket.on("newMessageCondo", async (message: any) => {
-            // update the chatMessages query here
+            if(message.leaseAgreementId !== leaseAgreementId) return; // ignore messages from other chats
+            
+            await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
+
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page, idx) => {
+                        if(idx === 0) {
+                            return {
+                                ...page,
+                                messages: [message, ...page.messages],
+                            }
+                        }
+                        return page;
+                    })
+                }
+            })
         })
         
         return () => {
@@ -51,7 +69,7 @@ const ChatListAndHeader = ({
         }
     }, [socket])
 
-    const messages = data?.pages.flatMap((page) => page.messages || []) || [];
+    const messages = data?.pages.flatMap((page) => page.messages) || [];
 
     return (
         <>
