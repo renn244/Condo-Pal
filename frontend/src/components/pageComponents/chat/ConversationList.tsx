@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { useAuthContext } from "@/context/AuthContext"
 import { useSocketContext } from "@/context/SocketContext"
+import useDebounceValue from "@/hooks/useDebounceValue"
 import useMessageParams from "@/hooks/useMessageParams"
 import axiosFetch from "@/lib/axios"
 import formatSmartDate from "@/lib/formatSmartDate"
@@ -20,10 +21,11 @@ const ConversationList = ({
     showMobileChat,
     setShowMobileChat,
 }: ConversationListProps) => {
+    const [searchTerm, setSearchTerm] = useState("");
+
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
     const { socket } = useSocketContext();
-    const [searchTerm, setSearchTerm] = useState("");
     const { leaseAgreementId, setLeaseAgreementId } = useMessageParams();
 
     const { data: conversationList, isLoading } = useQuery({
@@ -31,7 +33,7 @@ const ConversationList = ({
         queryFn: async () => {
             const isLandlord = user?.role === 'landlord';
             const endpoint = isLandlord ? "/message/getConversationListLandlord" : "/message/getConversationListTenant";
-            const response = await axiosFetch.get(`${endpoint}?search=${searchTerm}`)
+            const response = await axiosFetch.get(`${endpoint}?search=${searchTerm || ""}`)
 
             if(response.status >= 400) {
                 throw new Error(response.data.message);
@@ -85,17 +87,7 @@ const ConversationList = ({
 
     return (
         <div className={`w-full h-full md:w-1/4 border-r flex flex-col ${showMobileChat ? "hidden md:flex" : "flex"}`}>
-            <div className="p-3 border-b">
-                <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                    placeholder="Search residents..."
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
+            <ConversationListHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
             {isLoading ? (
                 <LoadingSpinner />
@@ -144,6 +136,37 @@ const ConversationList = ({
                     ))}
                 </div>
             )}
+        </div>
+    )
+}
+
+type ConversationListHeaderProps = {
+    searchTerm: string
+    setSearchTerm: (term: string) => void
+}
+
+const ConversationListHeader = ({
+    searchTerm,
+    setSearchTerm,
+}: ConversationListHeaderProps) => {
+    const [search, setSearch] = useState(searchTerm || "");
+    const debounceSearchTerm = useDebounceValue(search, 250);    
+
+    useEffect(() => {
+        setSearchTerm(debounceSearchTerm);
+    }, [debounceSearchTerm])
+
+    return (
+        <div className="p-3 border-b">
+            <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                placeholder="Search residents..."
+                className="pl-8"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
         </div>
     )
 }

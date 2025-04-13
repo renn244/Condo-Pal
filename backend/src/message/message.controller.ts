@@ -4,6 +4,7 @@ import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
+import { query } from 'express';
 
 @Controller('message')
 @UseGuards(JwtAuthGuard)
@@ -23,14 +24,14 @@ export class MessageController {
 
     // need landlord guard
     @Get("getConversationListLandlord")
-    async getActiveConversationListLandlord(@User() user: UserJwt) {
-        return this.messageService.getActiveConversationListLandlord(user);
+    async getActiveConversationListLandlord(@User() user: UserJwt, @Query() query: { search: string }) {
+        return this.messageService.getActiveConversationListLandlord(user, query);
     }
 
     // need tenant guard
     @Get("getConversationListTenant")
-    async getActiveConversationListTenant(@User() user: UserJwt) {
-        return this.messageService.getActiveConversationListTenant(user);
+    async getActiveConversationListTenant(@User() user: UserJwt, @Query() query: { search: string }) {
+        return this.messageService.getActiveConversationListTenant(user, query);
     }
 
     @Get("getSelectedChatInfo")

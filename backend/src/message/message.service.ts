@@ -54,12 +54,13 @@ export class MessageService {
     }
 
     // active means the leaseAgreement has not yet ended
-    async getActiveConversationListLandlord(user: UserJwt) {
+    async getActiveConversationListLandlord(user: UserJwt, query: { search: string }) {
         const conversations = await this.prisma.leaseAgreement.findMany({
             where: {
                 AND: [
                     { condo: { ownerId: user.id } },
                     { isLeaseEnded: false },
+                    { tenant: { name: { contains: query.search, mode: 'insensitive' } } }
                 ]
             },
             select: {
@@ -106,12 +107,13 @@ export class MessageService {
     }
 
     // active means the leaseAgreement has not yet ended
-    async getActiveConversationListTenant(user: UserJwt) {
+    async getActiveConversationListTenant(user: UserJwt, query: { search: string }) {
         const conversations = await this.prisma.leaseAgreement.findMany({
             where: {
                 AND: [
                     { tenantId: user.id },
                     { isLeaseEnded: false },
+                    { condo: { name: { contains: query.search, mode: 'insensitive' } } }
                 ]
             },
             select: {

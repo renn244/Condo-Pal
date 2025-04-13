@@ -21,6 +21,7 @@ const ChatInputLandlord = () => {
             const formData = toFormData({ message });
             attachments.forEach((file) => formData.append("attachments", file));
 
+            // this does not break because we always have "" as searchTerm every refresh because it's just useState
             const receiverId = (queryClient.getQueryData(["conversationList", ""]) as conversationList)
             ?.find((chat) => chat.id === leaseAgreementId)?.sender.id;
 
