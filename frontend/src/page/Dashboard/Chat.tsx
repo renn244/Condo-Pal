@@ -22,7 +22,7 @@ const Chat = () => {
         setShowMobileChat={setShowMobileChat}
         />
 
-        <div className={`w-full md:w-2/3 flex flex-col ${showMobileChat ? "flex" : "hidden md:flex"}`}>
+        <div className={`w-full md:w-full flex flex-col ${showMobileChat ? "flex" : "hidden md:flex"}`}>
           <ChatListAndHeader 
           openPhotoViewer={openPhotoViewer}
           setShowMobileChat={setShowMobileChat}

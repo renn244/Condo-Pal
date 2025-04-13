@@ -40,7 +40,7 @@ const ChatHeader = ({
     if(error) return
 
     return (
-        <div className="p-3 border-b flex items-center justify-between">
+        <div className="p-2.5 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setShowMobileChat(false)}>
                     <ChevronLeft className="h-5 w-5" />
