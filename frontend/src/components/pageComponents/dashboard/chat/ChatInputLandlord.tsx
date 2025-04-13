@@ -5,6 +5,7 @@ import { toFormData } from "axios";
 import axiosFetch from "@/lib/axios";
 import useMessageParams from "@/hooks/useMessageParams";
 import { useState } from "react";
+import { playAudio } from "@/lib/playAudio";
 
 const ChatInputLandlord = () => {
     const [newMessage, setNewMessage] = useState("");
@@ -39,6 +40,8 @@ const ChatInputLandlord = () => {
             return response.data;
         },
         onSuccess: (data) => {
+            playAudio("/messages/chat-audio-focus.mp3");
+
             setNewMessage("");
             setAttachments([]);
             setPreviewAttachments([]);

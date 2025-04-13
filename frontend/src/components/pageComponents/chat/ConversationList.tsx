@@ -6,6 +6,7 @@ import { useSocketContext } from "@/context/SocketContext"
 import useMessageParams from "@/hooks/useMessageParams"
 import axiosFetch from "@/lib/axios"
 import formatSmartDate from "@/lib/formatSmartDate"
+import { playAudio } from "@/lib/playAudio"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -46,6 +47,10 @@ const ConversationList = ({
 
         // this is for the sender
         socket.on("newMessageConversation", async (message: any) => {
+            if(message.leaseAgreementId !== leaseAgreementId) {
+                playAudio("/messages/messenger-notif-not-focus.mp3");
+            }
+            
             queryClient.setQueryData(['conversationList', searchTerm], (oldData: conversationList) => {
                 if(!oldData) return oldData;
 

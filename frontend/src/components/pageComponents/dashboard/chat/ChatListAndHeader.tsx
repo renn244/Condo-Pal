@@ -5,6 +5,7 @@ import axiosFetch from "@/lib/axios"
 import { useEffect } from "react"
 import { useSocketContext } from "@/context/SocketContext"
 import useMessageParams from "@/hooks/useMessageParams"
+import { playAudio } from "@/lib/playAudio"
 
 type ChatListAndHeaderProps = {
     openPhotoViewer: (photos: string[]) => void
@@ -47,6 +48,13 @@ const ChatListAndHeader = ({
         socket.on("newMessageCondo", async (message: any) => {
             if(message.leaseAgreementId !== leaseAgreementId) return; // ignore messages from other chats
             
+            // notitication
+            if(document.hidden) {
+                playAudio("/messages/messenger-notif-not-focus.mp3");
+            } else {
+                playAudio("/messages/chat-audio-focus.mp3");
+            }
+
             await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
 
                 return {
