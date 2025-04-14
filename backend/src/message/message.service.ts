@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { GeneralGateway } from 'src/general-gateway/general.gateway';
+import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -53,7 +54,32 @@ export class MessageService {
         return message;
     }
 
-    // active means the leaseAgreement has not yet ended
+    // when the user just clicked the conversation and wants to see the messages
+    async updateSeenMessages(query: { leaseAgreementId: string }, user: UserJwt)  {
+        const receiverId = user.id;
+        const isLandlord = user.role === 'landlord';
+
+        const [_, getUser] = await Promise.all([
+            this.prisma.message.updateMany({
+                where: { leaseAgreementId: query.leaseAgreementId, receiverId: receiverId, isRead: false },
+                data: { isRead: true },
+            }),
+            this.prisma.leaseAgreement.findUnique({
+                where: { id: query.leaseAgreementId },
+                select: { tenantId: true, condo: { select: { ownerId: true } } }
+            })
+        ])
+
+        const senderId = isLandlord ? getUser?.tenantId : getUser?.condo.ownerId;
+        const socketSenderId = this.generalGateway.getSocketIdByUserId(senderId!);
+        if(senderId) this.generalGateway.io.to(socketSenderId).emit('seenAllMessagesCondo', { leaseAgreementId: query.leaseAgreementId }); 
+
+        return {
+            message: 'Message seen!',
+            leaseAgreementId: query.leaseAgreementId,
+        }
+    }
+
     async getActiveConversationListLandlord(user: UserJwt, query: { search: string }) {
         const conversations = await this.prisma.leaseAgreement.findMany({
             where: {
@@ -106,7 +132,7 @@ export class MessageService {
         return formattedConversatons
     }
 
-    // active means the leaseAgreement has not yet ended
+
     async getActiveConversationListTenant(user: UserJwt, query: { search: string }) {
         const conversations = await this.prisma.leaseAgreement.findMany({
             where: {
@@ -199,6 +225,11 @@ export class MessageService {
     }
     
     async getMessages(query: { leaseAgreementId: string, cursor?: string }, user: UserJwt) {
+        if(!query.cursor) {
+            // if initial check message (no cursor) then update all messages to seen
+            this.updateSeenMessages({ leaseAgreementId: query.leaseAgreementId }, user)
+        }
+        
         const messages = await this.prisma.message.findMany({
             where: { leaseAgreementId: query.leaseAgreementId },
             include: {

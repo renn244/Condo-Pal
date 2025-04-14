@@ -44,6 +44,53 @@ const ChatListAndHeader = ({
     useEffect(() => {
         if(!socket) return;
 
+        // for sender when all messages are seen by the receiever
+        socket.on("seenAllMessagesCondo", async (data: { leaseAgreementId: string }) => {
+            if(data.leaseAgreementId !== leaseAgreementId) return; // ignore messages from other chats
+
+            await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => {
+                        return {
+                            ...page,
+                            messages: page.messages.map((message) => {
+                                return {
+                                    ...message,
+                                    isRead: true,
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        })
+
+        // this is for the sender to update the seen message
+        socket.on("seenMessageCondo", async (data: { leaseAgreementId: string, messageId: string }) => {
+            if(data.leaseAgreementId !== leaseAgreementId) return; // ignore messages from other chats
+
+            await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => {
+                        return {
+                            ...page,
+                            messages: page.messages.map((message) => {
+                                if(message.id === data.messageId) {
+                                    return {
+                                        ...message,
+                                        isRead: true,
+                                    }
+                                }
+                                return message;
+                            })
+                        }
+                    })
+                }
+            })
+        })
+
         // this is for the receiver
         socket.on("newMessageCondo", async (message: any) => {
             if(message.leaseAgreementId !== leaseAgreementId) return; // ignore messages from other chats
@@ -54,6 +101,13 @@ const ChatListAndHeader = ({
             } else {
                 playAudio("/messages/chat-audio-focus.mp3");
             }
+
+            // update the seen message
+            socket.emit("seenMessageCondo", {
+                leaseAgreementId,
+                messageId: message.id,
+                senderId: message.senderId
+            })
 
             // there is a bug here if we chat with same account but (that shouldn't happen of course)
             await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
@@ -74,6 +128,8 @@ const ChatListAndHeader = ({
         })
         
         return () => {
+            socket.off("seenAllMessagesCondo");
+            socket.off("seenMessageCondo");
             socket.off("newMessageCondo");
         }
     }, [socket, leaseAgreementId])

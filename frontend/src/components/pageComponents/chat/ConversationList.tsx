@@ -11,7 +11,6 @@ import { playAudio } from "@/lib/playAudio"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
 
 type ConversationListProps = {
     showMobileChat: boolean
@@ -45,12 +44,33 @@ const ConversationList = ({
         refetchOnWindowFocus: false,
     })
 
+    const updateSeenUnreadMessages = (currLeaseAgreementId: string) => {
+        if(!leaseAgreementId) return;
+
+        queryClient.setQueryData(['conversationList', searchTerm], (oldData: conversationList) => {
+            if(!oldData) return oldData;
+
+            const newData = oldData.map((conversation) => {
+                if(conversation.id === currLeaseAgreementId) {
+                    return {
+                        ...conversation,
+                        unreadCount: 0,
+                    }
+                }
+                return conversation;
+            })
+
+            return newData;
+        })
+    }
+
     useEffect(() => {
         if(!socket) return;
 
         // this is for the sender
         socket.on("newMessageConversation", async (message: any) => {
-            if(message.leaseAgreementId !== leaseAgreementId) {
+            const notViewed = message.leaseAgreementId !== leaseAgreementId;
+            if(notViewed) {
                 playAudio("/messages/messenger-notif-not-focus.mp3");
             }
             
@@ -63,7 +83,9 @@ const ConversationList = ({
                         return {
                             ...conversation,
                             messages: [message],
-                            unreadCount: isSender ? conversation.unreadCount : conversation.unreadCount + 1,
+                            unreadCount: isSender 
+                                ? conversation.unreadCount 
+                                : notViewed ?  conversation.unreadCount + 1 : 0,
                         }
                     }
                     return conversation;
@@ -102,7 +124,8 @@ const ConversationList = ({
                             ${leaseAgreementId === conversation.id && "bg-muted"}
                         `}
                         onClick={() => {
-                            setLeaseAgreementId(conversation.id) // this should be a parameter
+                            setLeaseAgreementId(conversation.id)
+                            updateSeenUnreadMessages(conversation.id)
                             setSearchTerm("")
                             setShowMobileChat(true)
                         }}
