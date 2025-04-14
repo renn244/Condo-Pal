@@ -55,6 +55,7 @@ const ChatListAndHeader = ({
                 playAudio("/messages/chat-audio-focus.mp3");
             }
 
+            // there is a bug here if we chat with same account but (that shouldn't happen of course)
             await queryClient.setQueryData(['chatMessages', leaseAgreementId], (oldData: InfiniteData<getMessageRequest>) => {
 
                 return {
@@ -75,14 +76,15 @@ const ChatListAndHeader = ({
         return () => {
             socket.off("newMessageCondo");
         }
-    }, [socket])
+    }, [socket, leaseAgreementId])
 
     const messages = data?.pages.flatMap((page) => page.messages) || [];
 
     return (
         <>
             <ChatHeader setShowMobile={setShowMobileChat} />
-            <ChatView messages={messages} openPhotoViewer={openPhotoViewer} 
+            <ChatView noChosen={!leaseAgreementId}
+            messages={messages} openPhotoViewer={openPhotoViewer} 
             hasNextPage={hasNextPage} fetchNextPage={fetchNextPage} />
         </>
     )

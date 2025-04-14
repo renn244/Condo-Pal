@@ -11,6 +11,7 @@ import { playAudio } from "@/lib/playAudio"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 type ConversationListProps = {
     showMobileChat: boolean
@@ -73,9 +74,9 @@ const ConversationList = ({
         })
 
         return () => {
-            socket.off("newMessageTenant");
+            socket.off("newMessageConversation");
         }
-    }, [socket, searchTerm])
+    }, [socket, searchTerm, leaseAgreementId])
     
     if(!conversationList && !isLoading) return
 
@@ -86,7 +87,7 @@ const ConversationList = ({
     }) || [];
 
     return (
-        <div className={`w-full h-full md:w-1/4 border-r flex flex-col ${showMobileChat ? "hidden md:flex" : "flex"}`}>
+        <div className={`w-full min-h-[90vh] h-full md:w-1/4 border-r flex flex-col ${showMobileChat ? "hidden md:flex" : "flex"}`}>
             <ConversationListHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
             {isLoading ? (

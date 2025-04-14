@@ -28,7 +28,7 @@ const Chat = () => {
           setShowMobileChat={setShowMobileChat}
           />
 
-          <ChatInputLandlord />
+          <ChatInputLandlord /> 
         </div>
       </div>
 

@@ -6,9 +6,9 @@ const formatSmartDate = (date: Date) => {
     if(isToday(date)) {
         const hoursAgo = differenceInHours(now, date);
         if(hoursAgo < 1) {
-            const current = formatDistanceToNow(date, { addSuffix: true });
+            const current = formatDistanceToNow(date);
             
-            if(current === 'less than a minute ago') {
+            if(current === 'less than a minute') {
                 return 'just now';
             }
             

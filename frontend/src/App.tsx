@@ -22,6 +22,7 @@ import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import TenantRoute from './components/common/Authorization/TenantRoute';
 import TenantDashboard from './page/TenantDashboard/TenantDashboard';
 import MaintenanceWorker from './page/MaintenanceWorker';
+import Chat from './page/TenantDashboard/Chat';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -63,6 +64,7 @@ const App = () => {
         {/* Dashboard Tenant */}
         <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
         <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
+        <Route path='/tenant/chats' element={<Chat />} />
         <Route path='/tenant' element={
           <TenantRoute>
             <TenantDashboard />

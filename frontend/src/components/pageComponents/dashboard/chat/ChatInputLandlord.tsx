@@ -16,7 +16,7 @@ const ChatInputLandlord = () => {
     const { leaseAgreementId } = useMessageParams();
 
     const { mutate, isPending } = useMutation({
-        mutationKey: ["sendMessage"],
+        mutationKey: ["sendMessage", leaseAgreementId],
         mutationFn: async ({ message, attachments }: { message: string, attachments: File[] }) => {
             const formData = toFormData({ message });
             attachments.forEach((file) => formData.append("attachments", file));

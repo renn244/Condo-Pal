@@ -9,17 +9,23 @@ type ChatViewProps = {
     openPhotoViewer: (photos: string[]) => void,
     fetchNextPage: (options?: FetchNextPageOptions) => Promise<InfiniteQueryObserverResult>,
     hasNextPage: boolean,
+    noChosen?: boolean,
 }
 
 const ChatView = ({
     messages,
     openPhotoViewer,
     fetchNextPage,
-    hasNextPage
+    hasNextPage,
+    noChosen
 }: ChatViewProps) => {
     const { user } = useAuthContext();
     const userId = user!.id;
-    
+    console.log(noChosen)
+    if(noChosen) {
+        return <h2>bruh</h2>
+    }
+
     return (
         <div id="messageContainer" className="flex-1 overflow-y-auto flex flex-col-reverse">
             <InfiniteScroll
@@ -40,7 +46,7 @@ const ChatView = ({
                 {messages.map((message) => (
                     <div
                     key={message.id}
-                    className={`flex ${userId === message.senderId ? "justify-end" : "justify-start"}`}
+                    className={`flex ${userId === message.senderId ? "justify-end mr-1" : "justify-start ml-2"}`}
                     >
                         <div
                         className={`
