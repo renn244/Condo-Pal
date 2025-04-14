@@ -69,7 +69,7 @@ const ChatInputLandlord = () => {
     })
     
     return (
-        <ChatInput isLoading={isPending} 
+        <ChatInput isLoading={isPending}
         newMessage={newMessage} setNewMessage={setNewMessage}
         attachments={attachments} setAttachments={setAttachments}
         previewAttachments={previewAttachments} setPreviewAttachments={setPreviewAttachments}

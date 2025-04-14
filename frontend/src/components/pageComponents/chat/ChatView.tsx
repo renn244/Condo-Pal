@@ -4,13 +4,13 @@ import formatSmartDate from "@/lib/formatSmartDate"
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from "@tanstack/react-query"
 import { Eye } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
+import ChatDetailCard from "./ChatDetailCard"
 
 type ChatViewProps = {
     messages: messageswithSender,
     openPhotoViewer: (photos: string[]) => void,
     fetchNextPage: (options?: FetchNextPageOptions) => Promise<InfiniteQueryObserverResult>,
     hasNextPage: boolean,
-    noChosen?: boolean,
 }
 
 const ChatView = ({
@@ -18,14 +18,9 @@ const ChatView = ({
     openPhotoViewer,
     fetchNextPage,
     hasNextPage,
-    noChosen
 }: ChatViewProps) => {
     const { user } = useAuthContext();
     const userId = user!.id;
-
-    if(noChosen) {
-        return <h2>bruh</h2>
-    }
 
     // get the last message seen
     const lastMessageSeen = messages
@@ -42,11 +37,7 @@ const ChatView = ({
             inverse={true}
             scrollableTarget={"messageContainer"}
             loader={<div className="flex justify-center"><LoadingSpinner /></div>}
-            endMessage={
-                <p style={{ textAlign: 'center' }}>
-                    <b>You have seen it all</b>
-                </p>
-            }
+            endMessage={<ChatDetailCard />}
             >
                 {messages.map((message) => (
                     <div
@@ -105,7 +96,7 @@ const ChatView = ({
                                     {formatSmartDate(new Date(message.createdAt))}
                                 </div>
                             </div>
-                            {(lastMessageSeen.id === message.id && message.senderId === userId) && (
+                            {(lastMessageSeen?.id === message.id && message.senderId === userId) && (
                                 <div className={`w-full flex justify-end`}>
                                     <Eye className={`h-4 w-4 text-primary`} />
                                 </div>

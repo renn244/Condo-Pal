@@ -139,7 +139,7 @@ const ChatListAndHeader = ({
     return (
         <>
             <ChatHeader setShowMobile={setShowMobileChat} />
-            <ChatView noChosen={!leaseAgreementId}
+            <ChatView
             messages={messages} openPhotoViewer={openPhotoViewer} 
             hasNextPage={hasNextPage} fetchNextPage={fetchNextPage} />
         </>

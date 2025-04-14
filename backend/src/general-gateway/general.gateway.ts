@@ -17,6 +17,10 @@ export class GeneralGateway implements OnGatewayConnection, OnGatewayDisconnect 
     private userIdToSocketId: Record<string, string> = {};
     private socketIdToUserId: Record<string, string> = {};
 
+    isUserOnline(userId: string) {
+        return this.userIdToSocketId[userId] ? true : false;
+    }
+
     getUserIdBySocketId(socketId: string) {
         return this.socketIdToUserId[socketId];
     }

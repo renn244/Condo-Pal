@@ -45,7 +45,7 @@ const ConversationList = ({
     })
 
     const updateSeenUnreadMessages = (currLeaseAgreementId: string) => {
-        if(!leaseAgreementId) return;
+        if(!currLeaseAgreementId) return;
 
         queryClient.setQueryData(['conversationList', searchTerm], (oldData: conversationList) => {
             if(!oldData) return oldData;

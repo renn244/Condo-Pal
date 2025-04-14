@@ -20,7 +20,6 @@ const ChatInput = ({
     sendMessage,
     isLoading,
     newMessage,
-    
     setNewMessage,
     attachments,
     setAttachments,

@@ -124,7 +124,7 @@ export class MessageService {
                     address: conversation.condo.address
                 },
                 messages: conversation.messages,
-                online: false, // TODO: implement online status
+                online: this.generalGateway.isUserOnline(conversation.condo.tenant?.id || ""),
                 unreadCount: conversation._count.messages,
             }
         })
@@ -177,7 +177,7 @@ export class MessageService {
                     address: conversation.condo.address,
                 },
                 messages: conversation.messages,
-                online: false, // TODO: implement online status
+                online: this.generalGateway.isUserOnline(conversation.condo.owner.id),
                 unreadCount: conversation._count.messages,
             }
         })
@@ -205,6 +205,7 @@ export class MessageService {
                         address: true,
                     },
                 },
+                leaseStart: true,
             }
         })
 
@@ -218,7 +219,8 @@ export class MessageService {
             profile: isLandlord ? selectedChat?.tenant.profile : selectedChat?.condo.owner.profile,
             condoName: selectedChat?.condo.name,
             address: selectedChat?.condo.address,
-            online: false, // TODO: implement online status
+            leaseStart: selectedChat?.leaseStart,
+            online: this.generalGateway.isUserOnline(isLandlord ? selectedChat.tenant.id : selectedChat.condo.owner.id)
         }
 
         return formattedData;
