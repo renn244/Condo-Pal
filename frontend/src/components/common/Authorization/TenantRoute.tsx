@@ -18,7 +18,7 @@ const TenantRoute = ({
     }
 
     if(user.role !== 'tenant') {
-        return <Forbidden message="This area is only for tenants and active(not deleted) tenants" />
+        return <Forbidden message="This area is only for tenants and active(with leaseAgreement) tenants" />
     }
 
     return children

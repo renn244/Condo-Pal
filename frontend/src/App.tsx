@@ -3,8 +3,6 @@ import AuthenticatedRoute from './components/common/Authorization/AuthenticatedR
 import NavBar from './components/common/NavBar';
 import NotFound from './components/common/NotFound';
 import { useAuthContext } from './context/AuthContext';
-import ManualPayment from './page/Dashboard/CondoPayment/ManualPayment';
-import VerifyGcashPayment from './page/Dashboard/CondoPayment/VerifyGcashPayment';
 import Dashboard from './page/Dashboard/Dashboard';
 import EditMaintenance from './page/Dashboard/EditMaintenance';
 import ForgotPassword from './page/ForgotPassword';
@@ -15,14 +13,12 @@ import Pricing from './page/Payment/Pricing';
 import RedirectToken from './page/RedirectToken';
 import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
-import GcashPayment from './page/TenantDashboard/CondoPayment/GcashPayment';
-import PaymongoPayment from './page/TenantDashboard/CondoPayment/PaymongoPayment';
-import VerifyPaymongoPayment from './page/TenantDashboard/CondoPayment/VerifyPaymongoPayment';
 import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import TenantRoute from './components/common/Authorization/TenantRoute';
-import TenantDashboard from './page/TenantDashboard/TenantDashboard';
 import MaintenanceWorker from './page/MaintenanceWorker';
-import Chat from './page/TenantDashboard/Chat';
+import LandlordRoute from './components/common/Authorization/LandlordRoute';
+import Tenant from './page/TenantDashboard/Tenant';
+import CondoPayments from './page/CondoPayments';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -59,27 +55,26 @@ const App = () => {
         } />
         
         {/* Dashboards Landlord */}
-        <Route path='/dashboard/*' element={<Dashboard />} />
+        <Route path='/dashboard/*' element={
+          <LandlordRoute>
+            <Dashboard />
+          </LandlordRoute>
+        } />
       
         {/* Dashboard Tenant */}
-        <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
-        <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
-        <Route path='/tenant/chats' element={<Chat />} />
-        <Route path='/tenant' element={
+        <Route path='/tenant/*' element={
           <TenantRoute>
-            <TenantDashboard />
+            <Tenant />
           </TenantRoute>
         } />
 
-        {/* Worker Page */}
+        {/* Maintenance Page */}
+        <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
+        <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
         <Route path='/maintenance/worker/:maintenanceId' element={<MaintenanceWorker />} />
 
         {/* we still need to put these pages to their proper url like dashboard of tenant or landlord  */}
-        <Route path='/condoPayments/manual/:condoId' element={<ManualPayment />} />
-        <Route path='/condoPayments/gcash/verify/:condoPaymentId' element={<VerifyGcashPayment />} />
-        <Route path='/condoPayments/gcash/:condoId' element={<GcashPayment />} />
-        <Route path='/condoPayments/paymongo/verify' element={<VerifyPaymongoPayment />} />
-        <Route path='/condoPayments/paymongo/:condoId' element={<PaymongoPayment />} />
+        <Route path='/condoPayments/*' element={ <CondoPayments /> } />
 
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />

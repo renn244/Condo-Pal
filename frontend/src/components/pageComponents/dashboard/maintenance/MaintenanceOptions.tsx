@@ -5,6 +5,7 @@ import ViewDetails from './ViewDetails'
 import { Separator } from '@/components/ui/separator'
 import CancelMaintenance from './CancelMaintenance'
 import ScheduleMaintenance from './ScheduleMaintenance'
+import { Link } from 'react-router-dom'
 
 type MaintenanceOptionProps = {
     maintenance: maintenanceCard,
@@ -32,10 +33,12 @@ const MaintenanceOptions = ({
                 maintenanceTitle={maintenance.title}
                 queryKey={queryKey}
                 />
-                <Button variant="ghost" className="w-full justify-start">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit maintenance
-                </Button>
+                <Link to={`/editMaintenanceRequest/${maintenance.id}`}>
+                    <Button variant="ghost" className="w-full justify-start">
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit maintenance
+                    </Button>
+                </Link>
                 {maintenance.Status !== "CANCELED" && (
                     <>
                         <Separator className="my-1" />

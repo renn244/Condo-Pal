@@ -65,11 +65,11 @@ const MaintenanceCard = ({
                         <div className="flex items-center gap-2">
                             <Calculator className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                            Estimated: {" "}
-                            {formatToPesos(maintenance.estimatedCost)}
-                            {maintenance.paymentResponsibility && (
-                                <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
-                            )}
+                                Estimated: {" "}
+                                {formatToPesos(maintenance.estimatedCost)}
+                                {maintenance.paymentResponsibility && (
+                                    <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
+                                )}
                             </span>
                         </div>
                     )}
