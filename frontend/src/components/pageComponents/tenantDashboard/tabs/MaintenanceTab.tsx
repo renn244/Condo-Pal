@@ -45,7 +45,7 @@ const MaintenanceTab = () => {
                     <CardDescription>View and manage your maintenance requests</CardDescription>
                 </div>
                 <Button asChild>
-                    <Link to="/maintenanceRequest">
+                    <Link to="/tenant/maintenanceRequest">
                         <Plus className="mr-2 h-4 w-4" />
                         New Request
                     </Link>

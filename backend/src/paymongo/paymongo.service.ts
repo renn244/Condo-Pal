@@ -80,8 +80,8 @@ export class PaymongoService {
                                 "billease", "card", "dob", "dob_ubp", "brankas_bdo", 
                                 "brankas_landbank", "brankas_metrobank", "gcash", "grab_pay", "paymaya" 
                             ], // Supported payment methods
-                            success_url: `${process.env.CLIENT_BASE_URL}/condoPayments/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
-                            cancel_url: `${process.env.CLIENT_BASE_URL}/condoPayments/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
+                            success_url: `${process.env.CLIENT_BASE_URL}/tenant/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
+                            cancel_url: `${process.env.CLIENT_BASE_URL}/tenant/paymongo/verify?condoPaymentId=${condoPaymentId}&condoId=${condoId}`,
                             description: title,
                             send_email_receipt: true,
                             show_description: true

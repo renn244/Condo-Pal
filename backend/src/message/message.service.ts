@@ -139,7 +139,7 @@ export class MessageService {
                 AND: [
                     { tenantId: user.id },
                     { isLeaseEnded: false },
-                    { condo: { name: { contains: query.search, mode: 'insensitive' } } }
+                    { condo: { owner: { name: { contains: query.search, mode: 'insensitive' } } } }
                 ]
             },
             select: {

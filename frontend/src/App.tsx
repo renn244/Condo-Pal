@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AuthenticatedRoute from './components/common/Authorization/AuthenticatedRoute';
-import NavBar from './components/common/NavBar';
 import NotFound from './components/common/NotFound';
 import { useAuthContext } from './context/AuthContext';
 import Dashboard from './page/Dashboard/Dashboard';
@@ -13,12 +12,12 @@ import Pricing from './page/Payment/Pricing';
 import RedirectToken from './page/RedirectToken';
 import ResetForgottenPassword from './page/ResetForgottenPassword';
 import SignUp from './page/SignUp';
-import RequestMaintenance from './page/TenantDashboard/RequestMaintenance';
 import TenantRoute from './components/common/Authorization/TenantRoute';
 import MaintenanceWorker from './page/MaintenanceWorker';
 import LandlordRoute from './components/common/Authorization/LandlordRoute';
 import Tenant from './page/TenantDashboard/Tenant';
 import CondoPayments from './page/CondoPayments';
+import MainNav from './components/common/MainNav';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -35,19 +34,18 @@ const App = () => {
   
   return (
     <div className='font-sans'>
-      <NavBar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<MainNav><HomePage /></MainNav>} />
 
         {/* Authentication Routes */}
-        <Route path='/login' element={user ? <Navigate to={'/'} /> : <Login />} />
-        <Route path='/signup' element={user ? <Navigate to={'/'} /> : <SignUp />} />
-        <Route path="/redirecttoken" element={user ? <Navigate to={'/'} /> : <RedirectToken />} />
-        <Route path='/forgot-password' element={user ? <Navigate to={'/'} /> : <ForgotPassword />} />
-        <Route path='/forgot-password/reset' element={user ? <Navigate to={'/'} /> : <ResetForgottenPassword />} />
+        <Route path='/login' element={user ? <Navigate to={'/'} /> : <MainNav><Login /></MainNav>} />
+        <Route path='/signup' element={user ? <Navigate to={'/'} /> : <MainNav><SignUp /></MainNav>} />
+        <Route path='/redirecttoken' element={user ? <Navigate to={'/'} /> : <MainNav><RedirectToken /></MainNav>} />
+        <Route path='/forgot-password' element={user ? <Navigate to={'/'} /> : <MainNav><ForgotPassword /></MainNav>} />
+        <Route path='/forgot-password/reset' element={user ? <Navigate to={'/'} /> : <MainNav><ResetForgottenPassword /></MainNav>} />
 
         {/* Subscription related routes */}
-        <Route path='/pricing' element={<Pricing />} />
+        <Route path='/pricing' element={<MainNav><Pricing /></MainNav>} />
         <Route path='/payment-status' element={
           <AuthenticatedRoute>
             <PaymentSuccess />
@@ -69,7 +67,6 @@ const App = () => {
         } />
 
         {/* Maintenance Page */}
-        <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
         <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
         <Route path='/maintenance/worker/:maintenanceId' element={<MaintenanceWorker />} />
 

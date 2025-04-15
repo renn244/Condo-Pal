@@ -63,7 +63,7 @@ const GcashPayment = () => {
                         Your payment for {condoBillInfo.name} ({getCurrentMonth()}) has been recorded and is pending verification from the landlord. You will receive a confirmation once it has been processed.
                     </AlertDescription>
                     <div className="mt-4">
-                        <Button onClick={() => (window.location.href = "/tenant")}>
+                        <Button onClick={() => (window.location.href = "/tenant/dashboard")}>
                             Return To condoBillInfo Dashboard
                         </Button>
                     </div>

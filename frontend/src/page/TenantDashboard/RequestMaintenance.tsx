@@ -34,8 +34,8 @@ const RequestMaintenance = () => {
         }
 
         toast.success('Maintenance Requested!')
-        // redirect
         // maybe update query if there is a query for tenant
+        return window.history.back();
     }
 
     return (
