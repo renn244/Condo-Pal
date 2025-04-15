@@ -162,14 +162,14 @@ const VerifyPaymongoPayment = () => {
                                 Go back to payment
                             </Button>
                             <Button asChild>
-                                <Link to={'/payment'}>Try Different Method</Link>
+                                <Link to={'/tenant/dashbord'}>Try Different Method</Link>
                             </Button>
                         </div>
                     )}
 
                     {data?.status === "paid" && (
                         <Button asChild>
-                            <Link to="/tenant">
+                            <Link to="/tenant/dashboard">
                                 <ArrowLeft className="h-4 w-4" />
                                 Return to Dashboard
                             </Link>

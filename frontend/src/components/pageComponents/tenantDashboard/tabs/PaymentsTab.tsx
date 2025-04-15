@@ -107,13 +107,13 @@ const PaymentsTab = ({
                             <h3 className="text-sm font-medium text-muted-foreground mb-1">Payment Options</h3>
                             <div className="space-y-2 mt-3">
                                 <Button variant="outline" className="w-full" asChild>
-                                    <Link to={`/condoPayments/paymongo/${condoId}`}>
+                                    <Link to={`/tenant/paymongo/${condoId}`}>
                                         <img src="/paymongo.png" className="h-5 w-5 mr-1" />
                                         Paymongo
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="w-full" asChild>
-                                    <Link to={`/condoPayments/gcash/${condoId}`}>
+                                    <Link to={`/tenant/gcash/${condoId}`}>
                                         <img src="/gcash.png" className="h-5 w-5 mr-1" />
                                         Gcash (proof of payment)
                                     </Link>
