@@ -65,7 +65,8 @@ export class MaintenanceService {
             condo: {
                 // if condo is specified then only show that condo
                 ...(query.condoId ? {
-                    id: query.condoId
+                    id: query.condoId,
+                    tenantId: user.id,
                 } : {
                     ownerId: user.id
                 })
@@ -214,7 +215,7 @@ export class MaintenanceService {
         return maintenanceRequest
     }
 
-    async editMaintenanceRequest(maintenanceId: string, tenantUser: UserJwt, body: TenantEditMaintenanceRequest, photos: Array<Express.Multer.File>) {
+    async editMaintenanceRequest(maintenanceId: string, user: UserJwt, body: TenantEditMaintenanceRequest, photos: Array<Express.Multer.File>) {
         const getPhotosofMaintenance = await this.prisma.maintenance.findFirst({
             where: { id: maintenanceId },
             select: { photos: true }
@@ -240,7 +241,11 @@ export class MaintenanceService {
 
         const editedMaintenance = await this.prisma.maintenance.update({
             where: {
-                id: maintenanceId
+                id: maintenanceId,
+                OR: [
+                    {condo: { tenantId: user.id }},
+                    {condo: { ownerId: user.id }},
+                ]
             },
             data: {
                 photos: [...previousPhotos, ...photoUrls], // combine all the photos that is kept and newly uploaded
@@ -260,7 +265,7 @@ export class MaintenanceService {
 
         const condoOfMaintenance = await this.prisma.maintenance.findFirst({
             where: {
-                id: maintenanceId
+                id: maintenanceId,
             },
             include: {
                 condo: {

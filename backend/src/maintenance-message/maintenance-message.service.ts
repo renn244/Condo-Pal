@@ -32,6 +32,18 @@ export class MaintenanceMessageService {
             (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token || ''}))?.workerName
         : null
 
+        // authorization for tenant and owner
+        if(senderType !== 'WORKER') {
+            const getMaintenanece = await this.prisma.maintenance.findUnique({
+                where: { id: maintenanceId, },
+                select: { condo: { select: { ownerId: true, tenantId: true } } }
+            })
+
+            if(getMaintenanece?.condo.ownerId !== user?.id && getMaintenanece?.condo.tenantId !== user?.id) {
+                throw new ForbiddenException('You are not authorized to send a message for this maintenance.')
+            }
+        }
+
         const maintenanceMessage = await this.prisma.maintenanceMessage.create({
             data: {
                 maintenanceId,
@@ -84,7 +96,19 @@ export class MaintenanceMessageService {
         if(!isAuthenticated) throw new ForbiddenException('You are not authorized to view this maintenance message.')
 
         const maintenanceMessages = await this.prisma.maintenanceMessage.findMany({
-            where: { maintenanceId: query.maintenanceId, },
+            where: { 
+                AND: [
+                    {maintenanceId: query.maintenanceId, },
+                    !query.token ? {maintenance: { 
+                        condo: {
+                            OR: [
+                                {ownerId: user?.id, },
+                                {tenantId: user?.id, },
+                            ]
+                        }
+                    }} : {}
+                ]
+            },
             include: {
                 sender: { 
                     select: {

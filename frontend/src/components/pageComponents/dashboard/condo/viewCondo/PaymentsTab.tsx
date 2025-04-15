@@ -23,7 +23,6 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import PaymentsOptions from "../../payments/PaymentsOptions"
 import GetPaymentType from "../../payments/GetPaymentType"
 
-
 const chartConfig = {
     totalPaid: {
       label: "Payments",

@@ -7,6 +7,8 @@ import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { Public } from 'src/lib/decorators/isPublic.decorator';
 import { OptionalAuthGuard } from 'src/lib/guards/OptionalAuth.guard';
+import { TenantGuard } from 'src/lib/guards/Tenant.guard';
+import { LandLordGuard } from 'src/lib/guards/LandLord.guard';
 
 @Controller('maintenance')
 @UseGuards(JwtAuthGuard)
@@ -15,6 +17,7 @@ export class MaintenanceController {
         private readonly maintenanceService: MaintenanceService
     ) {}
 
+    @UseGuards(TenantGuard)
     @Post('requestMaintenance')
     @UseInterceptors(FilesInterceptor('photos', 3, {
         storage: multer.memoryStorage()
@@ -30,6 +33,7 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceRequestsLandlord(user, query);
     }
 
+    @UseGuards(LandLordGuard)
     @Get('stats/:condoId')
     async getMaintenanceStats(@User() user: UserJwt, @Param('condoId') condoId: string) {
         return this.maintenanceService.getMaintenanceStats(user, condoId);
@@ -48,6 +52,7 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceRequestByToken(query.maintenanceId, query.token, user);
     }
 
+    @UseGuards(LandLordGuard)
     @Patch('editMaintenanceRequest')
     @UseInterceptors(FilesInterceptor('photos', 3, {
         storage: multer.memoryStorage()
@@ -57,6 +62,7 @@ export class MaintenanceController {
         return this.maintenanceService.editMaintenanceRequest(maintenanceId, user, body, photos);
     }
 
+    @UseGuards(LandLordGuard)
     @Patch('schedule')
     async scheduleMaintenance(@User() user: UserJwt, @Query('maintenanceId') maintenanceId: string, 
     @Body() body: ScheduleMaintenanceRequestDto) {

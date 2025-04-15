@@ -5,6 +5,8 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { query } from 'express';
+import { LandLordGuard } from 'src/lib/guards/LandLord.guard';
+import { TenantGuard } from 'src/lib/guards/Tenant.guard';
 
 @Controller('message')
 @UseGuards(JwtAuthGuard)
@@ -23,12 +25,14 @@ export class MessageController {
     }
 
     // need landlord guard
+    @UseGuards(LandLordGuard)
     @Get("getConversationListLandlord")
     async getActiveConversationListLandlord(@User() user: UserJwt, @Query() query: { search: string }) {
         return this.messageService.getActiveConversationListLandlord(user, query);
     }
 
     // need tenant guard
+    @UseGuards(TenantGuard)
     @Get("getConversationListTenant")
     async getActiveConversationListTenant(@User() user: UserJwt, @Query() query: { search: string }) {
         return this.messageService.getActiveConversationListTenant(user, query);

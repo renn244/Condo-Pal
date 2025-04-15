@@ -19,7 +19,7 @@ const MaintenanceTab = () => {
     const { 
         maintenancePage: page, maintenanceSearch: search, status, priority,
         setPage, setSearch, setStatus, setPriority
-     } = useTenantDashboardParams();
+    } = useTenantDashboardParams();
     const condoId = user!.condo.id;
 
     // should be infinite scroll

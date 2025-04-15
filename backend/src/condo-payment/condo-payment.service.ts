@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CondoPaymentType, GcashPaymentStatus, Prisma } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
@@ -176,10 +176,13 @@ export class CondoPaymentService {
         return createPaymentGcash
     }
 
-    async getGcashPayment(condoPaymentId: string) {
+    async getGcashPayment(condoPaymentId: string, user: UserJwt) {
         const gcashPayment =  await this.prisma.condoPayment.findFirst({
             where: {
-                id: condoPaymentId
+                id: condoPaymentId,
+                condo: {
+                    ownerId: user.id
+                }
             },
             select: {
                 id: true,
@@ -221,7 +224,10 @@ export class CondoPaymentService {
         
         const updatePayment = await this.prisma.condoPayment.update({
             where: {
-                id: condoPaymentId
+                id: condoPaymentId,
+                condo: {
+                    ownerId: user.id
+                }
             },
             data: {
                 isVerified,
@@ -392,6 +398,13 @@ export class CondoPaymentService {
     }
 
     async getCondoPaymentStatistic(condoId: string) {
+        const getCondoId = await this.prisma.condo.findUnique({
+            where: { id: condoId },
+            select: { ownerId: true }
+        });
+
+        if(!getCondoId) throw new ForbiddenException('not allowed to access this information')
+        
         const [payments, landlordMaintenance] = await Promise.all([
             this.prisma.condoPayment.findMany({
                 where: { condoId },

@@ -6,8 +6,9 @@ import { SubscriptionGuard } from 'src/lib/guards/Subscription.guard';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { CondoService } from './condo.service';
 import { CreateCondoDto } from './dto/condo.dto';
+import { LandLordGuard } from 'src/lib/guards/LandLord.guard';
 
-@UseGuards(JwtAuthGuard, SubscriptionGuard)
+@UseGuards(JwtAuthGuard, LandLordGuard, SubscriptionGuard)
 @Controller('condo')
 export class CondoController {
     constructor(
