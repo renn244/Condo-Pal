@@ -3,14 +3,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useAuthContext } from "@/context/AuthContext"
 import { BadgeCheck, Bell, Building2, CreditCard, LayoutDashboard, LogOut, MessageSquare, Sparkles } from "lucide-react"
-import { Link, NavLink } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 const navMain = [
   {
     title: "Dashboard",
     url: "/tenant/dashboard",
     icon: LayoutDashboard,
-    isActive: true,
   },
   {
     title: "Chats",
@@ -24,6 +23,14 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { isMobile } = useSidebar();
   const location = window.location.pathname;
   const path = "/" + location.split("/").slice(1).join("/");
+
+  const logOut = () => {
+    // delete all the tokens
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    window.location.reload();
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -47,12 +54,12 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
         <SidebarGroup>
           <SidebarMenu>
             {navMain.map((item) => (
-              <SidebarMenuItem>
+              <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton isActive={path === item.url} tooltip={item.title} asChild>
-                  <NavLink to={item.url}>
+                  <Link to={item.url}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                  </NavLink>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -121,7 +128,7 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logOut()}>
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
