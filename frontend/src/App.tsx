@@ -18,6 +18,7 @@ import LandlordRoute from './components/common/Authorization/LandlordRoute';
 import Tenant from './page/TenantDashboard/Tenant';
 import CondoPayments from './page/CondoPayments';
 import MainNav from './components/common/MainNav';
+import ContactUs from './page/ContactUs';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -36,6 +37,7 @@ const App = () => {
     <div className='font-sans'>
       <Routes>
         <Route path="/" element={<MainNav><HomePage /></MainNav>} />
+        <Route path="/contact" element={<MainNav><ContactUs /></MainNav>} />
 
         {/* Authentication Routes */}
         <Route path='/login' element={user ? <Navigate to={'/'} /> : <MainNav><Login /></MainNav>} />
