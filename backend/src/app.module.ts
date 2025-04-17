@@ -16,6 +16,7 @@ import { MaintenanceMessageModule } from './maintenance-message/maintenance-mess
 import { MaintenanceWorkerTokenModule } from './maintenance-worker-token/maintenance-worker-token.module';
 import { MessageModule } from './message/message.module';
 import { GeneralGatewayModule } from './general-gateway/general-gateway.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { GeneralGatewayModule } from './general-gateway/general-gateway.module';
       isGlobal: true,
       ttl: 60 * 1000, // time to live of 60 seconds
     }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule, MessageModule, GeneralGatewayModule
+    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule, MessageModule, GeneralGatewayModule, UserModule
   ],
   controllers: [],
   providers: [],

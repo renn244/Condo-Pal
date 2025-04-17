@@ -19,6 +19,9 @@ import Tenant from './page/TenantDashboard/Tenant';
 import CondoPayments from './page/CondoPayments';
 import MainNav from './components/common/MainNav';
 import ContactUs from './page/ContactUs';
+import AboutUs from './page/AboutUs';
+import TermsAndPrivacy from './page/TermsAndPrivacy';
+import Settings from './page/Settings';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -38,6 +41,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<MainNav><HomePage /></MainNav>} />
         <Route path="/contact" element={<MainNav><ContactUs /></MainNav>} />
+        <Route path="/aboutus" element={<MainNav><AboutUs /></MainNav>} />
+        <Route path="/terms&privacy" element={<MainNav><TermsAndPrivacy /></MainNav>} />
 
         {/* Authentication Routes */}
         <Route path='/login' element={user ? <Navigate to={'/'} /> : <MainNav><Login /></MainNav>} />
@@ -45,6 +50,8 @@ const App = () => {
         <Route path='/redirecttoken' element={user ? <Navigate to={'/'} /> : <MainNav><RedirectToken /></MainNav>} />
         <Route path='/forgot-password' element={user ? <Navigate to={'/'} /> : <MainNav><ForgotPassword /></MainNav>} />
         <Route path='/forgot-password/reset' element={user ? <Navigate to={'/'} /> : <MainNav><ResetForgottenPassword /></MainNav>} />
+
+        <Route path='/settings/*' element={<AuthenticatedRoute><Settings /></AuthenticatedRoute>} />
 
         {/* Subscription related routes */}
         <Route path='/pricing' element={<MainNav><Pricing /></MainNav>} />

@@ -24,6 +24,7 @@ model User {
   profile       String?
   name          String?
   password      String?
+  // phoneNumber   String?  @unique
 
   role          Role     @default(landlord)
 
