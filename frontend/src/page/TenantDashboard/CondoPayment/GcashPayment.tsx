@@ -80,13 +80,13 @@ const GcashPayment = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Label className="text-sm text-muted-foreground">Gcash Number</Label>
-                                    {/* Replace this with landlord */}
-                                    <p className="font-medium">0917-123-4567</p>
+                                    {/* landlord gcash number */}
+                                    <p className="font-medium">{condoBillInfo.owner.billingInfo.gcashNumber}</p>
                                 </div>
                                 <div>
-                                    {/* This is for the landlord or maybe to condoBillInfopal itself then we just put it in the credits so that way the landlord can just payout or cashout */}
-                                    <Label className="text-sm text-muted-foreground">Account Name</Label>
-                                    <p className="font-medium">CONDOPAL PROPERTY MGMT</p> 
+                                    {/* This is for the landlord */}
+                                    <Label className="text-sm text-muted-foreground">Owner Name</Label>
+                                    <p className="font-medium">{condoBillInfo.owner.name}</p> 
                                 </div>
                             </div>
 

@@ -57,7 +57,10 @@ type CondoBillInformation = {
     owner: {
         id: user['id']
         name: user['name'],
-        profile: user['profile']
+        profile: user['profile'],
+        billingInfo: {
+            gcashNumber: string,
+        }
     },
 }
 
