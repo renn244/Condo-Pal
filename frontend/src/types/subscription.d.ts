@@ -11,7 +11,6 @@ type subscription = {
     id: string,
     type: SubscriptionType,
     userId: string,
-    user: any, // supposed to be user
 
     linkId: string, // this is the linkId of the link payment from paymongo
 
@@ -26,4 +25,35 @@ type subscriptionCheckUser = {
     type: subscription['type']
     createdAt: subscription['createdAt'],
     expiresAt: subscription['expiresAt']
+}
+
+type billingHistory = {
+    id: subscription['id'];
+    type: subscription['type'];
+    linkId: string;
+
+    createdAt: subscription['createdAt'];
+    expiresAt: subscription['expiresAt'];
+    canceledAt?: subscription['canceledAt'];
+}[];
+
+type getBillingHistory = {
+    billingHistory: billingHistory;
+    totalPages: number;
+    hasNext: boolean;
+}
+
+type getCurrentPlan = {
+    id: subscription['id'];
+    type: subscription['type'];
+    linkId: string;
+
+    createdAt: subscription['createdAt'];
+    expiresAt: subscription['expiresAt'];
+    canceledAt?: subscription['canceledAt'];
+
+    price: number;
+    title: string;
+    description: string;
+    features: string[];
 }

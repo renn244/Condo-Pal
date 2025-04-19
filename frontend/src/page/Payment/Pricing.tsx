@@ -9,7 +9,12 @@ const Pricing = () => {
             title: "Starter",
             description: "Perfect for side projects",
             monthlyPrice: 9,
-            features: ["5 projects", "10GB storage", "Basic analytics", "Email support"],
+            features: [
+                "5 projects", 
+                "10GB storage", 
+                "Basic analytics", 
+                "Email support"
+            ],
             buttonText: "Get Started",
         },
         {

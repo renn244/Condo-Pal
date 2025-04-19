@@ -20,4 +20,14 @@ export class SubscriptionController {
     async verifyPaymentLink(@Query('subscriptionId') subscriptionId: string, @User() user: UserJwt) {
         return this.subscriptionService.verifyPayment(subscriptionId, user)
     }
+
+    @Get('getCurrentPlan')
+    async getCurrentPlan(@User() user: UserJwt) {
+        return this.subscriptionService.getCurrentPlan(user)
+    }
+
+    @Get('getBillingHistory')
+    async getBillingHistory(@User() user: UserJwt, @Query() query: { page?: string }) {
+        return this.subscriptionService.getBillingHistory(user, query)
+    }
 }

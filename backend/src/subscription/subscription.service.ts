@@ -20,16 +20,38 @@ export class SubscriptionService {
                 price: 450,
                 title: 'Starter',
                 description: 'Perfect for side projects',
+                features: [
+                    "5 projects", 
+                    "10GB storage", 
+                    "Basic analytics", 
+                    "Email support"
+                ],
             },
             'Pro': {
                 price: 1450,
                 title: 'Pro',
                 description: 'For growing businesses',
+                features: [
+                    "Unlimited projects",
+                    "100GB storage",
+                    "Advanced analytics",
+                    "Priority support",
+                    "Custom domains",
+                    "Team collaboration",
+                ],
             },
             'Enterprise': {
                 price: 5950,
                 title: 'Enterprise',
-                description: 'For large organizations'
+                description: 'For large organizations',
+                features: [
+                    "Unlimited everything",
+                    "Advanced security",
+                    "Custom integrations",
+                    "24/7 phone support",
+                    "SLA guarantee",
+                    "Dedicated account manager",
+                ],
             },
         }
 
@@ -115,4 +137,53 @@ export class SubscriptionService {
         }
     }
 
+    async getCurrentPlan(user: UserJwt) {
+        const subscription = await this.prisma.subscription.findFirst({
+            where: {
+                userId: user.id,
+                isPaid: true
+            },
+            select: {
+                id: true, type: true, linkId: true,
+                createdAt: true, expiresAt: true, canceledAt: true, 
+            },
+            orderBy: { createdAt: 'desc' }
+        })
+
+        if(!subscription) throw new NotFoundException({ name: 'subscription', message: 'failed to find subscription' })
+
+        return {
+            ...subscription,
+            ...this.handleTypeSubscription(subscription.type),
+        };
+    }
+
+    async getBillingHistory(user: UserJwt, query: { page?: string }) {
+        const take = 10;
+        const skip = (parseInt(query.page || '1') - 1) * take || 0;
+
+        const [billingHistory, totalCount] = await Promise.all([
+            this.prisma.subscription.findMany({
+                where: { userId: user.id },
+                select: {
+                    id: true, type: true,  linkId: true,
+                    createdAt: true, expiresAt: true, canceledAt: true, 
+                },
+                orderBy: { createdAt: 'desc' },
+                take, skip
+            }),
+            this.prisma.subscription.count({
+                where: { userId: user.id }
+            })
+        ])
+
+        const hasNext = totalCount > (skip + take);
+        const totalPages = Math.ceil(totalCount / take);
+
+        return {
+            billingHistory,
+            totalPages,
+            hasNext,
+        }
+    }
 }

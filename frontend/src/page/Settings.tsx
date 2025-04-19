@@ -1,7 +1,7 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import NotFound from "@/components/common/NotFound"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
-import Billing from "@/components/pageComponents/settings/Billing"
+import Billing from "@/components/pageComponents/settings/Billing/Billing"
 import Notification from "@/components/pageComponents/settings/Notification"
 import Profile from "@/components/pageComponents/settings/Profile"
 import Security from "@/components/pageComponents/settings/Security"
@@ -40,7 +40,7 @@ const Settings = () => {
             {/* Header */}
             <div className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-8 md:px-12 lg:px-10">
                 <Link
-                to="/landlord/dashboard"
+                to="/dashboard"
                 className="flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -48,7 +48,7 @@ const Settings = () => {
                 </Link>
             </div>
 
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
+            <div className="container mx-auto px-3 py-6 max-w-7xl">
                 <div className="flex flex-col gap-2 mb-8">
                     <div className="flex items-center gap-2">
                         <SettingsIcon className="h-5 w-5 text-muted-foreground" />

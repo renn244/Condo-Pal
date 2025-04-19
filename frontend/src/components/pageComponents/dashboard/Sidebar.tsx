@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useAuthContext } from "@/context/AuthContext"
-import { BadgeCheck, Bell, Building2, CreditCard, Hotel, LayoutDashboard, LogOut, MessageSquare, Sparkles, Wrench } from "lucide-react"
+import { BadgeCheck, Bell, Building2, CreditCard, Hotel, LayoutDashboard, LogOut, MessageSquare, Settings2, Sparkles, Wrench } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const DashboardSidebar = ({
@@ -122,6 +122,12 @@ const DashboardSidebar = ({
                                 <DropdownMenuItem>
                                     <Bell />
                                     Notifications
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link to={'/settings/profile'}>
+                                        <Settings2 />
+                                        Setting
+                                    </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />

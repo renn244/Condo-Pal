@@ -3,7 +3,7 @@ import { truncateByDomain } from 'recharts/types/util/ChartUtils';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PasswordDto, ProfileDto } from './dto/user.dto';
+import { NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
 import { ValidationException } from 'src/lib/exception/validationException';
 import * as bcrypt from 'bcrypt';
 
@@ -25,6 +25,7 @@ export class UserService {
                 name: true,
                 profile: true,
                 email: true,
+                TwoFA: true,
             }
         })
 
@@ -102,5 +103,36 @@ export class UserService {
         return {
             message: "Password updated successfully",
         };
+    }
+
+    async update2FA(user: UserJwt, body: TwoFADto) {
+        // update 2FA settings in the database
+        const updatedUser = await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                TwoFA: body.TwoFA,
+            },
+            select: { id: true, TwoFA: true },
+        });
+
+
+        return updatedUser;
+    }
+
+    async updateNotification(user: UserJwt, body: NotificationDto) {
+
+        // update notification settings in the database
+        // const updatedUser = await this.prisma.notificationPreferences.update({
+        //     where: { id: user.id },
+        //     data: {
+        //        ...body
+        //     },
+        // });
+
+        // return updatedUser;
+    }
+
+    async updateBilling(user: UserJwt, body: any) {
+
     }
 }

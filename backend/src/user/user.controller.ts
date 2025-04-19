@@ -1,10 +1,10 @@
-import { Controller, Get, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
-import { PasswordDto, ProfileDto } from './dto/user.dto';
+import { NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
@@ -22,15 +22,28 @@ export class UserController {
     @UseInterceptors(FileInterceptor('profile', {
         storage: multer.memoryStorage(),
     }))
-    async updateProfile(@User() user: UserJwt, @User('body') body: ProfileDto, 
+    async updateProfile(@User() user: UserJwt, @Body() body: ProfileDto, 
     @UploadedFile('file') file: Express.Multer.File) {
         return this.userService.updateProfile(user, body, file);
     }
 
     @Patch('password')
-    async updatePassword(@User() user: UserJwt, @User('body') body: PasswordDto) {
+    async updatePassword(@User() user: UserJwt, @Body() body: PasswordDto) {
         return this.userService.updatePassword(user, body);
     }
 
-    
+    @Patch('2fa')
+    async update2fa(@User() user: UserJwt, @Body() body: TwoFADto) {
+        return this.userService.update2FA(user, body);
+    }
+
+    @Patch('notification')
+    async updateNotification(@User() user: UserJwt, @Body() body: NotificationDto) {
+        return this.userService.updateNotification(user, body);
+    }
+
+    @Patch('billing')
+    async updateBilling(@User() user: UserJwt, @Body() body: any) {
+        return this.userService.updateBilling(user, body);
+    }
 }

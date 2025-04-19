@@ -1,5 +1,4 @@
-import { IsEmail, IsString, MinLength } from "class-validator";
-
+import { IsBoolean, IsEmail, IsString, MinLength } from "class-validator";
 
 export class ProfileDto {
     @IsString()
@@ -28,4 +27,32 @@ export class PasswordDto {
         message: "Password must be at least 8 characters"
     })
     confirmPassword: string;
+}
+
+export class TwoFADto {
+    @IsBoolean()
+    TwoFA: boolean;
+}
+
+export class NotificationDto {
+    @IsBoolean()
+    emailNotifications: boolean;
+    
+    @IsBoolean()
+    pushNotifications: boolean;
+    
+    @IsBoolean()
+    smsNotifications: boolean;
+    
+    @IsBoolean()
+    maintenanceAlerts: boolean;
+    
+    @IsBoolean()
+    paymentAlerts: boolean;
+    
+    @IsBoolean()
+    leaseAlerts: boolean; // maybe replace with somethign better later
+    
+    @IsBoolean()
+    marketingAlerts: boolean;
 }

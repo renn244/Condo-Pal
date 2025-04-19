@@ -20,6 +20,14 @@ const Sidebars = () => {
     const location = useLocation();
     const activeTab = location.pathname.split("/").pop() || "profile";
 
+    const logOut = () => {
+        // delete all the tokens
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+    
+        window.location.reload();
+    }
+
     return (
         <>
             {/* Sidebar */}
@@ -34,7 +42,7 @@ const Sidebars = () => {
                             <p className="font-medium">{user?.name}</p>
                             <p className="text-sm text-muted-foreground">{user?.email}</p>
                             <Badge variant="outline" className="mt-1 text-xs font-normal">
-                                Professional Plan
+                                {user?.subscriptions?.[0]?.type}
                             </Badge>
                         </div>
                     </div>
@@ -65,14 +73,14 @@ const Sidebars = () => {
                                 <HelpCircle className="mr-3 h-4 w-4 text-muted-foreground" />
                                 <span>Help Center</span>
                             </Link>
-                            <Link to="#" className="flex items-center px-4 py-3 text-sm hover:bg-muted transition-colors">
+                            <Link to="/contact" className="flex items-center px-4 py-3 text-sm hover:bg-muted transition-colors">
                                 <Mail className="mr-3 h-4 w-4 text-muted-foreground" />
                                 <span>Contact Support</span>
                             </Link>
                         </div>
                     </div>
 
-                    <Button variant="destructive" className="mt-6 gap-2">
+                    <Button onClick={() => logOut()} variant="destructive" className="mt-6 gap-2">
                         <LogOut className="h-4 w-4" />
                         Sign Out
                     </Button>

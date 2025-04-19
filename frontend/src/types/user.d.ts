@@ -24,12 +24,12 @@ type checkUser = {
     }
 
     role: role,
-    isOauth: boolean,
+    isOAuth: boolean,
 
     provider?: provider,
     providerId?: string
 
-    subscription: subscriptionCheckUser[]
+    subscriptions: subscriptionCheckUser[]
 
     createdAt: string,
     updatedAt: string,
