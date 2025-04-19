@@ -66,9 +66,15 @@ export class MaintenanceService {
                 // if condo is specified then only show that condo
                 ...(query.condoId ? {
                     id: query.condoId,
-                    tenantId: user.id,
+                    OR: [
+                        {ownerId: user.id},
+                        {tenantId: user.id}
+                    ]
                 } : {
-                    ownerId: user.id
+                    OR: [
+                        {ownerId: user.id},
+                        {tenantId: user.id}
+                    ]
                 })
             },
             ...(query.search && {
@@ -154,7 +160,7 @@ export class MaintenanceService {
             statusStatistics: [
                 { name: "Pending", value: pendingMaintenances.length },
                 { name: "Scheduled", value: totalScheduled },
-                { name: "In Progress", value: totalInProgress },
+                { name: "In_Progress", value: totalInProgress },
                 { name: "Completed", value: totalCompleted },
                 { name: "Canceled", value: totalCanceled }
             ].filter((stat) => stat.value > 0),

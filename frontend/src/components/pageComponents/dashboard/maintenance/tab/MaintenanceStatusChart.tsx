@@ -18,7 +18,7 @@ const chartConfig = {
         label: "Scheduled",
         color: "#fbbf24",
     },
-    InProgress: {
+    In_Progress: {
         label: "In Progress",
         color: "#8b5cf6",
     },

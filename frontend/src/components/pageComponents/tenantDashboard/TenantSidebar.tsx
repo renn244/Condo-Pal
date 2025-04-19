@@ -55,7 +55,7 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
           <SidebarMenu>
             {navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton isActive={path === item.url} tooltip={item.title} asChild>
+                <SidebarMenuButton className="data-[active=true]:bg-primary data-[active=true]:text-white" isActive={path === item.url} tooltip={item.title} asChild>
                   <Link to={item.url}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>

@@ -142,7 +142,6 @@ export class CondoPaymentService {
                 }
             }),
             this.getTotalPayment(condoId, user),
-
         ])
         
         if(!condoInfo) {

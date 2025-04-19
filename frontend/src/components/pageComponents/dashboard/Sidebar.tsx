@@ -52,7 +52,7 @@ const DashboardSidebar = ({
                     <SidebarMenu>
                         {sidebarLinks.map((item) => (
                             <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton isActive={path === item.url} asChild>
+                                <SidebarMenuButton className="data-[active=true]:bg-primary data-[active=true]:text-white" isActive={path === item.url} asChild>
                                     <Link to={item.url}>
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
