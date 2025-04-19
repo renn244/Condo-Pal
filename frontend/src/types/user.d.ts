@@ -35,3 +35,10 @@ type checkUser = {
     updatedAt: string,
 }
 
+type initialDataSettings = {
+    id: string,
+    name: string,
+    profile: string,
+    email: string,
+    TwoFA: boolean,
+}

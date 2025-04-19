@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';

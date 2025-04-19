@@ -4,7 +4,7 @@ import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import Billing from "@/components/pageComponents/settings/Billing/Billing"
 import Notification from "@/components/pageComponents/settings/Notification"
 import Profile from "@/components/pageComponents/settings/Profile"
-import Security from "@/components/pageComponents/settings/Security"
+import Security from "@/components/pageComponents/settings/Security/Security"
 import Sidebars from "@/components/pageComponents/settings/Sidebars"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
@@ -25,7 +25,7 @@ const Settings = () => {
                 throw new Error(response.data.message);
             }
 
-            return response.data;
+            return response.data as initialDataSettings;
         }
     })
 
@@ -72,7 +72,7 @@ const Settings = () => {
                                 />
                             } />
                             <Route path="security" element={
-                                <Security />
+                                <Security initial2FA={initialData.TwoFA} />
                             } />
                             <Route path="notifications" element={
                                 <Notification />
