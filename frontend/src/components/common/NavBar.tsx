@@ -30,20 +30,6 @@ const NavBar = () => {
                     className={({ isActive }) => `
                         px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
                     `} 
-                    to={''}>
-                        Report
-                    </NavLink>
-                    <NavLink 
-                    className={({ isActive }) => `
-                        px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
-                    `} 
-                    to={''}>
-                        Fee Management
-                    </NavLink>
-                    <NavLink 
-                    className={({ isActive }) => `
-                        px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
-                    `} 
                     to={'/pricing'}>
                         Pricing
                     </NavLink>

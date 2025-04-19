@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import BillingHistory from "./BillingHistory"
 import { useQuery } from "@tanstack/react-query"
 import axiosFetch from "@/lib/axios"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
@@ -10,8 +9,9 @@ import formatToPesos from "@/lib/formatToPesos"
 import formatDate from "@/lib/formatDate"
 import { Link } from "react-router-dom"
 import { Check } from "lucide-react"
+import SubscriptionHistory from "./SubscriptionHistory"
 
-const Billing = () => {
+const Subscription = () => {
 
     const { data: currentPlan, isLoading, error } = useQuery({
         queryKey: ['currentPlan'],
@@ -93,9 +93,9 @@ const Billing = () => {
                     )}
                 </CardContent>
             </Card>
-            <BillingHistory />
+            <SubscriptionHistory />
         </>
     )
 }
 
-export default Billing
+export default Subscription

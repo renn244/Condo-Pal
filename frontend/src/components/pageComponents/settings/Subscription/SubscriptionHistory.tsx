@@ -9,7 +9,7 @@ import { Download } from "lucide-react"
 import { useState } from "react"
 import PaymentsPagination from "../../dashboard/payments/PaymentsPagination"
 
-const BillingHistory = () => {
+const SubscriptionHistory = () => {
     const [page, setPage] = useState(1);
 
     const { data: billingHistory, isLoading } = useQuery({
@@ -24,7 +24,7 @@ const BillingHistory = () => {
     return (
         <Card className="border shadow-sm">
             <CardHeader className="pb-3">
-                <CardTitle>Billing History</CardTitle>
+                <CardTitle>Subscription History</CardTitle>
                 <CardDescription>View and download your past invoices</CardDescription>
             </CardHeader>
             <CardContent>
@@ -93,4 +93,4 @@ const BillingHistory = () => {
     )
 }
 
-export default BillingHistory
+export default SubscriptionHistory

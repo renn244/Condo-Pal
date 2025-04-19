@@ -3,7 +3,7 @@ import { truncateByDomain } from 'recharts/types/util/ChartUtils';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
+import { BillingInfoDto, NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
 import { ValidationException } from 'src/lib/exception/validationException';
 import * as bcrypt from 'bcrypt';
 
@@ -16,24 +16,24 @@ export class UserService {
 
     // for settings
     async getUserInitialData(user: UserJwt) {
-        const userData = await this.prisma.user.findUnique({
-            where: {
-                id: user.id
-            },
-            select: {
-                id: true,
-                name: true,
-                profile: true,
-                email: true,
-                TwoFA: true,
-            }
-        })
-
+        const [userData, billingInfo] = await Promise.all([
+            this.prisma.user.findUnique({
+                where: { id: user.id },
+                select: { id: true, name: true, profile: true, email: true, TwoFA: true }
+            }),
+            this.prisma.billingInfo.findUnique({
+                where: { userId: user.id },
+            }),
+        ])
+        
         if(!userData) {
             throw new NotFoundException("User not found")
         }
 
-        return userData
+        return {
+            ...userData,
+            ...billingInfo
+        }
     }
 
     // updates
@@ -106,7 +106,6 @@ export class UserService {
     }
 
     async update2FA(user: UserJwt, body: TwoFADto) {
-        // update 2FA settings in the database
         const updatedUser = await this.prisma.user.update({
             where: { id: user.id },
             data: {
@@ -132,7 +131,20 @@ export class UserService {
         // return updatedUser;
     }
 
-    async updateBilling(user: UserJwt, body: any) {
+    async updateBillingInfo(user: UserJwt, body: BillingInfoDto) {
+        const billingInfo = await this.prisma.billingInfo.upsert({
+            where: {
+                userId: user.id
+            },
+            update: {
+                ...body
+            },
+            create: {
+                userId: user.id,
+                ...body
+            }  
+        })
 
+        return billingInfo;
     }
 }

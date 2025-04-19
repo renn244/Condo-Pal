@@ -1,7 +1,7 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import NotFound from "@/components/common/NotFound"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
-import Billing from "@/components/pageComponents/settings/Billing/Billing"
+import BillingInfo from "@/components/pageComponents/settings/BillingInfo"
 import Notification from "@/components/pageComponents/settings/Notification"
 import Profile from "@/components/pageComponents/settings/Profile"
 import Security from "@/components/pageComponents/settings/Security/Security"
@@ -10,6 +10,7 @@ import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { ArrowLeft, Settings as SettingsIcon } from "lucide-react"
 import { Link, Route, Routes } from "react-router-dom"
+import Subscription from "@/components/pageComponents/settings/Subscription/Subscription"
 
 const Settings = () => {
     const { data: initialData, isLoading, error, refetch } = useQuery({
@@ -72,7 +73,9 @@ const Settings = () => {
                                 />
                             } />
                             <Route path="security" element={
-                                <Security initial2FA={initialData.TwoFA} />
+                                <Security 
+                                initial2FA={initialData.TwoFA} 
+                                />
                             } />
                             <Route path="notifications" element={
                                 <Notification />
@@ -80,8 +83,17 @@ const Settings = () => {
                             <Route path="property" element={
                                 undefined
                             } />
-                            <Route path="billing" element={
-                                <Billing />
+                            <Route path="subscription" element={
+                                <Subscription />
+                            } />
+                            <Route path="billingInfo" element={
+                                <BillingInfo
+                                initialFirstName={initialData.firstName}
+                                initialLastName={initialData.lastName}
+                                initialAddress={initialData.address}
+                                initialPhoneNumber={initialData.phoneNumber}
+                                initialGcashNumber={initialData.gcashNumber}
+                                />
                             } />
                         </Routes>
                     </div>

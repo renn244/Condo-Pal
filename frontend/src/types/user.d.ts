@@ -41,4 +41,12 @@ type initialDataSettings = {
     profile: string,
     email: string,
     TwoFA: boolean,
+
+    // billingInfo
+    userId: string
+    firstName?: string,
+    lastName?: string,
+    address?: string,
+    phoneNumber?: string,
+    gcashNumber?: string,
 }

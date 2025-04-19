@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
-import { NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
+import { BillingInfoDto, NotificationDto, PasswordDto, ProfileDto, TwoFADto } from './dto/user.dto';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
@@ -42,8 +42,8 @@ export class UserController {
         return this.userService.updateNotification(user, body);
     }
 
-    @Patch('billing')
-    async updateBilling(@User() user: UserJwt, @Body() body: any) {
-        return this.userService.updateBilling(user, body);
+    @Patch("billingInfo")
+    async updateBillingInfo(@User() user: UserJwt, @Body() body: BillingInfoDto) {
+        return this.userService.updateBillingInfo(user, body);
     }
 }

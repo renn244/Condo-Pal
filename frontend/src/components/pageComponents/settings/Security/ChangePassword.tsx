@@ -65,7 +65,7 @@ const ChangePassword = () => {
                 return
             }
 
-            toast.error(error.message)
+            toast.error("Something went wrong.")
         } finally {
             setIsLoading(false)
         }
