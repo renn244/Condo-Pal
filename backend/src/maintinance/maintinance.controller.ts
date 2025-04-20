@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
-import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
@@ -22,8 +22,17 @@ export class MaintenanceController {
     @UseInterceptors(FilesInterceptor('photos', 3, {
         storage: multer.memoryStorage()
     }))
-    async requestMaintenance(@User() user: UserJwt, @Body() body: TenantMaintenaceRequestDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+    async requestMaintenance(@User() user: UserJwt, @Body() body: MaintenaceRequestDto, @UploadedFiles() files: Array<Express.Multer.File>) {
         return this.maintenanceService.TenantMaintenanceRequest(user, body, files);
+    }
+
+    @UseGuards(LandLordGuard)
+    @Post('requestMaintenanceLandlord/:condoId')
+    @UseInterceptors(FilesInterceptor('photos', 3, {
+        storage: multer.memoryStorage()
+    }))
+    async requestMaintenanceLandlord(@User() user: UserJwt, @Param('condoId') condoId: string, @Body() body: MaintenaceRequestDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+        return this.maintenanceService.LandlordMaintenanceRequest(user, condoId, body, files);
     }
 
     @Get()

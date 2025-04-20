@@ -85,3 +85,19 @@ type ViewCondoInformation = {
     condoSummary: CondoSummary,
     latestBill: billingMonth,
 } & condo
+
+type CondoLinkCard = {
+    id: condo['id'],
+    name: condo['name'],
+    address: condo['address'],
+    rentAmount: condo['rentAmount'],
+    tenant: {
+        id: string,
+        name: strig,
+    } | null
+}
+
+type getMyCondoList = {
+    getCondos: CondoLinkCard[],
+    hasNext: boolean,
+}

@@ -29,9 +29,9 @@ export class CondoController {
         return this.condoService.getMyCondos(user, page);
     }
 
-    @Get('getMyCondoForManualPayment')
-    async getMyCondoForManualPayment(@User() user: UserJwt, @Query('page') page: number) {
-        return this.condoService.getMyCondosForManualPayment(user, page);
+    @Get('getMyCondoList')
+    async getMyCondoList(@User() user: UserJwt, @Query('page') page: number) {
+        return this.condoService.getMyCondoList(user, page);
     }
 
     @Get('getViewCondo')

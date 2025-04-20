@@ -1,10 +1,7 @@
 import { MaintenanceType, PaymentResponsibility, PriorityLevel } from "@prisma/client";
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
 
-export class TenantMaintenaceRequestDto {
-    // @IsString()
-    // condoId: string;
-
+export class MaintenaceRequestDto {
     @IsString()
     title: string;
 
@@ -24,7 +21,7 @@ export class TenantMaintenaceRequestDto {
     preferredSchedule: string;
 }
 
-export class TenantEditMaintenanceRequest extends TenantMaintenaceRequestDto {
+export class TenantEditMaintenanceRequest extends MaintenaceRequestDto {
 
     @IsArray()
     @IsOptional()

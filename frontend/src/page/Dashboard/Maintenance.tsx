@@ -1,11 +1,10 @@
 import MaintenanceCard from "@/components/pageComponents/dashboard/maintenance/MaintenanceCard"
 import MaintenanceHeader from "@/components/pageComponents/dashboard/maintenance/MaintenanceHeader"
 import MaintenancePagination from "@/components/pageComponents/dashboard/maintenance/MaintenancePagination"
-import { Button } from "@/components/ui/button"
+import NewRequestDialog from "@/components/pageComponents/dashboard/maintenance/NewRequestDialog"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
-import { Plus } from "lucide-react"
 
 const Maintenance = () => {
     const { search, status, priority, page, setPage, setStatus, setPriority, setSearch } = useMaintenanceParams();
@@ -27,10 +26,7 @@ const Maintenance = () => {
                 <h1 className="text-2xl font-bold text-primary">
                     Maintenance Requests
                 </h1>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Request
-                </Button>
+                <NewRequestDialog />
             </header>
 
             <div className="flex flex-col gap-4 mb-6">

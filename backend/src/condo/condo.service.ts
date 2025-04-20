@@ -74,7 +74,7 @@ export class CondoService {
         return { getCondos, hasNext }
     }
 
-    async getMyCondosForManualPayment(user: UserJwt, page: number) {
+    async getMyCondoList(user: UserJwt, page: number) {
         const take = 10;
         const skip = Math.max(((page || 1) - 1) * take, 0);
         

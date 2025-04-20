@@ -4,7 +4,7 @@ import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest, TenantMaintenaceRequestDto } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
 import { MaintenanceMessageService } from 'src/maintenance-message/maintenance-message.service';
 import { v4 as uuidv4 } from 'uuid';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
@@ -20,7 +20,7 @@ export class MaintenanceService {
         private readonly emailSenderService: EmailSenderService,
     ) {}
 
-    async TenantMaintenanceRequest(tenantUser: UserJwt, body: TenantMaintenaceRequestDto, photos: Array<Express.Multer.File>) {
+    async TenantMaintenanceRequest(tenantUser: UserJwt, body: MaintenaceRequestDto, photos: Array<Express.Multer.File>) {
         const condo = await this.prisma.condo.findUnique({
             where: {
                 tenantId: tenantUser.id
@@ -40,7 +40,7 @@ export class MaintenanceService {
             })
         );
 
-        const createMaintinanceRequest = await this.prisma.maintenance.create({
+        const createMaintenanceRequest = await this.prisma.maintenance.create({
             data: {
                 condoId: condo.id,
                 title: body.title,
@@ -52,7 +52,38 @@ export class MaintenanceService {
             }
         })
 
-        return createMaintinanceRequest;
+        return createMaintenanceRequest;
+    }
+
+    async LandlordMaintenanceRequest(user: UserJwt, condoId: string, body: MaintenaceRequestDto, photos: Array<Express.Multer.File>) {
+        const getCondo = await this.prisma.condo.findUnique({
+            where: { id: condoId, ownerId: user.id }
+        })
+
+        if(!getCondo) {
+            throw new ForbiddenException('you are not allowed to create maintenance request for this condo!')
+        }
+        
+        const photoUrls = await Promise.all(
+            photos.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url;
+            })
+        )
+
+        const createMaintenanceRequest = await this.prisma.maintenance.create({
+            data: {
+                condoId: condoId,
+                title: body.title,
+                description: body.description,
+                photos: photoUrls,
+                type: body.type,
+                priorityLevel: body.priorityLevel,
+                preferredSchedule: body.preferredSchedule
+            }
+        })
+
+        return createMaintenanceRequest;
     }
 
     async getMaintenanceRequestsLandlord(user: UserJwt, query: { 
@@ -97,8 +128,8 @@ export class MaintenanceService {
                 include: {
                     condo: { select: { id: true, name: true, address: true, } }
                 },
-                take: take,
-                skip: skip,
+                take: take, skip: skip,
+                orderBy: { createdAt: 'desc' },
             }),
             this.prisma.maintenance.count({ where: where })
         ])

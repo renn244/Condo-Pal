@@ -8,6 +8,7 @@ import Chat from "./Chat"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import RequestMaintenance from "./RequestMaintenance"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -49,6 +50,8 @@ const Dashboard = () => {
                             <Route path="/maintenance" element={<Maintenance />} />
                             <Route path="/payments" element={<Payments />} />
                             <Route path="/chats" element={<Chat />} />
+
+                            <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
                         </Routes>
                     </main>
                 </SidebarInset>
