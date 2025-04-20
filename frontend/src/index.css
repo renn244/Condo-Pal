@@ -108,19 +108,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --animate-appear: "appear 0.5s ease-out forwards"
-
-  @keyframes appear {
-    "0%" {
-      opacity: 0;
-      transform: "translateY(10px)";
-    },
-    "100%" {
-      opacity: 1;
-      transform: "translateY(0)";
-    }
-  }
-;
+  --animate-appear: "appear 0.5s ease-out forwards";
 
   --color-sidebar-ring: var(--sidebar-ring);
 
@@ -136,7 +124,19 @@
 
   --color-sidebar-foreground: var(--sidebar-foreground);
 
-  --color-sidebar: var(--sidebar)}
+  --color-sidebar: var(--sidebar);
+  
+  @keyframes appear {
+    "0%" {
+      opacity: 0;
+      transform: "translateY(10px)";
+    },
+    "100%" {
+      opacity: 1;
+      transform: "translateY(0)";
+    }
+  };
+}
 
 @layer base {
   * {

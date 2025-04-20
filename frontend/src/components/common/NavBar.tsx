@@ -1,6 +1,4 @@
-import { Settings2 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
-import { Toggle } from '../ui/toggle';
 import UserNav from "./UserNav";
 import { useAuthContext } from "@/context/AuthContext";
 import { Button } from "../ui/button";
@@ -36,11 +34,6 @@ const NavBar = () => {
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <div aria-label="settings">
-                    <Toggle pressed={false} asChild>
-                        <Settings2 className="text-muted-foreground h-5 w-5" />
-                    </Toggle>
-                </div>
                 <div aria-label="profile-sheet"  className="cursor-pointer">
                     {isLoggedIn ? (
                         <UserNav /> 

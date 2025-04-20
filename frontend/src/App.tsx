@@ -20,8 +20,9 @@ import CondoPayments from './page/CondoPayments';
 import MainNav from './components/common/MainNav';
 import ContactUs from './page/ContactUs';
 import AboutUs from './page/AboutUs';
-import TermsAndPrivacy from './page/TermsAndPrivacy';
 import Settings from './page/Settings';
+import TermsAndCondition from './page/TermsAndCondition';
+import PrivacyPolicy from './page/PrivacyPolicy';
 
 const App = () => {
   const { user, isLoading } = useAuthContext();
@@ -42,7 +43,8 @@ const App = () => {
         <Route path="/" element={<MainNav><HomePage /></MainNav>} />
         <Route path="/contact" element={<MainNav><ContactUs /></MainNav>} />
         <Route path="/aboutus" element={<MainNav><AboutUs /></MainNav>} />
-        <Route path="/terms&privacy" element={<MainNav><TermsAndPrivacy /></MainNav>} />
+        <Route path="/terms&conditions" element={<MainNav><TermsAndCondition /></MainNav>} />
+        <Route path="/privacy-policy" element={<MainNav><PrivacyPolicy /></MainNav>} />
 
         {/* Authentication Routes */}
         <Route path='/login' element={user ? <Navigate to={'/'} /> : <MainNav><Login /></MainNav>} />
