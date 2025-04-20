@@ -74,7 +74,7 @@ const MaintenanceStatusChart = ({
                                         animationEasing="ease"
                                         >
                                             {maintenanceStats?.statusStatistics.map((entry: any, index: number) => (
-                                                entry.value > 0 ? (
+                                                entry?.value > 0 ? (
                                                     <Cell key={`cell-${index}`} name={entry.name} fill={(chartConfig as any)[entry.name]?.color} />
                                                 ) : null
                                             )
@@ -97,7 +97,7 @@ const MaintenanceStatusChart = ({
                                 <div className="bg-muted p-3 rounded-md">
                                     <div className="text-sm font-medium">Pending Attention</div>
                                     <div className="text-2xl font-bold">
-                                        {maintenanceStats.statusStatistics?.[0].value || 0}
+                                        {maintenanceStats.statusStatistics?.[0]?.value || 0}
                                     </div>
                                 </div>
                             </div>

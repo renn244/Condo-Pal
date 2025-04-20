@@ -55,29 +55,26 @@ const HomePage = () => {
                             <div className="w-full xl:col-span-5 lg:col-span-6 2xl:-mx-5 xl:-mx-0">
                                 <div className="flex items-center text-sm font-medium text-gray-500 justify-center lg:justify-start">
                                     <span className="bg-primary py-1 px-3 rounded-2xl text-xs font-medium text-white mr-3 ">#1</span>
-                                        Investment app
-                                    </div>
-                                    <h1 className="py-8 text-center text-gray-900 font-bold font-manrope text-5xl lg:text-left leading-[70px]">
-                                        The new standard for <span className="text-primary">Modern investor</span>
-                                    </h1>
-                                    <p className=" text-gray-500 text-lg text-center lg:text-left">
-                                        When you’re ready to invest, quickly execute your orders with Complex and outdated.
-                                    </p>
-                                    <div className="relative p-1.5 my-10  flex  items-center gap-y-4 h-auto md:h-16 flex-col md:flex-row justify-between rounded-full md:shadow-[0px 15px 30px -4px rgba(16, 24, 40, 0.03)] border border-transparent md:bg-white transition-all duration-500 hover:border-indigo-600 focus-within:border-indigo-600">
-                                        <input type="text" name="email" placeholder="Enter email to get started"
-                                            className="text-base rounded-full text-gray-900 flex-1 py-4 px-6 shadow-[0px 15px 30px -4px rgba(16, 24, 40, 0.03)] md:shadow-none bg-white md:bg-transparent shadow-none placeholder:text-gray-400 focus:outline-none md:w-fit w-full" />
-                                        <button className="bg-primary rounded-full py-3 px-7 text-base font-semibold text-white hover:bg-primary cursor-pointer transition-all duration-500 md:w-fit w-full">Get
-                                            Started
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center flex-col lg:flex-row">
+                                        Condo Management Web App
+                                </div>
+                                <h1 className="py-4 text-center text-gray-900 font-bold font-manrope text-5xl lg:text-left leading-[70px]">
+                                    The new standard for <span className="text-primary">Condo Management in Philippines</span>
+                                </h1>
+                                <p className=" text-gray-500 text-sm lg:text-lg text-center lg:text-left">
+                                    CondoPal is a centralized platform that simplifies condo rental management by streamlining rent collection,
+                                    communication, and tracking—making life easier for both landlords and tenants.
+                                </p>
+                                {/* <button className="bg-primary rounded-full py-3 px-7 text-base font-semibold text-white hover:bg-primary cursor-pointer transition-all duration-500 md:w-fit my-3">
+                                    Get Started
+                                </button> */}
+                                <div className="flex items-center flex-col lg:flex-row mt-3">
                                     <div className="flex items-center">
-                                        <img src="https://pagedone.io/asset/uploads/1694846673.png" alt="Rounded image "
-                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-50 object-cover" />
-                                        <img src="https://pagedone.io/asset/uploads/1694846691.png" alt="Rounded image"
-                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-30 -ml-3 object-cover" />
-                                        <img src="https://pagedone.io/asset/uploads/1694846704.png" alt="Rounded image"
-                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-20 -ml-3 object-cover" />
+                                        <img src="https://scontent.fmnl4-4.fna.fbcdn.net/v/t39.30808-1/476438701_1831289464302906_579132043874563226_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=100&ccb=1-7&_nc_sid=e99d92&_nc_ohc=HwZGVwuQkTAQ7kNvwECS9oL&_nc_oc=Adm6JB8SaPmIigK3el6xP4B516m0FnbB0GGOb-gF53PmszIAEOsux-DFU0yp0hPW9UHmiPJfs-7EN9rRl4t2lrMh&_nc_zt=24&_nc_ht=scontent.fmnl4-4.fna&_nc_gid=tF7mRVC6GKAwqsqJWEZCQw&oh=00_AfHaCZGq_mKpo0vxGqaat2Ufi0CHlnMqEdO3pc9Hrm91Dg&oe=680AC4E6" alt="Rounded image "
+                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-50 object-cover h-10" />
+                                        <img src="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-1/449657888_1444199612914122_4028637159301397245_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=104&ccb=1-7&_nc_sid=e99d92&_nc_ohc=LZ2RXL8rNfwQ7kNvwEA5E-D&_nc_oc=AdnW_WnsJCCQbdFCwV8JNffLdCCTbauwfO5xHNVq9BPWitjTCvr2EFk6rPHRekZ88xitPzoED5IOKkQznKebQToj&_nc_zt=24&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=7b2l9FSQnMJ7gvN9uPx3Mg&oh=00_AfEPvfa_m4_-cY6DLwRcOGpvpPykZ8c3uzty7hPgTQKOhw&oe=680AACA2" alt="Rounded image"
+                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-30 -ml-3 object-cover h-10" />
+                                        <img src="https://scontent.fmnl4-5.fna.fbcdn.net/v/t39.30808-1/491935753_2147078735811909_7695763110483343951_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=106&ccb=1-7&_nc_sid=e99d92&_nc_ohc=zc_flL6TibIQ7kNvwGxG04J&_nc_oc=AdlB_vCaUFqSCcYAhUtOe-C7eKSN-Hp7U41y3C-U_kCZia5t5bUyUhOULqCDICqTC6dMzePL-Io7tDYPixq-RKR0&_nc_zt=24&_nc_ht=scontent.fmnl4-5.fna&_nc_gid=vFS3r_ikYULNwua4IGeZXA&oh=00_AfGLFODIwsbjUYQ-55bDXDtdUwPhCccbaCqAankwWQKnig&oe=680AC6EE" alt="Rounded image"
+                                        className="border-2 border-solid border-indigo-50 rounded-full relative z-20 -ml-3 object-cover h-10" />
                                     </div>
                                     <span className="mt-3 text-base text-gray-600 font-medium lg:ml-3">People have joined</span>
                                 </div>
@@ -92,9 +89,31 @@ const HomePage = () => {
                 </div>
             </section>
 
+            <section className="py-12 relative">
+                <div className="w-full max-w-[1480px] px-4 md:px-5 lg:px-5 mx-auto">
+                    <div className="w-full justify-start items-center gap-8 grid lg:grid-cols-2 grid-cols-1">
+                        <img className="lg:mx-0 mx-auto h-full rounded-3xl object-cover" src="https://pagedone.io/asset/uploads/1717751272.png" alt="about Us image" />
+                        <div className="w-full flex-col justify-start lg:items-start items-center gap-10 inline-flex">
+                            <div className="w-full flex-col justify-start lg:items-start items-center gap-4 flex">
+                                <h2 className="text-gray-900 text-4xl font-bold font-manrope leading-normal lg:text-start text-center">
+                                    Building Stronger Communities through Collaboration and Empowerment
+                                </h2>
+                                <p className="text-gray-500 text-base font-normal leading-relaxed lg:text-start text-center">
+                                    Through collaborationperse perspectives and strengths are leveraged to create inclusive environments where everyone has the opportunity to thrive. 
+                                    This approach not only fosters personal growth and achievement but also strengthens the fabric of society.
+                                </p>
+                            </div>
+                            <button className="sm:w-fit w-full px-3.5 py-2 bg-indigo-600 hover:bg-indigo-800 transition-all duration-700 ease-in-out rounded-lg shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
+                                <span className="px-1.5 text-white text-sm font-medium leading-6">Get Started</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Video Demo to an app */}
             <section className="pt-0 px-2 h-full mx-auto">
-                <div className="relative z-10 mt-20 mb-8 max-w-7xl rounded-3xl border border-neutral-200 bg-neutral-100 p-4 shadow-md dark:border-neutral-800 dark:bg-neutral-900 mx-auto">
+                <div className="relative z-10 md:mt-20 md:mb-8 max-w-7xl rounded-3xl border border-neutral-200 bg-neutral-100 p-2 md:p-4 shadow-md dark:border-neutral-800 dark:bg-neutral-900 mx-auto">
                     <div className="w-full overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700">
                         <img
                         src="https://assets.aceternity.com/pro/aceternity-landing.webp"
@@ -109,7 +128,7 @@ const HomePage = () => {
 
             {/* Features */}
             <section className="pt-0 px-2 h-full mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-10 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-10 max-w-[1480px] mx-auto">
                     {features.map((feature, index) => (
                         <FeatureCard key={feature.title} {...feature} index={index} />
                     ))}

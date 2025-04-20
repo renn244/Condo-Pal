@@ -87,6 +87,7 @@ const TenantForm = ({
                         <FormDescription>
                             The Tenant's real name so that we can easily identify them.
                         </FormDescription>
+                        <FormMessage />
                     </FormItem>
                 )}
                 />

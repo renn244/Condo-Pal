@@ -11,43 +11,61 @@ const Footer = () => {
                         <p className="py-8 text-sm text-gray-500 lg:max-w-xs text-center lg:text-left">
                             Trusted in more than 100 countries & 5 million customers. Have any query?
                         </p>
-                        <a href="" className="py-2.5 px-5 h-9 block w-fit bg-primary rounded-full shadow-sm text-xs text-white mx-auto transition-all duration-500 hover:bg-blue-700 lg:mx-0">
+                        <a href="/contact" className="py-2.5 px-5 h-9 block w-fit bg-primary rounded-full shadow-sm text-xs text-white mx-auto transition-all duration-500 hover:bg-blue-700 lg:mx-0">
                             Contact us
                         </a>
                     </div>
 
                     <div className="lg:mx-auto text-left">
                         <h4 className="text-lg text-gray-900 font-medium mb-7">
-                            Pagedone
+                            CondoPal
                         </h4>
                         <ul className="text-sm transition-all duration-500">
                             <li className="mb-6">
-                                <a href="" className="text-gray-600 hover:text-gray-900">Figma UI System</a>
+                                <a href="/dashboard" className="text-gray-600 hover:text-gray-900">Dashboard</a>
                             </li>
                             <li className="mb-6">
                                 <Link to="/contact"  className=" text-gray-600 hover:text-gray-900">Contact</Link>
                             </li>
                             <li>
-                                <a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">Responsive Blocks</a>
+                                <a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">About us</a>
                             </li>
                         </ul>
                     </div>
                 
                     <div className="lg:mx-auto text-left ">
-                        <h4 className="text-lg text-gray-900 font-medium mb-7">Products</h4>
+                        <h4 className="text-lg text-gray-900 font-medium mb-7">Services</h4>
                         <ul className="text-sm  transition-all duration-500">
-                            <li className="mb-6"><a href="javascript:;"  className="text-gray-600 hover:text-gray-900">Figma UI System</a></li>
-                            <li className="mb-6"><a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">Icons Assets</a></li>
-                            <li><a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">Responsive Blocks</a></li>
+                            <li className="mb-6">
+                                <a href="javascript:;"  className="text-gray-600 hover:text-gray-900">
+                                    Pricing
+                                </a>
+                            </li>
+                            <li className="mb-6">
+                                <a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">
+                                    How it works
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">
+                                    Blog
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
                     <div className="lg:mx-auto text-left ">
                         <h4 className="text-lg text-gray-900 font-medium mb-7">Support</h4>
                         <ul className="text-sm  transition-all duration-500">
-                            <li className="mb-6"><a href="javascript:;"  className="text-gray-600 hover:text-gray-900">Customer Support</a></li>
-                            <li className="mb-6"><a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">Terms & Conditions</a></li>
-                            <li ><a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">Privacy Policy</a></li>
+                            <li className="mb-6">
+                                <a href="javascript:;"  className="text-gray-600 hover:text-gray-900">Customer Support</a>
+                            </li>
+                            <li className="mb-6">
+                                <Link to="/terms&conditions" reloadDocument className=" text-gray-600 hover:text-gray-900">Terms & Conditions</Link>
+                            </li>
+                            <li >
+                                <Link to="/privacy-policy" reloadDocument   className=" text-gray-600 hover:text-gray-900">Privacy Policy</Link>
+                            </li>
                         </ul>
                     </div>
 
@@ -63,7 +81,7 @@ const Footer = () => {
                 
                 <div className="py-7 border-t border-gray-200">
                     <div className="flex items-center justify-center flex-col lg:justify-between lg:flex-row">
-                        <span className="text-sm text-gray-500">©<a href="https://pagedone.io">pagedone</a> 2024, All rights reserved.</span>
+                        <span className="text-sm text-gray-500">©<a href="https://pagedone.io">CondoPal</a> 2024, All rights reserved.</span>
                         <div className="flex mt-4 space-x-4 sm:justify-center lg:mt-0">
                             <Link to="https://x.com/?lang=en"  className="w-8 h-8 rounded-full transition-all duration-500 flex justify-center items-center bg-[#33CCFF] hover:bg-gray-900">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
