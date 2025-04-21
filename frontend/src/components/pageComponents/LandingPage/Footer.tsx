@@ -7,13 +7,10 @@ const Footer = () => {
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 gap-y-8 md:gap-8 py-10 max-w-sm mx-auto sm:max-w-3xl lg:max-w-full">
                     <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0">
-                        {/* Link Logo Here */}
+                        <img src="/logo/Full_Logo.jpg" className="h-[50px]" />
                         <p className="py-8 text-sm text-gray-500 lg:max-w-xs text-center lg:text-left">
                             Trusted in more than 100 countries & 5 million customers. Have any query?
                         </p>
-                        <a href="/contact" className="py-2.5 px-5 h-9 block w-fit bg-primary rounded-full shadow-sm text-xs text-white mx-auto transition-all duration-500 hover:bg-blue-700 lg:mx-0">
-                            Contact us
-                        </a>
                     </div>
 
                     <div className="lg:mx-auto text-left">

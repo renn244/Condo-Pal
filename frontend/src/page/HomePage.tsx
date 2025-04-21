@@ -1,5 +1,7 @@
 import FeatureCard from "@/components/pageComponents/LandingPage/FeatureCard"
+import { Button } from "@/components/ui/button"
 import { ChartNetwork, ChartNoAxesCombined, Globe, IdCard, MessageSquareMore, ReceiptText, Scale, Wrench } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const HomePage = () => {
     const features = [
@@ -96,16 +98,19 @@ const HomePage = () => {
                         <div className="w-full flex-col justify-start lg:items-start items-center gap-10 inline-flex">
                             <div className="w-full flex-col justify-start lg:items-start items-center gap-4 flex">
                                 <h2 className="text-gray-900 text-4xl font-bold font-manrope leading-normal lg:text-start text-center">
-                                    Building Stronger Communities through Collaboration and Empowerment
+                                    Empowering Landlords. Enhancing Rental Living.
                                 </h2>
                                 <p className="text-gray-500 text-base font-normal leading-relaxed lg:text-start text-center">
-                                    Through collaborationperse perspectives and strengths are leveraged to create inclusive environments where everyone has the opportunity to thrive. 
-                                    This approach not only fosters personal growth and achievement but also strengthens the fabric of society.
+                                    CondoPal transforms condo management into a seamless, smart experience. 
+                                    By simplifying communication, automating rent collection, and centralizing key tasks, CondoPal empowers landlords to focus on growth—not paperwork. 
+                                    At the same time, it improves the rental journey for tenants, fostering a more connected and stress-free community.
                                 </p>
                             </div>
-                            <button className="sm:w-fit w-full px-3.5 py-2 bg-indigo-600 hover:bg-indigo-800 transition-all duration-700 ease-in-out rounded-lg shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
-                                <span className="px-1.5 text-white text-sm font-medium leading-6">Get Started</span>
-                            </button>
+                            <Button asChild>
+                                <Link to="/signup">
+                                    Get Started
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </div>

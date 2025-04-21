@@ -12,9 +12,7 @@ const NavBar = () => {
             <div className="flex items-center gap-4 md:gap-16">
                 <div aria-label="logo">
                     <Link to={'/'}>
-                        <h1 className="text-xl font-bold select-none cursor-pointer">
-                            CONDOPAL
-                        </h1>
+                        <img src="/logo/Full_Logo.jpg" className="h-8" />
                     </Link>
                 </div>
                 <div className="flex items-center justify-evenly gap-3" aria-label="links">
@@ -24,6 +22,13 @@ const NavBar = () => {
                     `}
                     to={dashboardLink}>
                         Dashboard
+                    </NavLink>
+                    <NavLink
+                    className={({ isActive }) => `
+                        px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
+                    `}
+                    to={'/aboutus'}>
+                        About Us
                     </NavLink>
                     <NavLink 
                     className={({ isActive }) => `

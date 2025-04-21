@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useAuthContext } from "@/context/AuthContext"
-import { BadgeCheck, Bell, Building2, CreditCard, LayoutDashboard, LogOut, MessageSquare, Sparkles } from "lucide-react"
+import { BadgeCheck, Bell, CreditCard, LayoutDashboard, LogOut, MessageSquare, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const navMain = [
@@ -40,7 +40,7 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Building2 className="size-4 font-thin" />
+                  <img src="/logo/Logo_A.jpg" className="rounded-md" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">CondoPal</span>
