@@ -146,6 +146,8 @@ model Condo {
 
   agreements   LeaseAgreement[] // condo may have many leases from different time
   maintinances Maintenance[]
+  expenses     Expense[]
+
   payments     CondoPayment[]
 
   // used for update and delete to make sure the one performing those actions is the owner
@@ -190,6 +192,40 @@ model CondoPayment {
 
   billingMonth    String // MM-YYYY
   payedAt         DateTime @default(now())
+}
+
+enum ExpenseCategory {
+  UTILITY
+  ASSOCIATION
+  CLEANING
+  OTHER
+}
+
+enum Recurrence {
+  ONE_TIME
+  MONTHLY
+  QUERTERLY
+  YEARLY
+}
+
+model Expense {
+  id              String   @id @default(cuid())
+
+  condoId         String
+  condo           Condo    @relation(fields: [condoId], references: [id])
+
+  title           String
+  cost            Float
+  notes           String? // this is the notes for the expense
+
+  category        ExpenseCategory
+  isPaid          Boolean @default(false) // if this is paid or not
+  
+  recurring       Boolean @default(false) // if this is a recurring expense or not
+  recurrence      Recurrence? // if this is a recurring expense then this is the type of recurrence
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 enum MaintenanceStatus {

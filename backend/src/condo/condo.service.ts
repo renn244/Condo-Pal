@@ -119,7 +119,7 @@ export class CondoService {
     async getCondoPaymentSummary(condoId: string) {
         const [totalMaintenanceCost, totalExpenses, totalIncome] = await Promise.all([
             this.prisma.maintenance.aggregate({
-                where: { condoId: condoId, paymentResponsibility: 'LANDLORD' },
+                where: { condoId: condoId, paymentResponsibility: 'LANDLORD' }, // should this be just general (not just landlord payment responsibility)
                 _sum: { totalCost: true }
             }),
             new Promise(resolve => resolve(0)), // calculate expenses later when there is a model
@@ -223,5 +223,16 @@ export class CondoService {
         if(deletedCondo.photo) this.fileUploadService.deleteFile(deletedCondo.photo);
 
         return deletedCondo
+    }
+
+    async isCondoOwner(condoId: string, user: UserJwt) {
+        const condo = await this.prisma.condo.findUnique({
+            where: { id: condoId },
+            select: { ownerId: true }
+        })
+
+        if(!condo) throw new NotFoundException("Condo not found!")
+
+        return condo.ownerId === user.id;
     }
 }
