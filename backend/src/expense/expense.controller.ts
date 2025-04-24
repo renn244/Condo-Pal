@@ -1,10 +1,9 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, ParseBoolPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { LandLordGuard } from 'src/lib/guards/LandLord.guard';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto/expense.dto';
-import { ExpenseCategory, Recurrence } from '@prisma/client';
 
 @Controller('expense')
 @UseGuards(JwtAuthGuard)
@@ -21,9 +20,9 @@ export class ExpenseController {
 
     @Get()
     async getExpenses(@User() user: UserJwt, @Query() query: { 
-        search: string, page: string, category: ExpenseCategory, isRecurring: boolean, recurrence: Recurrence, condoId?: string
-    }) {
-        return this.expenseService.getExpenses(user, query);
+        search: string, page: string, category: string, recurrence: string, condoId?: string
+    }, @Query('isRecurring', ParseBoolPipe) isReccuring: boolean) {
+        return this.expenseService.getExpenses(user, {...query, isRecurring: isReccuring});
     }
 
     @UseGuards(LandLordGuard)

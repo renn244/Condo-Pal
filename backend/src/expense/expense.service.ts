@@ -30,7 +30,7 @@ export class ExpenseService {
     }
 
     async getExpenses(user: UserJwt, query: {
-        search: string, page: string, category: ExpenseCategory, isRecurring: boolean, recurrence: Recurrence, condoId?: string 
+        search: string, page: string, category: string, isRecurring: boolean, recurrence: string, condoId?: string 
     }) {
         const take = 10;
         const skip = (parseInt(query.page || '1') - 1) * take || 0;
@@ -56,14 +56,14 @@ export class ExpenseService {
                     { id: { contains: query.search, mode: 'insensitive' } }
                 ]
             }),
-            ...(query.category && {
-                category: query.category
+            ...((query.category && query.category !== "ALL") && {
+                category: query.category as ExpenseCategory
             }),
             ...(query.isRecurring && {
                 recurring: query.isRecurring
             }),
-            ...(query.recurrence && {
-                recurrence: query.recurrence
+            ...((query.recurrence && query.recurrence !== "ALL") && {
+                recurrence: query.recurrence as Recurrence
             })
         }
 

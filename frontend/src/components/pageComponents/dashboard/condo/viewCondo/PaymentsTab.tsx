@@ -54,7 +54,8 @@ const PaymentsTab = ({
             }
 
             return response.data as CondoPaymentsDashboard
-        }
+        },
+        refetchOnWindowFocus: false
     })
 
     const { data: condoStats } = useQuery({
@@ -68,7 +69,8 @@ const PaymentsTab = ({
             }
 
             return response.data
-        }
+        },
+        refetchOnWindowFocus: false
     })
 
     if(!payments && !isLoading) return <NotFound />

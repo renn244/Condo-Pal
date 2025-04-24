@@ -2,6 +2,7 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import NotFound from "@/components/common/NotFound";
 import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import CondoHeader from "@/components/pageComponents/dashboard/condo/viewCondo/CondoHeader";
+import ExpensesTab from "@/components/pageComponents/dashboard/condo/viewCondo/ExpensesTab";
 import MaintenanceTab from "@/components/pageComponents/dashboard/condo/viewCondo/MaintenanceTab";
 import PaymentsTab from "@/components/pageComponents/dashboard/condo/viewCondo/PaymentsTab";
 import SummaryCards from "@/components/pageComponents/dashboard/condo/viewCondo/SummaryCards";
@@ -80,7 +81,7 @@ const ViewCondo = () => {
         <MaintenanceTab condo={condo} />
 
         {/* Expenses Tab */}
-        {/* <ExpensesTab condo={condo} /> */}
+        <ExpensesTab condo={condo} />
       </Tabs>
     </div>
   )
