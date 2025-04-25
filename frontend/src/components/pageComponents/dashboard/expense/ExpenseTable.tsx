@@ -6,10 +6,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatToPesos from "@/lib/formatToPesos"
-import { DollarSign, Download, FileText, MoreHorizontal } from "lucide-react"
+import { Download, FileText, MoreHorizontal } from "lucide-react"
 import ExpenseHeader from "./ExpenseHeader"
 import useViewCondoParams from "@/hooks/useViewCondoParams"
 import ExpensePagination from "./ExpensePagination"
+import AddExpense from "./AddExpense"
+import EditExpense from "./EditExpense"
+import { Separator } from "@/components/ui/separator"
+import DeleteExpense from "./DeleteExpense"
 
 type ExpenseTableProps = {
     expenses?: getExpensesResponse,
@@ -32,10 +36,7 @@ const ExpenseTable = ({
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                     <CardTitle>Expense Records</CardTitle>
-                    <Button size="sm">
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Add Expense
-                    </Button>
+                    <AddExpense condoId={condoId} />
                 </div>
                 <CardDescription>
                     {expenses?.expenses.length || 0} expense record{expenses?.expenses.length !== 1 ? "s": ""} found
@@ -69,20 +70,20 @@ const ExpenseTable = ({
                             expenses && expenses?.expenses.length > 0 ? (
                                 expenses.expenses.map((expense) => (
                                     <TableRow key={expense.id}>
-                                        <TableCell className="font-medium">{formatBillingMonth(expense.billingMonth)}</TableCell>
+                                        <TableCell className="font-medium">
+                                            {expense.recurring ? (
+                                                <Badge className="text-xs">
+                                                    {expense.recurrence}
+                                                </Badge>
+                                            ) : (
+                                                expense.billingMonth ? formatBillingMonth(expense.billingMonth) : "N/A"
+                                            )}
+                                            </TableCell>
                                         <TableCell>{expense.category}</TableCell>
                                         <TableCell>{expense.title}</TableCell>
                                         <TableCell className="font-medium">{formatToPesos(expense.cost)}</TableCell>
                                         <TableCell>
-                                            {expense.recurring ? (
-                                                <Badge>
-                                                    {expense.recurrence}
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="outline">
-                                                    One-time
-                                                </Badge>
-                                            )}
+                                            {expense.recurring ? "Yes" : "No"}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Popover>
@@ -92,6 +93,7 @@ const ExpenseTable = ({
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent align="end" className="w-56 p-1">
+                                                    <EditExpense initialExpense={expense} condoId={condoId} />
                                                     <Button variant="ghost" className="w-full justify-start">
                                                         <FileText className="mr-2 h-4 w-4" />
                                                         View Details
@@ -100,6 +102,8 @@ const ExpenseTable = ({
                                                         <Download className="mr-2 h-4 w-4" />
                                                         Download Receipt
                                                     </Button>
+                                                    <Separator className="my-1" />
+                                                    <DeleteExpense condoId={condoId} expenseId={expense.id} />
                                                 </PopoverContent>
                                             </Popover>
                                         </TableCell>

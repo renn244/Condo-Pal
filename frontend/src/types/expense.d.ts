@@ -10,9 +10,8 @@ const ExpenseCategory = {
 type ExpenseCategory = typeof ExpenseCategory[keyof typeof ExpenseCategory];
 
 const Recurrence = {
-    ONE_TIME: 'ONE_TIME',
     MONTHLY: 'MONTHLY',
-    QUERTERLY: 'QUERTERLY',
+    QUERTERLY: 'QUARTERLY',
     YEARLY: 'YEARLY',
 } as const;
 
@@ -31,9 +30,9 @@ type expense = {
     isPaid: boolean,
 
     recurring: boolean,
-    recurrence: Recurrence,
+    recurrence?: Recurrence,
 
-    billingMonth: string, // MM-YYYY
+    billingMonth?: string, // MM-YYYY
     createdAt: string,
     updatedAt: string,
 }

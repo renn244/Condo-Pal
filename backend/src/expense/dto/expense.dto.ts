@@ -6,7 +6,7 @@ export class CreateExpenseDto {
     title: string;
 
     @IsString()
-    notes: string;
+    notes?: string;
 
     @IsNumber()
     cost: number;
@@ -28,10 +28,15 @@ export class CreateExpenseDto {
     recurrence?: Recurrence;
 
     @IsString()
+    @IsOptional()
     @Matches(/^(0[1-9]|1[0-2])-\d{4}$/, {
         message: "billingMonth must be in MM-YYYY format with a valid month (01-12)",
     })
     billingMonth: string;
+
+    @IsBoolean()
+    @IsOptional()
+    isPaid?: boolean;
 }
 
 export class UpdateExpenseDto extends CreateExpenseDto {}

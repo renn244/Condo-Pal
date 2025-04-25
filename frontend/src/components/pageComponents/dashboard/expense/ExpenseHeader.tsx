@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useDebounceValue from "@/hooks/useDebounceValue"
 import { Search } from "lucide-react"
@@ -39,7 +40,10 @@ const ExpenseHeader = ({
                 placeholder="Search expense..." className="pl-10 w-full" />
             </div>
             <div className="flex gap-2">
-                <Checkbox checked={expenseIsRecurring} onCheckedChange={setExpenseIsRecurring} />
+                <div className="flex items-center gap-2">
+                    <Label>isRecurring</Label>
+                    <Checkbox checked={expenseIsRecurring} onCheckedChange={setExpenseIsRecurring} />
+                </div>
 
                 {expenseIsRecurring &&(
                     <Select value={expenseRecurrence} onValueChange={setExpenseRecurrence}>
@@ -48,7 +52,6 @@ const ExpenseHeader = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">ALL Recurrence</SelectItem>
-                            <SelectItem value="ONE_TIME">One Time</SelectItem>
                             <SelectItem value="MONTHLY">Monthly</SelectItem>
                             <SelectItem value="QUERTERLY">Querterly</SelectItem>
                             <SelectItem value="YEARLY">Yearly</SelectItem>
