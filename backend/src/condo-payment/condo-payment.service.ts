@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CondoPaymentType, GcashPaymentStatus, Prisma } from '@prisma/client';
+import { CondoPaymentType, GcashPaymentStatus, Prisma, Recurrence } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GcashPayment, GcashPaymentVerification, ManualPayment } from './dto/condo-payment.dto';
+import { ExpenseService } from 'src/expense/expense.service';
 
 @Injectable()
 export class CondoPaymentService {
@@ -13,6 +14,61 @@ export class CondoPaymentService {
         private readonly fileUploadService: FileUploadService,
         private readonly paymongoService: PaymongoService,
     ) {}
+    
+    // supposed to be in expense (error: circular dependency)
+    async aggregateExpensesByBillingMonth(
+        condoId: string,
+        targetBillingMonth: string, // Format: "MM-YYYY" (e.g., "03-2024")
+        options?: {
+            useFixedQuarters?: boolean;
+        }
+    ) {
+        const [targetMonth, targetYear] = targetBillingMonth.split('-').map(Number);
+        const targetDate = new Date(targetYear, targetMonth, 1);
+        const QUARTERLY_BILLING_MONTHS = [3, 6, 9, 12]; // Mar, Jun, Sep, Dec
+
+        if (targetMonth < 1 || targetMonth > 12) {
+            throw new Error("Invalid billing month (MM must be 01-12)");
+        }
+
+        const expenses = await this.prisma.expense.findMany({
+            where: {
+                condoId,
+                OR: [
+                    { billingMonth: targetBillingMonth, recurring: false },
+                    { recurring: true },
+                ],
+            },
+        });
+      
+        const filteredExpenses = expenses.filter((expense) => {
+            if (!expense.recurring) return true;
+        
+            const createdMonth = expense.createdAt.getMonth() + 1;
+        
+            switch (expense.recurrence) {
+                case Recurrence.MONTHLY:
+                    return expense.createdAt <= targetDate;
+        
+                case Recurrence.QUARTERLY:
+                    if (options?.useFixedQuarters) {
+                        return QUARTERLY_BILLING_MONTHS.includes(targetMonth);
+                    } else {
+                        return (targetMonth - createdMonth) % 3 === 0 && targetMonth >= createdMonth;
+                    }
+        
+                case Recurrence.YEARLY:
+                    return targetMonth === createdMonth && expense.createdAt <= targetDate;
+        
+                default:
+                    return false;
+            }
+        });
+      
+        const total = filteredExpenses.reduce((sum, expense) => sum + expense.cost, 0);
+      
+        return total;
+    }
 
     private getBillingMonthOfDate(date: Date) {
         const month = date.getMonth() + 1; // base 1 means january is 1
@@ -26,7 +82,7 @@ export class CondoPaymentService {
             this.prisma.condoPayment.findFirst({
                 where: {
                     AND: [
-                        { condoId: condoId },
+                        { condoId: condoId, isPaid: true, isVerified: { not: false }},
                         { OR: [ { tenantId: userId }, { condo: { ownerId: userId } } ] }
                     ]
                 },
@@ -54,7 +110,11 @@ export class CondoPaymentService {
         if(!latestPayment) {
             // First-time payer: Use lease start month as the first billing month
             billingMonth = this.getBillingMonthOfDate(leaseStartDate);
-            const dueDate = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}-${tenantLease.due_date}`;
+            const month = leaseStartDate.getMonth() + 1; 
+            const year = leaseStartDate.getFullYear();
+            const day = tenantLease.due_date === -1 ? new Date(year, month + 1, 0).getDate() : tenantLease.due_date
+
+            const dueDate = `${year}-${month.toString().padStart(2, '0')}-${day}`;
 
             return { billingMonth, dueDate }
         }
@@ -71,10 +131,11 @@ export class CondoPaymentService {
             nextMonth = 1; 
             nextYear += 1;
         }
+        const day = tenantLease.due_date === -1 ? new Date(nextYear, nextMonth + 1, 0).getDate() : tenantLease.due_date
 
         // TODO LATER: should also find out if it's an advanced payment
         billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;
-        const dueDate = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-${tenantLease.due_date}`;
+        const dueDate = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-${day}`; 
 
         return { billingMonth, dueDate };
     }
@@ -87,13 +148,13 @@ export class CondoPaymentService {
         
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
-
-        const [getCondoPayment, getAdditionalCost] = await Promise.all([
+        
+        const [getCondoPayment, getExpensesCost ,getAdditionalCost] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
                 select: { rentAmount: true }
             }),
-            // as of now we don't have penalties so just maintenance  (all where tenat is responble for payment)
+            this.aggregateExpensesByBillingMonth(condoId, billingMonth.billingMonth),
             this.prisma.maintenance.aggregate({
                 _sum: { totalCost: true },
                 where: {
@@ -106,15 +167,15 @@ export class CondoPaymentService {
                 }
             })
         ])
-        
+
         if(!getCondoPayment) {
             throw new NotFoundException('condo not found')
         }
 
         return {
             rentCost: getCondoPayment.rentAmount,
-            additionalCost: getAdditionalCost._sum.totalCost || 0,
-            totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0),
+            additionalCost: (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
+            totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
             ...billingMonth,
         }
     }

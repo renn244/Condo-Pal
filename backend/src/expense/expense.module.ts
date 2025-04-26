@@ -6,6 +6,7 @@ import { CondoModule } from 'src/condo/condo.module';
 @Module({
   providers: [ExpenseService],
   controllers: [ExpenseController],
-  imports: [CondoModule]
+  imports: [CondoModule],
+  exports: [ExpenseService],
 })
 export class ExpenseModule {}

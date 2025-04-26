@@ -9,7 +9,7 @@ import LoadingSpinner from "../common/LoadingSpinner"
 import { Button } from "../ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "../ui/textarea"
 
 export const formSchema = z.object({
@@ -88,7 +88,9 @@ const ExpenseForm = ({
             setIsLoading(false)
         }
     }
-    console.log(form.formState.errors)
+
+    const billingMonts = getAvailableBillingMonths();
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className={cn("space-y-4 ", className)}>
@@ -135,13 +137,10 @@ const ExpenseForm = ({
                                         <SelectValue placeholder="Select a category" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Categories</SelectLabel>
-                                            <SelectItem value="UTILITY">Utility</SelectItem>
-                                            <SelectItem value="ASSOCIATION">Association</SelectItem>
-                                            <SelectItem value="CLEANING">Cleaning</SelectItem>
-                                            <SelectItem value="OTHER">Other</SelectItem>
-                                        </SelectGroup>
+                                        <SelectItem value="UTILITY">Utility</SelectItem>
+                                        <SelectItem value="ASSOCIATION">Association</SelectItem>
+                                        <SelectItem value="CLEANING">Cleaning</SelectItem>
+                                        <SelectItem value="OTHER">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </FormControl>
@@ -204,7 +203,18 @@ const ExpenseForm = ({
                             <FormItem>
                                 <FormLabel>Billing Month</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="MM-YYYY" {...field} />
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a billing month" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {billingMonts.map((month, idx) => (
+                                                <SelectItem key={month} value={month}>
+                                                    {month} {idx === 0 && "(now)"} 
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -260,6 +270,19 @@ const ExpenseForm = ({
             </form> 
         </Form>
     )
+}
+
+const getAvailableBillingMonths = () => {
+    const currentDate = new Date();
+    const billingMonths = [];
+
+    for (let i = 0; i < 12; i++) {
+        const month = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+        const formattedMonth = month.toLocaleString('default', { month: '2-digit' }) + '-' + month.getFullYear();
+        billingMonths.push(formattedMonth);
+    }
+
+    return billingMonths;
 }
 
 export default ExpenseForm
