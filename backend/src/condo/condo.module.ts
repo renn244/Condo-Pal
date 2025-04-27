@@ -7,6 +7,7 @@ import { CondoPaymentModule } from 'src/condo-payment/condo-payment.module';
 @Module({
   providers: [CondoService],
   controllers: [CondoController],
+  exports: [CondoService],
   imports: [FileUploadModule, CondoPaymentModule],
 })
 export class CondoModule {}

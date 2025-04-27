@@ -14,6 +14,9 @@ const RedirectToken = () => {
 
             const next = sessionStorage.getItem('next');
 
+            if (next) {
+                sessionStorage.removeItem('next');
+            }
             window.location.href = next || "/"
         }
     }, [access_token, refresh_token])

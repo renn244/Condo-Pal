@@ -24,7 +24,7 @@ const MaintenanceTable = ({
     condoId
 }: MaintenanceTablProps) => {
     const { maintenancePage, status, priority, maintenanceSearch, setPage, setSearch, setStatus, setPriority } = useViewCondoParams();
-
+    
     return (
         <Card id="maintenance-table" className="mb-6 h-[800px]">
             <CardHeader className="pb-2">
@@ -92,10 +92,8 @@ const MaintenanceTable = ({
                 </Table>
             </CardContent>
             <CardFooter className="justify-center">
-                {maintenance?.totalPages &&
-                    <MaintenancePagination page={maintenancePage} setPage={(value) => setPage('maintenance', value)} 
-                    totalPages={maintenance.totalPages} hasNext={maintenance.hasNext} />
-                }
+                <MaintenancePagination page={maintenancePage} setPage={(value) => setPage('maintenance', value)} 
+                totalPages={maintenance?.totalPages || 1} hasNext={maintenance?.hasNext || false} />
             </CardFooter>
         </Card>
     )

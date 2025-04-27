@@ -15,6 +15,13 @@ const useTenantDashboardParams = () => {
     const paymentPage = parseInt(searchParams.get('paymentPage') || '1');
     const paymentSearch = searchParams.get('paymentSearch') || '';
 
+    // expense tab
+    const expenseCategory = searchParams.get('expenseCategory') || 'ALL';
+    const expenseIsRecurring = searchParams.get('expenseIsRecurring') === 'true';
+    const expenseRecurrence = searchParams.get('expenseRecurrence') || 'ALL';
+    const expensePage = parseInt(searchParams.get('expensePage') || '1');
+    const expenseSearch = searchParams.get('expenseSearch') || '';
+
     // maintenance
     const setStatus = (value: MaintenanceStatus | "ALL" ) => {
         const newParams = new URLSearchParams(searchParams);
@@ -42,14 +49,34 @@ const useTenantDashboardParams = () => {
         setSearchParams(newParams);
     }
 
+    // expense
+    const setExpenseCategory = (value: ExpenseCategory | "ALL") => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('expenseCategory', value);
+        setSearchParams(newParams);
+    }
+
+    const setExpenseIsRecurring = (value: boolean) => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('expenseIsRecurring', value.toString());
+        if(value === false) newParams.delete('expenseRecurrence');
+        setSearchParams(newParams);
+    }
+
+    const setExpenseRecurrence = (value: Recurrence | "ALL") => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('expenseRecurrence', value);
+        setSearchParams(newParams);
+    }
+
     // general
-    const setPage = (type: 'maintenance' | 'payment', value: number) => {
+    const setPage = (type: 'maintenance' | 'payment' | 'expense', value: number) => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set(`${type}Page`, value.toString());
         setSearchParams(newParams);
     }
 
-    const setSearch = (type: 'maintenance' | 'payment', value: string) => {
+    const setSearch = (type: 'maintenance' | 'payment' | 'expense', value: string) => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set(`${type}Search`, value);
         setSearchParams(newParams);
@@ -63,6 +90,9 @@ const useTenantDashboardParams = () => {
         // payment
         paymentType, paymentStatus, paymentPage, paymentSearch,
         setPaymentType, setPaymentStatus,
+        // expense
+        expenseCategory, expenseIsRecurring, expenseRecurrence, expensePage, expenseSearch,
+        setExpenseCategory, setExpenseIsRecurring, setExpenseRecurrence
     }
 }
 

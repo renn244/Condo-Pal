@@ -141,7 +141,6 @@ const MaintenanceForm = ({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className={cn("space-y-4", className)}>
-                {/* should have a carousel */}
                 <FormField 
                 control={form.control}
                 name="photos"

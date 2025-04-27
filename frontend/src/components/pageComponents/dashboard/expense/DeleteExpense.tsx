@@ -1,28 +1,28 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import useCondoParams from "@/hooks/useCondoParams";
 import axiosFetch from "@/lib/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
-import { useState } from "react"
+import { useState } from "react";
 import toast from "react-hot-toast";
 
-type DeleteCondoProps = {
+type DeleteExpenseProps = {
+    expenseId: string,
     condoId: string
 }
 
-const DeleteCondo = ({
+const DeleteExpense = ({
+    expenseId,
     condoId
-}: DeleteCondoProps) => {
+}: DeleteExpenseProps) => {
     const queryClient = useQueryClient();
-    const { page, search } = useCondoParams();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [open, setOpen] = useState(false);
 
     const { mutate, isPending } = useMutation({
-        mutationKey: ['condo', 'delete'],
+        mutationKey: ['expense', 'delete'],
         mutationFn: async () => {
-            const response = await axiosFetch.delete(`/condo?condoId=${condoId}`)
+            const response = await axiosFetch.delete(`/expense?condoId=${condoId}&expenseId=${expenseId}`)
 
             if(response.status >= 400) {
                 throw new Error(response.data.message)
@@ -31,22 +31,22 @@ const DeleteCondo = ({
             return response.data
         },
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['condos', page, search] })
-            toast.success('Condo has been deleted!')
+            await queryClient.invalidateQueries({ queryKey: ['expenses'] })
+            toast.success('Expense has been deleted!')
 
-            setIsOpen(false)
+            setOpen(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
             toast.error(error.message)
         }
     })
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="ghost" className="justify-start w-full text-destructive focus:text-destructive hover:text-destructive">
-                    {/* should we delete or archived?? */}
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete Condo
+                    <Trash2 className="mr-2 h-4 w-4" /> 
+                    Delete Expense
                 </Button>
             </DialogTrigger>
             <DialogContent>
@@ -55,15 +55,14 @@ const DeleteCondo = ({
                         Delete Condo
                     </DialogTitle>
                     <DialogDescription>
-                        Note: Once you delete condo you can't get it back and all the information will be lost,
-                        including the maintenance history, expenses, payment histoy and etc... .
+                        Note: Once you delete condo you can't get it back and all the information will be lost.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={() => setIsOpen(false)} variant='outline'>
+                    <Button onClick={() => setOpen(false)} variant="outline">
                         Cancel
                     </Button>
-                    <Button disabled={isPending} onClick={() => mutate()} variant='destructive'>
+                    <Button disabled={isPending} onClick={() => mutate()} variant="destructive">
                         {isPending ? <LoadingSpinner /> : "Delete"}
                     </Button>
                 </DialogFooter>
@@ -72,4 +71,4 @@ const DeleteCondo = ({
     )
 }
 
-export default DeleteCondo
+export default DeleteExpense
