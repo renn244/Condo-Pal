@@ -5,7 +5,6 @@ import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GcashPayment, GcashPaymentVerification, ManualPayment } from './dto/condo-payment.dto';
-import { ExpenseService } from 'src/expense/expense.service';
 
 @Injectable()
 export class CondoPaymentService {
@@ -77,7 +76,7 @@ export class CondoPaymentService {
         return `${month.toString().padStart(2, '0')}-${year.toString()}`;
     }
 
-    private async getBillingMonth(condoId: string, userId: string) {
+    async getBillingMonth(condoId: string, userId: string) {
         const [latestPayment, tenantLease] = await Promise.all([
             this.prisma.condoPayment.findFirst({
                 where: {
@@ -475,7 +474,7 @@ export class CondoPaymentService {
                 select: { id: true, billingMonth: true, additionalCost: true, totalPaid: true },
             }),
             this.prisma.maintenance.findMany({
-                where: { condoId, paymentResponsibility: 'LANDLORD', Status: 'COMPLETED' },
+                where: { condoId, paymentResponsibility: 'TENANT', Status: 'COMPLETED' },
                 select: { completionDate: true, totalCost: true },
             }),
         ]);

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, ParseBoolPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, ParseBoolPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { LandLordGuard } from 'src/lib/guards/LandLord.guard';
@@ -21,8 +21,13 @@ export class ExpenseController {
     @Get()
     async getExpenses(@User() user: UserJwt, @Query() query: { 
         search: string, page: string, category: string, recurrence: string, condoId?: string
-    }, @Query('isRecurring', ParseBoolPipe) isReccuring: boolean) {
-        return this.expenseService.getExpenses(user, {...query, isRecurring: isReccuring});
+    }, @Query('isRecurring', ParseBoolPipe) isReccuring: boolean, @Query('isPaid', new ParseBoolPipe({ optional: true })) isPaid?: boolean) {
+        return this.expenseService.getExpenses(user, {...query, isRecurring: isReccuring, isPaid: isPaid });
+    }
+
+    @Get('summary')
+    async getExpenseSummary(@User() user: UserJwt, @Query('condoId') condoId: string) {
+        return this.expenseService.getExpenseSummary(user, condoId);
     }
 
     @UseGuards(LandLordGuard)

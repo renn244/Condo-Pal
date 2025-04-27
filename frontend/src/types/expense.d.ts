@@ -44,3 +44,9 @@ type getExpensesResponse = {
     hasNext: boolean,
     totalPages: number,
 }
+
+type getExpenseSummaryResponse = {
+    billingExpenses: number,
+    totalExpenses: number,
+    paidExpenses: number
+}

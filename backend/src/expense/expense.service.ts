@@ -4,12 +4,14 @@ import { CreateExpenseDto, UpdateExpenseDto } from './dto/expense.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { ExpenseCategory, Prisma, Recurrence } from '@prisma/client';
 import { CondoService } from 'src/condo/condo.service';
+import { CondoPaymentService } from 'src/condo-payment/condo-payment.service';
 
 @Injectable()
 export class ExpenseService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly condoService: CondoService
+        private readonly condoService: CondoService,
+        private readonly CondoPaymentService: CondoPaymentService,
     ) {}
 
     async createExpense(user: UserJwt, condoId: string, data: CreateExpenseDto) {
@@ -30,7 +32,7 @@ export class ExpenseService {
     }
 
     async getExpenses(user: UserJwt, query: {
-        search: string, page: string, category: string, isRecurring: boolean, recurrence: string, condoId?: string 
+        search: string, page: string, category: string, isRecurring: boolean, recurrence: string, condoId?: string, isPaid?: boolean
     }) {
         const take = 10;
         const skip = (parseInt(query.page || '1') - 1) * take || 0;
@@ -64,6 +66,9 @@ export class ExpenseService {
             }),
             ...((query.recurrence && query.recurrence !== "ALL") && {
                 recurrence: query.recurrence as Recurrence
+            }),
+            ...(query.isPaid && {
+                isPaid: query.isPaid
             })
         }
 
@@ -116,5 +121,33 @@ export class ExpenseService {
         })
 
         return expense;
+    }
+
+    async getExpenseSummary(user: UserJwt, condoId: string) {
+        const condoTenant = await this.prisma.condo.findFirst({ where: { id: condoId, tenantId: user.id }, })
+        
+        if(!condoTenant) {
+            throw new ForbiddenException('You do not have permission to view this condo\'s expenses.')
+        }
+
+        const billingMonth = await this.CondoPaymentService.getBillingMonth(condoId, user.id);
+
+        const [expensesThisMonth, totalExpenses, paidExpenses] = await Promise.all([
+            this.CondoPaymentService.aggregateExpensesByBillingMonth(condoId, billingMonth.billingMonth),
+            this.prisma.expense.aggregate({
+                where: { condoId: condoId },
+                _sum: { cost: true }
+            }),
+            this.prisma.expense.aggregate({
+                where: { condoId: condoId, isPaid: true },
+                _sum: { cost: true }
+            })
+        ])
+
+        return {
+            billingExpenses: expensesThisMonth || 0,
+            totalExpenses: totalExpenses._sum.cost || 0,
+            paidExpenses: paidExpenses._sum.cost || 0,
+        }
     }
 }

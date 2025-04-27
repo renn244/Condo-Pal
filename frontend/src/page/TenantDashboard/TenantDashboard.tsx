@@ -1,6 +1,7 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import NotFound from "@/components/common/NotFound";
 import SomethingWentWrong from "@/components/common/SomethingWentWrong";
+import ExpenseTab from "@/components/pageComponents/tenantDashboard/tabs/ExpenseTab";
 import MaintenanceTab from "@/components/pageComponents/tenantDashboard/tabs/MaintenanceTab";
 import OverviewTab from "@/components/pageComponents/tenantDashboard/tabs/OverviewTab";
 import PaymentsTab from "@/components/pageComponents/tenantDashboard/tabs/PaymentsTab";
@@ -47,10 +48,11 @@ const TenantDashboard = () => {
             </div>
 
             <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-2 w-full">
+                <TabsList className="grid grid-cols-4 mb-2 w-full">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="payments">Payments</TabsTrigger>
                     <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+                    <TabsTrigger value="expenses">Expenses</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -61,6 +63,8 @@ const TenantDashboard = () => {
 
                 {/* Maintenance Tab */}
                 <MaintenanceTab />
+
+                <ExpenseTab />
             </Tabs>
         </div>
     )

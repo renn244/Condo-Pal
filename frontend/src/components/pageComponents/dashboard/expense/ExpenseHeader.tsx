@@ -40,9 +40,11 @@ const ExpenseHeader = ({
                 placeholder="Search expense..." className="pl-10 w-full" />
             </div>
             <div className="flex gap-2">
-                <div className="flex items-center gap-2">
-                    <Label>isRecurring</Label>
-                    <Checkbox checked={expenseIsRecurring} onCheckedChange={setExpenseIsRecurring} />
+                <div className="flex flex-col justify-center gap-2">
+                    <div className="flex items-center gap-2">
+                        <Checkbox checked={expenseIsRecurring} onCheckedChange={setExpenseIsRecurring} />
+                        <Label>isRecurring</Label>
+                    </div>
                 </div>
 
                 {expenseIsRecurring &&(
@@ -51,9 +53,9 @@ const ExpenseHeader = ({
                             <SelectValue placeholder="Recurrence" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="ALL">ALL Recurrence</SelectItem>
+                            <SelectItem value="ALL">ALL</SelectItem>
                             <SelectItem value="MONTHLY">Monthly</SelectItem>
-                            <SelectItem value="QUERTERLY">Querterly</SelectItem>
+                            <SelectItem value="QUARTERLY">Quarterly</SelectItem>
                             <SelectItem value="YEARLY">Yearly</SelectItem>
                         </SelectContent>
                     </Select>
@@ -64,7 +66,7 @@ const ExpenseHeader = ({
                         <SelectValue placeholder="Category" /> 
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="ALL">All Category</SelectItem>
+                        <SelectItem value="ALL">ALL</SelectItem>
                         <SelectItem value="UTILITY">Utility</SelectItem>
                         <SelectItem value="ASSOCIATION">Association</SelectItem>
                         <SelectItem value="CLEANING">Cleaning</SelectItem>
