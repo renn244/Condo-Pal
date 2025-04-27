@@ -222,6 +222,7 @@ model Expense {
   
   recurring       Boolean @default(false) // if this is a recurring expense or not
   recurrence      Recurrence? // if this is a recurring expense then this is the type of recurrence
+  timesPaid       Int @default(0) // how many times this has been paid
 
   billingMonth    String? // MM-YYYY
   createdAt       DateTime @default(now())

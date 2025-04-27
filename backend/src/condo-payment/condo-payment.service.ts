@@ -69,15 +69,57 @@ export class CondoPaymentService {
       
         return total;
     }
-
+ 
     async updateExpensesToPaid(condoId: string, billingMonth: string) {
+        const [targetMonth, targetYear] = billingMonth.split('-').map(Number);
+        const targetDate = new Date(targetYear, targetMonth, 1);
+
+        const [expenses, expensesRecurring] = await Promise.all([
+            this.prisma.expense.updateMany({
+                where: {
+                    condoId, isPaid: false,
+                    billingMonth: billingMonth, recurring: false
+                },
+                data: { isPaid: true }
+            }),
+            this.prisma.expense.findMany({
+                where: {
+                    condoId, isPaid: false, recurring: true
+                },
+                select: {
+                    id: true, createdAt: true, recurrence: true, recurring: true
+                }
+            })
+        ])
+      
+        const filteredExpenses = expensesRecurring.filter((expense) => {
+            if (!expense.recurring) return true;
+            const createdMonth = expense.createdAt.getMonth() + 1;
+        
+            switch (expense.recurrence) {
+                case Recurrence.MONTHLY:
+                    return expense.createdAt <= targetDate;
+        
+                case Recurrence.QUARTERLY:
+                    return (targetMonth - createdMonth) % 3 === 0 && targetMonth >= createdMonth;
+        
+                case Recurrence.YEARLY:
+                    return targetMonth === createdMonth && expense.createdAt <= targetDate;
+        
+                default:
+                    return false;
+            }
+        });
+
+        const expensesId = filteredExpenses.map((expense) => expense.id);
+        if (expensesId.length === 0) return; // no expenses to update
+
         await this.prisma.expense.updateMany({
-            where: {
-                condoId: condoId, isPaid: false, 
-                billingMonth: billingMonth
-            },
-            data: { isPaid: true, }
-        })
+            where: { id: { in: expensesId }, },
+            data: { timesPaid: { increment: 1 } },
+        });
+
+        return expensesId
     }
 
     private getBillingMonthOfDate(date: Date) {
@@ -158,7 +200,6 @@ export class CondoPaymentService {
         
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
-        console.log(startOfMonth, endOfMonth);
 
         const [getCondoPayment, getExpensesCost ,getAdditionalCost] = await Promise.all([
             this.prisma.condo.findUnique({

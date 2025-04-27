@@ -119,12 +119,11 @@ export class CondoService {
     async getCondoPaymentSummary(user: UserJwt, condoId: string) {
         const billingMonth = await this.condoPaymentService.getBillingMonth(condoId, user.id);
 
-        const [totalMaintenanceCost, totalExpenses, totalIncome] = await Promise.all([
+        const [totalMaintenanceCost, totalIncome] = await Promise.all([
             this.prisma.maintenance.aggregate({
                 where: { condoId: condoId },
                 _sum: { totalCost: true }
             }),
-            this.condoPaymentService.aggregateExpensesByBillingMonth(condoId, billingMonth.billingMonth),
             this.prisma.condoPayment.aggregate({
                 where: { 
                     condoId: condoId,
@@ -138,7 +137,7 @@ export class CondoService {
 
         return {
             totalMaintenanceCost: totalMaintenanceCost._sum.totalCost || 0,
-            totalExpenses: (totalExpenses || 0),
+            totalExpenses: ((totalIncome._sum.additionalCost || 0) - (totalMaintenanceCost._sum.totalCost || 0)),
             totalIncome: totalIncome._sum.totalPaid || 0,
             totalPaymentCount: totalIncome._count.id || 0,
         }
