@@ -33,6 +33,7 @@ export class CondoPaymentService {
         const expenses = await this.prisma.expense.findMany({
             where: {
                 condoId,
+                isPaid: false,
                 OR: [
                     { billingMonth: targetBillingMonth, recurring: false },
                     { recurring: true },
@@ -69,6 +70,16 @@ export class CondoPaymentService {
         return total;
     }
 
+    async updateExpensesToPaid(condoId: string, billingMonth: string) {
+        await this.prisma.expense.updateMany({
+            where: {
+                condoId: condoId, isPaid: false, 
+                billingMonth: billingMonth
+            },
+            data: { isPaid: true, }
+        })
+    }
+
     private getBillingMonthOfDate(date: Date) {
         const month = date.getMonth() + 1; // base 1 means january is 1
         const year = date.getFullYear();
@@ -81,7 +92,7 @@ export class CondoPaymentService {
             this.prisma.condoPayment.findFirst({
                 where: {
                     AND: [
-                        { condoId: condoId, isPaid: true, isVerified: { not: false }},
+                        { condoId: condoId, OR: [{ isPaid: true }, { isVerified: { not: false } }]},
                         { OR: [ { tenantId: userId }, { condo: { ownerId: userId } } ] }
                     ]
                 },
@@ -147,7 +158,8 @@ export class CondoPaymentService {
         
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
-        
+        console.log(startOfMonth, endOfMonth);
+
         const [getCondoPayment, getExpensesCost ,getAdditionalCost] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
@@ -296,8 +308,11 @@ export class CondoPaymentService {
                 isVerified,
                 isPaid,
                 gcashStatus: body.gcashStatus
-            }
+            },
         })
+
+        // update to isPaid to the database
+        await this.updateExpensesToPaid(updatePayment.condoId, updatePayment.billingMonth);
 
         return updatePayment
     }
@@ -328,6 +343,9 @@ export class CondoPaymentService {
                 billingMonth: billingMonth.billingMonth
             }
         })
+
+        // update expense to paid
+        await this.updateExpensesToPaid(condoId, createManualPayment.billingMonth);
 
         return createManualPayment;
     }
@@ -389,7 +407,9 @@ export class CondoPaymentService {
                 id: condoPaymentId
             },
             select: {
-                linkId: true // checkout_sessionId
+                linkId: true, // checkout_sessionId
+                billingMonth: true,
+                condoId: true,
             }
         })
 
@@ -407,16 +427,9 @@ export class CondoPaymentService {
             }
         }
 
-        // update to isPaid to the database
-        await this.prisma.condoPayment.update({
-            where: {
-                id: condoPaymentId,
-                tenantId: user.id
-            },
-            data: {
-                isPaid: true
-            }
-        })
+        // update to isPaid to the databas
+        await this.prisma.condoPayment.update({ where: { id: condoPaymentId }, data: { isPaid: true } })
+        await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth);
 
         return {
             name: "Condo Payment",
@@ -440,7 +453,7 @@ export class CondoPaymentService {
         const prevMonthFormatted = `${String(prevMonth.getMonth() + 1).padStart(2, "0")}-${prevMonth.getFullYear()}`;
         
         const [allPayments, currMonthPayments, prevMonthPayments, pendingVerifications] = await Promise.all([
-            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds } }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }]}, _sum: { totalPaid: true } }),
             this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: currMonth }, _sum: { totalPaid: true } }),
             this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: prevMonthFormatted }, _sum: { totalPaid: true } }),
             this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, gcashStatus: "PENDING", type: 'GCASH' }, _sum: { totalPaid: true } })
@@ -470,7 +483,7 @@ export class CondoPaymentService {
         
         const [payments, landlordMaintenance] = await Promise.all([
             this.prisma.condoPayment.findMany({
-                where: { condoId },
+                where: { condoId, OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }] },
                 select: { id: true, billingMonth: true, additionalCost: true, totalPaid: true },
             }),
             this.prisma.maintenance.findMany({
@@ -509,6 +522,15 @@ export class CondoPaymentService {
 
         const where: Prisma.CondoPaymentWhereInput = {
             condoId: { in: condoIds },
+            OR: [
+                {
+                    AND: [
+                        { isPaid: true },
+                        { type: { not: 'GCASH' }}
+                    ]
+                },
+                { type: 'GCASH' }
+            ],
             ...(query.search && {
                 OR: [
                     {tenant: {

@@ -3,17 +3,17 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import useViewCondoParams from "@/hooks/useViewCondoParams"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatToPesos from "@/lib/formatToPesos"
-import { Download, FileText, MoreHorizontal } from "lucide-react"
-import ExpenseHeader from "./ExpenseHeader"
-import useViewCondoParams from "@/hooks/useViewCondoParams"
-import ExpensePagination from "./ExpensePagination"
+import { FileText, MoreHorizontal } from "lucide-react"
 import AddExpense from "./AddExpense"
-import EditExpense from "./EditExpense"
-import { Separator } from "@/components/ui/separator"
 import DeleteExpense from "./DeleteExpense"
+import EditExpense from "./EditExpense"
+import ExpenseHeader from "./ExpenseHeader"
+import ExpensePagination from "./ExpensePagination"
 
 type ExpenseTableProps = {
     expenses?: getExpensesResponse,
@@ -97,10 +97,6 @@ const ExpenseTable = ({
                                                     <Button variant="ghost" className="w-full justify-start">
                                                         <FileText className="mr-2 h-4 w-4" />
                                                         View Details
-                                                    </Button>
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <Download className="mr-2 h-4 w-4" />
-                                                        Download Receipt
                                                     </Button>
                                                     <Separator className="my-1" />
                                                     <DeleteExpense condoId={condoId} expenseId={expense.id} />
