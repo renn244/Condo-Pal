@@ -31,6 +31,7 @@ type expense = {
 
     recurring: boolean,
     recurrence?: Recurrence,
+    timesPaid?: number,
 
     billingMonth?: string, // MM-YYYY
     createdAt: string,

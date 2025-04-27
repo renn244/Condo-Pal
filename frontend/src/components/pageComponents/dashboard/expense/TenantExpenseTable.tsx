@@ -30,7 +30,8 @@ const TenantExpenseTable = () => {
             });
 
             return response.data as getExpensesResponse;
-        }
+        },
+        refetchOnWindowFocus: false,
     })
 
     return (

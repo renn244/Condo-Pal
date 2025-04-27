@@ -56,7 +56,7 @@ const SummaryCards = ({
                         {formatToPesos(netIncome)}
                     </div>
                     <div className="text-xs text-muted-foreground mt-2">
-                        {netIncome >= 0 ? "Profit" : "Loss"}
+                        Net Rental Income (Before Taxes)
                     </div>
                 </CardContent>
             </Card>

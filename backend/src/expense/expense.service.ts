@@ -123,6 +123,36 @@ export class ExpenseService {
         return expense;
     }
 
+    async getTotalexpenses(condoId: string, isPaid?: boolean) {
+        const expenses = await this.prisma.expense.findMany({
+            where: { 
+                condoId: condoId,
+                ...(isPaid && {
+                    OR: [
+                        { isPaid: true },
+                        { recurring: true, isPaid: false }
+                    ]
+                })
+            },
+            select: {
+                cost: true,
+                recurrence: true,
+                recurring: true,
+                timesPaid: true
+            }
+        })
+
+        const total = expenses.reduce((acc, expense) => {
+            if (expense.recurring) {
+                return acc + (expense.cost * expense.timesPaid);
+            } else {
+                return acc + expense.cost;
+            }
+        }, 0);
+
+        return total;
+    }
+
     async getExpenseSummary(user: UserJwt, condoId: string) {
         const condoTenant = await this.prisma.condo.findFirst({ where: { id: condoId, tenantId: user.id }, })
         
@@ -134,20 +164,14 @@ export class ExpenseService {
 
         const [expensesThisMonth, totalExpenses, paidExpenses] = await Promise.all([
             this.CondoPaymentService.aggregateExpensesByBillingMonth(condoId, billingMonth.billingMonth),
-            this.prisma.expense.aggregate({
-                where: { condoId: condoId },
-                _sum: { cost: true }
-            }),
-            this.prisma.expense.aggregate({
-                where: { condoId: condoId, isPaid: true },
-                _sum: { cost: true }
-            })
+            this.getTotalexpenses(condoId),
+            this.getTotalexpenses(condoId, true)
         ])
 
         return {
-            billingExpenses: expensesThisMonth || 0,
-            totalExpenses: totalExpenses._sum.cost || 0,
-            paidExpenses: paidExpenses._sum.cost || 0,
+            billingExpenses: expensesThisMonth,
+            totalExpenses: totalExpenses + expensesThisMonth,
+            paidExpenses: paidExpenses,
         }
     }
 }

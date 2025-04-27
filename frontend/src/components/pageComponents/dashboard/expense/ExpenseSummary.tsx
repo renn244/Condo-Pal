@@ -18,7 +18,8 @@ const ExpenseSummary = ({
             const response = await axiosFetch.get(`/expense/summary?condoId=${condoId}`);
 
             return response.data as getExpenseSummaryResponse;
-        }
+        },
+        refetchOnWindowFocus: false,
     })
 
     const billingExpenses = expenseSummary?.billingExpenses || 0;
@@ -58,7 +59,7 @@ const ExpenseSummary = ({
                     ) : (
                         <>
                             <div className="text-2xl font-bold">{formatToPesos(totalExpenses)}</div>
-                            <p className="text-xs text-muted-foreground">Overall expense for all your bills</p>
+                            <p className="text-xs text-muted-foreground">Overall expense for all your bills (including the future)</p>
                         </>
                     )}
                 </CardContent>

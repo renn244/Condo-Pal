@@ -116,19 +116,20 @@ export class CondoService {
     }
 
 
-    async getCondoPaymentSummary(condoId: string) {
-        const [totalMaintenanceCost, totalExpenses, totalIncome] = await Promise.all([
+    async getCondoPaymentSummary(user: UserJwt, condoId: string) {
+        const billingMonth = await this.condoPaymentService.getBillingMonth(condoId, user.id);
+
+        const [totalMaintenanceCost, totalIncome] = await Promise.all([
             this.prisma.maintenance.aggregate({
-                where: { condoId: condoId, paymentResponsibility: 'LANDLORD' }, // should this be just general (not just landlord payment responsibility)
+                where: { condoId: condoId },
                 _sum: { totalCost: true }
             }),
-            new Promise(resolve => resolve(0)), // calculate expenses later when there is a model
             this.prisma.condoPayment.aggregate({
                 where: { 
                     condoId: condoId,
                     OR: [{ gcashStatus: 'APPROVED' }, { isPaid: true } ]
                 },
-                _sum: { totalPaid: true },
+                _sum: { totalPaid: true, additionalCost: true },
                 _count: { id: true }
             }) 
         ])
@@ -136,7 +137,7 @@ export class CondoService {
 
         return {
             totalMaintenanceCost: totalMaintenanceCost._sum.totalCost || 0,
-            totalExpenses: totalExpenses || 0,
+            totalExpenses: ((totalIncome._sum.additionalCost || 0) - (totalMaintenanceCost._sum.totalCost || 0)),
             totalIncome: totalIncome._sum.totalPaid || 0,
             totalPaymentCount: totalIncome._count.id || 0,
         }
@@ -151,7 +152,7 @@ export class CondoService {
                     tenant: { select: { id: true, name: true, profile: true } }
                 }
             }),
-            this.getCondoPaymentSummary(condoId),
+            this.getCondoPaymentSummary(user, condoId),
             this.condoPaymentService.getTotalPayment(condoId, user),
         ])
 
