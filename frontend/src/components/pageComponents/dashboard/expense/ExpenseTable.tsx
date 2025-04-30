@@ -8,12 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useViewCondoParams from "@/hooks/useViewCondoParams"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatToPesos from "@/lib/formatToPesos"
-import { FileText, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import AddExpense from "./AddExpense"
 import DeleteExpense from "./DeleteExpense"
 import EditExpense from "./EditExpense"
 import ExpenseHeader from "./ExpenseHeader"
 import ExpensePagination from "./ExpensePagination"
+import ViewExpense from "./ViewExpense"
 
 type ExpenseTableProps = {
     expenses?: getExpensesResponse,
@@ -94,10 +95,7 @@ const ExpenseTable = ({
                                                 </PopoverTrigger>
                                                 <PopoverContent align="end" className="w-56 p-1">
                                                     <EditExpense initialExpense={expense} condoId={condoId} />
-                                                    <Button variant="ghost" className="w-full justify-start">
-                                                        <FileText className="mr-2 h-4 w-4" />
-                                                        View Details
-                                                    </Button>
+                                                    <ViewExpense expense={expense} />
                                                     <Separator className="my-1" />
                                                     <DeleteExpense condoId={condoId} expenseId={expense.id} />
                                                 </PopoverContent>

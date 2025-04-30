@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import ExpenseHeader from './ExpenseHeader'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
-import { Button } from '@/components/ui/button'
 import ExpensePagination from './ExpensePagination'
 import formatToPesos from '@/lib/formatToPesos'
 import formatDate from '@/lib/formatDate'
@@ -11,6 +10,7 @@ import { useAuthContext } from '@/context/AuthContext'
 import useTenantDashboardParams from '@/hooks/useTenantDashboardParams'
 import { useQuery } from '@tanstack/react-query'
 import axiosFetch from '@/lib/axios'
+import ViewExpense from './ViewExpense'
 
 const TenantExpenseTable = () => {
     const { user } = useAuthContext();
@@ -84,9 +84,7 @@ const TenantExpenseTable = () => {
                                             </div>
                                             <div className="mt-3 md:mt-0 flex items-center space-x-4">
                                                 <div className="text-lg font-semibold">{formatToPesos(expense.cost)}</div>
-                                                <Button variant="outline" size="sm">
-                                                    View Details
-                                                </Button>
+                                                <ViewExpense buttonVariant='outline' expense={expense} />
                                             </div>
                                         </div>
                                     </CardContent>
