@@ -37,7 +37,7 @@ const MaintenanceHeader = ({
                         <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="ALL">All Priority</SelectItem>
+                        <SelectItem value="ALL">All Status</SelectItem>
                         <SelectItem value="PENDING">Pending</SelectItem>
                         <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                         <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
@@ -51,7 +51,7 @@ const MaintenanceHeader = ({
                         <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="ALL">All Status</SelectItem>
+                        <SelectItem value="ALL">All Priority</SelectItem>
                         <SelectItem value="LOW">Low</SelectItem>
                         <SelectItem value="MEDIUM">Medium</SelectItem>
                         <SelectItem value="HIGH">High</SelectItem>

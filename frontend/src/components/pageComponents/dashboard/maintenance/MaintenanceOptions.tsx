@@ -39,7 +39,7 @@ const MaintenanceOptions = ({
                         Edit maintenance
                     </Button>
                 </Link>
-                {maintenance.Status !== "CANCELED" && (
+                {maintenance.Status === "PENDING" && (
                     <>
                         <Separator className="my-1" />
                         <CancelMaintenance queryKey={queryKey} maintenanceId={maintenance.id} />

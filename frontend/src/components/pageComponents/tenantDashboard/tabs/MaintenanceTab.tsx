@@ -8,11 +8,15 @@ import axiosFetch from "@/lib/axios"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import { useQuery } from "@tanstack/react-query"
-import { Plus, Wrench } from "lucide-react"
+import { MoreVertical, Plus, Wrench } from "lucide-react"
 import MaintenanceHeader from "../../dashboard/maintenance/MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import MaintenancePagination from "../../dashboard/maintenance/MaintenancePagination"
 import { Link } from "react-router-dom"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import ViewDetails from "../../dashboard/maintenance/ViewDetails"
+import { Separator } from "@/components/ui/separator"
+import CancelMaintenance from "../../dashboard/maintenance/CancelMaintenance"
 
 const MaintenanceTab = () => {
     const { user } = useAuthContext();
@@ -87,13 +91,25 @@ const MaintenanceTab = () => {
                                                 <span className="text-muted-foreground">Created: {formatDate(new Date(request.createdAt))}</span>
                                                 <span className="text-muted-foreground">Priority: {request.priorityLevel}</span>
                                             </div>
-                                            <Button variant="outline" size="sm">
-                                                View Details
-                                            </Button>
-                                            {/* Edit maybe?? */}
-                                            <Button variant='destructive'>
-                                                Cancel Maintenance
-                                            </Button>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent align="end" className="w-56 p-1">
+                                                    <ViewDetails maintenance={request} />
+                                                    {request.Status === "PENDING" && (
+                                                        <>
+                                                            <Separator className="my-1" />
+                                                            <CancelMaintenance 
+                                                            queryKey={["maintenanceRequests", page, search, status, priority, condoId]} 
+                                                            maintenanceId={request.id} 
+                                                            />
+                                                        </>
+                                                    )}
+                                                </PopoverContent>
+                                            </Popover>
                                         </div>
                                     </div>
                                 ))}

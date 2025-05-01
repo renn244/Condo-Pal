@@ -6,6 +6,7 @@ import axiosFetch from "@/lib/axios"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
 import { ChevronRight, Home } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const PropertiesOverview = () => {
     const { data, isLoading } = useQuery({
@@ -30,9 +31,11 @@ const PropertiesOverview = () => {
                         Manage your {data.condoList.length} properties
                     </CardDescription>
                 </div>
-                <Button variant="outline" size="sm">
-                    View All
-                    <ChevronRight className="ml-1 h-4 w-4" />
+                <Button variant="outline" size="sm" asChild>
+                    <Link to="/dashboard/condo">
+                        View All
+                        <ChevronRight className="ml-1 h-4 w-4" />
+                    </Link>
                 </Button>
             </CardHeader>
             <CardContent>

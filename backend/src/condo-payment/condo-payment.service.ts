@@ -671,7 +671,13 @@ export class CondoPaymentService {
 
         const financialStat = Object.entries(formattedFinancialStat).map(([month, { totalPaid, additionalCost }]) => ({
             billingMonth: month, revenue: totalPaid, expenses: additionalCost 
-        }));
+        })).sort((a, b) => {
+            const [monthA, yearA] = a.billingMonth.split('-').map(Number);
+            const [monthB, yearB] = b.billingMonth.split('-').map(Number);
+
+            if (yearA !== yearB) return yearB - yearA; // Sort by year first
+            return monthB - monthA; // Then sort by month
+        })
 
         return {
             financialStatistics: financialStat.reverse(),

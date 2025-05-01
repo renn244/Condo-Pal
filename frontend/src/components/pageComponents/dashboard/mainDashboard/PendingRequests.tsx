@@ -7,6 +7,7 @@ import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVaria
 import formatDate from "@/lib/formatDate"
 import { useQuery } from "@tanstack/react-query"
 import { ChevronRight, Wallet } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const PendingRequests = () => {
     const { data, isLoading } = useQuery({
@@ -29,9 +30,11 @@ const PendingRequests = () => {
                     <CardTitle>Maintenance Requests</CardTitle>
                     <CardDescription>{data.pendingMaintenanceCount} pending requests</CardDescription>
                 </div>
-                <Button variant="outline" size="sm">
-                    View All
-                    <ChevronRight className="ml-1 h-4 w-4" />
+                <Button variant="outline" size="sm" asChild>
+                    <Link to="/dashboard/maintenance?search=&status=PENDING">
+                        View All
+                        <ChevronRight className="ml-1 h-4 w-4" />
+                    </Link>
                 </Button>
             </CardHeader>
             <CardContent>

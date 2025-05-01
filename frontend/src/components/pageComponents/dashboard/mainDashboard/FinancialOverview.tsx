@@ -1,10 +1,22 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import axiosFetch from "@/lib/axios"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
+
+const chartConfig = {
+    revenue: {
+        label: "Revenue",
+        color: "hsl(var(--chart-1))",
+    },
+    expenses: {
+        label: "Expenses",
+        color: "hsl(var(--chart-2))",
+    },
+} satisfies ChartConfig
 
 const FinancialOverview = () => {
     const { data, isLoading } = useQuery({
@@ -41,15 +53,25 @@ const FinancialOverview = () => {
             </CardHeader>
             <CardContent>
                 <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.financialStatistics} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="billingMonth" />
-                            <YAxis />
-                            <Tooltip formatter={(value) => formatToPesos(value as number)} />
-                            <Bar dataKey="revenue" name="Revenue" fill="#4ade80" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="expenses" name="Expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
-                        </BarChart>
+                    <ResponsiveContainer>
+                        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                            <BarChart data={data.financialStatistics} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="billingMonth" />
+                                <YAxis />
+                                <ChartTooltip 
+                                cursor={false}
+                                content={
+                                    <ChartTooltipContent 
+                                    labelFormatter={(label: any) => `BillingMonth: ${label}`}
+                                    indicator="dot"
+                                    />
+                                }
+                                />
+                                <Bar dataKey="revenue" name="Revenue" fill="#4ade80" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="expenses" name="Expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ChartContainer>
                     </ResponsiveContainer>
                 </div>
             </CardContent>

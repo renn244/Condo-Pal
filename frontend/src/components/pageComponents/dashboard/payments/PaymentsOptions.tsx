@@ -24,9 +24,11 @@ const PaymentsOptions = ({
             </PopoverTrigger>
             <PopoverContent align="end" className="w-56 p-1">
                 <ViewReceipt payment={payment} />
-                <Button variant="ghost" className="w-full justify-start">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Condo
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link to={`/dashboard/condo/${payment.condoId}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Condo
+                    </Link>
                 </Button>
                 {(payment.type === "GCASH" && payment.gcashStatus !== "APPROVED") && (
                     <Button variant="ghost" className="w-full justify-start" asChild>
