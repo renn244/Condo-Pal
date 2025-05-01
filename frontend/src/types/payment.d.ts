@@ -83,3 +83,13 @@ type billingMonth = {
     totalCost: number;
     billingMonth: string;
 }
+
+type CondoPaymentsTenant = {
+    financialStatistics: {
+        billingMonth: string;
+        revenue: number;
+        expenses: number;
+    }[];
+    totalRevenue: number;
+    totalExpenses: number;
+}

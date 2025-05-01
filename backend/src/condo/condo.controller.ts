@@ -23,6 +23,16 @@ export class CondoController {
         return this.condoService.createCondo(user, body, photo);
     }
 
+    @Get('getMainDashboardSummary')
+    async getMainDashboardSummary(@User() user: UserJwt) {
+        return this.condoService.getMainDashboardSummary(user);
+    }
+
+    @Get('getCondoOverview')
+    async getCondoOverview(@User() user: UserJwt) {
+        return this.condoService.getCondoOverview(user);
+    } 
+
     @Get('getMyCondos')
     async getMyCondos(@Query('page', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) page: number,
     @User() user: UserJwt) {

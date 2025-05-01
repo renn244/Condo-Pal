@@ -103,3 +103,8 @@ type MaintenanceRequestStats = {
     totalRequests: number,
     pendingMaintenances: maintenance[],
 }
+
+type getPriorityMaintenanceReqeuest = {
+    maintenanceRequests: maintenanceCard[],
+    pendingMaintenanceCount: number,
+}

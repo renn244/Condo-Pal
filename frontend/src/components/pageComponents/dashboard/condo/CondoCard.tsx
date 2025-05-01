@@ -36,8 +36,8 @@ const CondoCard = ({
                 <div className="relative h-58">
                     <img src={condo.photo} alt={condo.name} 
                     className="w-full h-full object-fill" />
-                    <Badge variant={condo.isActive ? "default" : "secondary"} className="absolute top-3 right-3 rounded-full">
-                        {condo.isActive ? "Active" : "Inactive"}
+                    <Badge variant={condo.isActive ? "success" : "outline"} className="absolute top-3 right-3 rounded-full">
+                        {condo.isActive ? "Occupied" : "Vacant"}
                     </Badge>
                     <div className="absolute top-3 left-3" onClick={(e) => e.stopPropagation()}>
                         {/* Options */}

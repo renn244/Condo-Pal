@@ -21,8 +21,8 @@ const CondoHeader = ({
                     <div className="relative h-48 md:h-64">
                         <img src={condo.photo} alt={condo.name} className="w-full h-full object-cover" />
                         <div className="absolute top-3 right-3">
-                            <Badge variant={condo.isActive ? "default" : "secondary"}>
-                                {condo.isActive ? "Active" : "Inactive"}
+                            <Badge variant={condo.isActive ? "success" : "outline"}>
+                                {condo.isActive ? "Occupied" : "Vacant"}
                             </Badge>
                         </div>
                     </div>

@@ -42,6 +42,11 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceRequestsLandlord(user, query);
     }
 
+    @Get('getPriorityMaintenance')
+    async getPriorityMaintenanceRequests(@User() user: UserJwt) {
+        return this.maintenanceService.getPriorityMainteanceRequests(user);
+    }
+
     @UseGuards(LandLordGuard)
     @Get('stats/:condoId')
     async getMaintenanceStats(@User() user: UserJwt, @Param('condoId') condoId: string) {

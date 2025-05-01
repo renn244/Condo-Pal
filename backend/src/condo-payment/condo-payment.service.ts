@@ -627,4 +627,56 @@ export class CondoPaymentService {
             totalPages,
         };
     }
+
+    async getFinancialStats(user: UserJwt) {
+        const getCondoIds = await this.prisma.condo.findMany({
+            where: { ownerId: user.id },
+            select: { id: true }
+        });
+        const condoIds = getCondoIds.flatMap((condo) => condo.id);
+
+        const getCurrentBillingMonth = this.getBillingMonthOfDate(new Date());
+        const [currentMonth, currentYear] = getCurrentBillingMonth.split('-').map((data) => Number(data));
+
+        // first month of the year to current month
+        const billingMonths = Array.from({ length: currentMonth }, (_, i) => {
+            const month = i + 1;
+            const year = currentYear;
+
+            return `${month.toString().padStart(2, '0')}-${year}`;
+        }) 
+
+        const where: Prisma.CondoPaymentWhereInput = {
+            condoId: { in: condoIds }, billingMonth: { in: billingMonths },
+            OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }],
+        }
+
+        const [condoPayments, currentYearData] = await Promise.all([
+            this.prisma.condoPayment.findMany({ where: where, select: { totalPaid: true, additionalCost: true, billingMonth: true } }),
+            this.prisma.condoPayment.aggregate({ where: where, _sum: { totalPaid: true, additionalCost: true } }),
+        ])
+
+        const formattedFinancialStat = condoPayments.reduce((acc, payment) => {
+            const billingMonth = payment.billingMonth;
+
+            if (!acc[billingMonth]) {
+                acc[billingMonth] = { totalPaid: 0, additionalCost: 0 };
+            }
+
+            acc[billingMonth].totalPaid += payment.totalPaid || 0;
+            acc[billingMonth].additionalCost += payment.additionalCost || 0;
+
+            return acc;
+        }, { } as Record<string, { totalPaid: number; additionalCost: number }>);
+
+        const financialStat = Object.entries(formattedFinancialStat).map(([month, { totalPaid, additionalCost }]) => ({
+            billingMonth: month, revenue: totalPaid, expenses: additionalCost 
+        }));
+
+        return {
+            financialStatistics: financialStat.reverse(),
+            totalRevenue: currentYearData._sum.totalPaid || 0,
+            totalExpenses: currentYearData._sum.additionalCost || 0,
+        }
+    }
 }

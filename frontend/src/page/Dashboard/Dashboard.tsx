@@ -9,6 +9,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import RequestMaintenance from "./RequestMaintenance"
+import MainDashboard from "./MainDashboard"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -44,7 +45,7 @@ const Dashboard = () => {
                     </header>
                     <main className="w-full min-h-[853px] p-4">
                         <Routes>
-                            <Route path="/dashboard" element={undefined} />
+                            <Route path="/dashboard" element={<MainDashboard />} />
                             <Route path="/condo" element={<Condo />} />
                             <Route path="/condo/:condoId" element={<ViewCondo />} />
                             <Route path="/maintenance" element={<Maintenance />} />

@@ -79,4 +79,9 @@ export class CondoPaymentController {
     async getCondoPaymentsLandLord(@User() user: UserJwt, @Query() query: { search: string, page: string, status: string, paymentType: string, condoId: string | undefined }) {
         return this.condoPaymentService.getCondoPaymentsLandlord(user, query);
     }
+
+    @Get('condoPaymentsTenant')
+    async getFinancialStats(@User() user: UserJwt) {
+        return this.condoPaymentService.getFinancialStats(user);
+    } 
 }

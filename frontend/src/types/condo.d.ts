@@ -101,3 +101,17 @@ type getMyCondoList = {
     getCondos: CondoLinkCard[],
     hasNext: boolean,
 }
+
+type getCondoOverview = {
+    condoList: condo[],
+    occupiedCount: number,
+    vacantCount: number,
+    totalCount: number,
+}
+
+type getMainDashboardSummary = {
+    totalActive: number,
+    totalCondo: number,
+    pendingMaintenance: number,
+    pendingGcashPayment: number,
+}

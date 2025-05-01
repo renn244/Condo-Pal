@@ -46,6 +46,40 @@ export class CondoService {
         return createCondoPrisma;
     }
 
+    async getMainDashboardSummary(user: UserJwt) {
+        const condo = await this.prisma.condo.findMany({
+            where: { ownerId: user.id }, select: { id: true }
+        })
+        const condoIds = condo.flatMap((condo) => condo.id)
+
+        const [totalActive, totalCondo, pendingMaintenance, pendingGcashPayment] = await Promise.all([
+            this.prisma.condo.count({ where: { id: { in: condoIds } ,isActive: true } }),
+            this.prisma.condo.count({ where: { id: { in: condoIds } } }),
+            this.prisma.maintenance.count({ where: { condoId: { in: condoIds }, Status: 'PENDING' } }),
+            this.prisma.condoPayment.count({ where: { condoId: { in: condoIds }, gcashStatus: 'PENDING' } }),
+        ])
+
+        return {
+            totalActive,
+            totalCondo,
+            pendingMaintenance,
+            pendingGcashPayment,
+        }
+    }
+
+    async getCondoOverview(user: UserJwt) {
+        const [condoList, occupiedCount, vacantCount, totalCount] = await Promise.all([
+            this.prisma.condo.findMany({ where: { ownerId: user.id, }, take: 3 }),
+            this.prisma.condo.count({ where: { ownerId: user.id, isActive: true } }),
+            this.prisma.condo.count({ where: { ownerId: user.id, isActive: false } }),
+            this.prisma.condo.count({ where: { ownerId: user.id } }),
+        ])
+
+        return {
+            condoList, occupiedCount, vacantCount, totalCount
+        }
+    }
+    
     // landlord
     async getMyCondos(user: UserJwt, page: number) {
         const take = 10;

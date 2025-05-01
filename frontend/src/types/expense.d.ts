@@ -11,7 +11,7 @@ type ExpenseCategory = typeof ExpenseCategory[keyof typeof ExpenseCategory];
 
 const Recurrence = {
     MONTHLY: 'MONTHLY',
-    QUERTERLY: 'QUARTERLY',
+    QUARTERLY: 'QUARTERLY',
     YEARLY: 'YEARLY',
 } as const;
 

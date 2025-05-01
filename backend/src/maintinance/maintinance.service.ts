@@ -144,6 +144,28 @@ export class MaintenanceService {
         }
     }
 
+    async getPriorityMainteanceRequests(user: UserJwt) {
+        const condo = await this.prisma.condo.findMany({
+            where: { ownerId: user.id },
+            select: { id: true }
+        })
+        const condoIds = condo.flatMap((condo) => condo.id)
+
+        const [maintenanceRequests, pendingMaintenanceCount] = await Promise.all([
+            this.prisma.maintenance.findMany({
+                where: { condoId: { in: condoIds }, Status: 'PENDING' }, orderBy: { priorityLevel: 'desc' },
+                include: { condo: { select: { id: true, name: true, address: true } } },
+                take: 5,
+            }),
+            this.prisma.maintenance.count({ where: { condoId: { in: condoIds }, Status: 'PENDING' } })
+        ])
+
+        return {
+            maintenanceRequests,
+            pendingMaintenanceCount
+        };
+    }
+
     async getMaintenanceCostDistributionStats(user: UserJwt, condoId: string, year?: number) {
         const currentYear = year || new Date().getFullYear();
         const startYear = startOfYear(new Date(currentYear, 0, 1));
@@ -172,7 +194,7 @@ export class MaintenanceService {
 
         return Object.values(data);
     }
-    
+
     async getMaintenanceStats(user: UserJwt, condoId: string) {
         const [
             pendingMaintenances, totalScheduled, totalInProgress, totalCompleted, totalCanceled,
