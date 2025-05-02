@@ -9,6 +9,7 @@ import { MaintenanceMessageService } from 'src/maintenance-message/maintenance-m
 import { v4 as uuidv4 } from 'uuid';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class MaintenanceService {
@@ -18,6 +19,7 @@ export class MaintenanceService {
         private readonly maintenanceMessageService: MaintenanceMessageService,
         private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
         private readonly emailSenderService: EmailSenderService,
+        private readonly notificationService: NotificationService
     ) {}
 
     async TenantMaintenanceRequest(tenantUser: UserJwt, body: MaintenaceRequestDto, photos: Array<Express.Multer.File>) {
@@ -52,6 +54,12 @@ export class MaintenanceService {
             }
         })
 
+        // get landlordId to notify him
+        this.notificationService.sendNotificationToUser(condo.ownerId, {
+            title: "New Maintenance Request", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+            message: `new Maintenanece request has been created by ${tenantUser.name} from ${condo.name}`,
+        })
+
         return createMaintenanceRequest;
     }
 
@@ -82,6 +90,14 @@ export class MaintenanceService {
                 preferredSchedule: body.preferredSchedule
             }
         })
+
+        // get tenantId to notify the tenant
+        if(getCondo.tenantId) {
+            this.notificationService.sendNotificationToUser(getCondo.tenantId, {
+                title: "New Maintenance Request", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                message: `new Maintenanece request has been created by ${user.name} from ${getCondo.name}`,
+            })
+        }
 
         return createMaintenanceRequest;
     }
@@ -328,7 +344,7 @@ export class MaintenanceService {
             },
             include: {
                 condo: {
-                    select: { tenantId: true, ownerId: true }
+                    select: { name: true, tenantId: true, ownerId: true }
                 }
             }
         })
@@ -361,9 +377,16 @@ export class MaintenanceService {
         })
 
         this.maintenanceWorkerTokenService.createMaintenanceWorkerToken(maintenanceId, token);
-
         if(!body.manualLink) {
             this.emailSenderService.sendAssignedWorkerMaintenanceEmail(body.workerEmail!, scheduleMaintenance, token);
+        }
+
+        // get tenantId to notify
+        if(condoOfMaintenance.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(condoOfMaintenance.condo.tenantId, {
+                title: "New Maintenance Scheduled", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                message: `${scheduleMaintenance.title} Maintenanece has been scheduled by ${user.name} from ${condoOfMaintenance.condo.name}`,
+            })
         }
 
         return scheduleMaintenance
@@ -377,11 +400,24 @@ export class MaintenanceService {
         const maintenanceRequest = await this.prisma.maintenance.update({
             where: { id: maintenanceId },
             data: { Status: 'IN_PROGRESS' },
+            include: { condo: { select: { tenantId: true, ownerId: true, name: true }} }
         })
 
         this.maintenanceMessageService.createMaintenanceStatusUpdate(maintenanceId, {
             status: 'IN_PROGRESS',
             workerName: getWorker.workerName!,
+        })
+
+        // get both landlordId and tenantId to notify
+        if(maintenanceRequest.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId, {
+                title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+            })
+        }
+        this.notificationService.sendNotificationToUser(maintenanceRequest.condo.ownerId, {
+            title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+            message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
         })
 
         return maintenanceRequest
@@ -406,7 +442,7 @@ export class MaintenanceService {
                 proofOfCompletion: photoUrls, 
                 totalCost: parseInt(body.totalCost),
                 completionDate: new Date(),
-            },
+            }, include: { condo: { select: { tenantId: true, ownerId: true, name: true }} }
         })
 
         // notify the tenant and the landlord using email and build in notification in our app
@@ -416,6 +452,18 @@ export class MaintenanceService {
             workerName: getWorker.workerName!,
         }, photoUrls)
 
+        // notify here both the tenantId and landlordId
+        if(maintenanceRequest.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId, {
+                title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+            })
+        }
+        this.notificationService.sendNotificationToUser(maintenanceRequest.condo.ownerId, {
+            title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+            message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+        })
+
         return maintenanceRequest
     }
 
@@ -423,14 +471,8 @@ export class MaintenanceService {
     async cancelMaintenanceRequest(maintenanceId: string, user: UserJwt) {
         // make sure he owns the condo
         const condoOfMaintenance = await this.prisma.maintenance.findFirst({
-            where: {
-                id: maintenanceId
-            },
-            include: {
-                condo: {
-                    select: { tenantId: true, ownerId: true }
-                }
-            }
+            where: { id: maintenanceId },
+            include: { condo: { select: { tenantId: true, ownerId: true, name: true } } }
         })
         
         if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
@@ -448,6 +490,15 @@ export class MaintenanceService {
                 canceledBy: user.role
             }
         })
+
+        // notify for the opposite of who canceled
+        if(condoOfMaintenance.condo.tenantId && condoOfMaintenance.condo.ownerId) {
+            const userToNotify = condoOfMaintenance.condo.ownerId === user.id ? condoOfMaintenance.condo.tenantId : condoOfMaintenance.condo.ownerId;
+            this.notificationService.sendNotificationToUser(userToNotify, {
+                title: "Maintenance Canceled", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                message: `${cancelMaintenance.title} Maintenance has been canceled by ${user.name} from ${condoOfMaintenance.condo.name}`,
+            })
+        }
 
         return cancelMaintenance
     }

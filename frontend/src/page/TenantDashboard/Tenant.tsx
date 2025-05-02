@@ -5,12 +5,11 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import TenantSidebar from "../../components/pageComponents/tenantDashboard/TenantSidebar"
-
-import Notification from "@/components/pageComponents/tenantDashboard/Notification"
 import GcashPayment from "./CondoPayment/GcashPayment"
 import PaymongoPayment from "./CondoPayment/PaymongoPayment"
 import VerifyPaymongoPayment from "./CondoPayment/VerifyPaymongoPayment"
 import RequestMaintenance from "./RequestMaintenance"
+import Notification from "@/components/pageComponents/common/Notification"
 
 const Tenant = () => {
     const location = useLocation();
@@ -42,7 +41,7 @@ const Tenant = () => {
                                     </BreadcrumbList>
                                 </Breadcrumb>
                             </div>
-                            <Notification />
+                            <Notification linkToAllNotifications="/tenant/allNotifications" />
                         </div>
                     </header>
                     <main className="flex-1 p-4">

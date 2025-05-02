@@ -56,7 +56,7 @@ const ManualPaymentDialog = () => {
                         <div className="space-y-4">
                             {data?.pages.map(page => (
                                 page.getCondos?.map((condo) => (
-                                    <CondoLinkCard key={condo.id} condo={condo} link="/condoPayments/manual" />
+                                    <CondoLinkCard key={condo.id} condo={condo} link="/dashboard/manual" />
                                 ))
                             ))}
                             {hasNextPage && (

@@ -5,6 +5,7 @@ import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { ExpenseCategory, Prisma, Recurrence } from '@prisma/client';
 import { CondoService } from 'src/condo/condo.service';
 import { CondoPaymentService } from 'src/condo-payment/condo-payment.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class ExpenseService {
@@ -12,6 +13,7 @@ export class ExpenseService {
         private readonly prisma: PrismaService,
         private readonly condoService: CondoService,
         private readonly CondoPaymentService: CondoPaymentService,
+        private readonly notificationService: NotificationService,
     ) {}
 
     async createExpense(user: UserJwt, condoId: string, data: CreateExpenseDto) {
@@ -25,8 +27,17 @@ export class ExpenseService {
             data: {
                 ...data,
                 condoId: condoId,
-            }
+            },
+            include: { condo: { select: { tenantId: true } } }
         })
+
+        // notify tenant with tenantId
+        if(expense.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(expense.condo.tenantId, {
+                title: "New Expense Added", type: "EXPENSE",
+                message: `A new expense called ${expense.title} has been added to your condo unit.`,
+            })
+        }
 
         return expense;
     }

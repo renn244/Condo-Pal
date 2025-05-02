@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import RequestMaintenance from "./RequestMaintenance"
 import MainDashboard from "./MainDashboard"
+import ManualPayment from "./CondoPayment/ManualPayment"
+import VerifyGcashPayment from "./CondoPayment/VerifyGcashPayment"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -53,6 +55,10 @@ const Dashboard = () => {
                             <Route path="/chats" element={<Chat />} />
 
                             <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
+
+                            {/* Condo Payments */}
+                            <Route path="/manual/:condoId" element={<ManualPayment />} />
+                            <Route path="/gcash/verify/:condoPaymentId" element={<VerifyGcashPayment />} />
                         </Routes>
                     </main>
                 </SidebarInset>

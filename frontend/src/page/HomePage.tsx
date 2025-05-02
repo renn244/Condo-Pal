@@ -57,7 +57,7 @@ const HomePage = () => {
                             <div className="w-full xl:col-span-5 lg:col-span-6 2xl:-mx-5 xl:-mx-0">
                                 <div className="flex items-center text-sm font-medium text-gray-500 justify-center lg:justify-start">
                                     <span className="bg-primary py-1 px-3 rounded-2xl text-xs font-medium text-white mr-3 ">#1</span>
-                                        Condo Management Web App
+                                    Condo Management Web App
                                 </div>
                                 <h1 className="py-4 text-center text-gray-900 font-bold font-manrope text-5xl lg:text-left leading-[70px]">
                                     The new standard for <span className="text-primary">Condo Management in Philippines</span>

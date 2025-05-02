@@ -5,6 +5,7 @@ import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GcashPayment, GcashPaymentVerification, ManualPayment } from './dto/condo-payment.dto';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class CondoPaymentService {
@@ -12,6 +13,7 @@ export class CondoPaymentService {
         private readonly prisma: PrismaService,
         private readonly fileUploadService: FileUploadService,
         private readonly paymongoService: PaymongoService,
+        private readonly notificationService: NotificationService,
     ) {}
     
     // supposed to be in expense (error: circular dependency)
@@ -286,8 +288,16 @@ export class CondoPaymentService {
                 isVerified: false,
 
                 billingMonth: billingMonth.billingMonth
-            }
+            },
+            include: { condo: { select: { ownerId: true, name: true } } }
         })
+
+        // notify the landlord
+        this.notificationService.sendNotificationToUser(createPaymentGcash.condo.ownerId, { 
+            type: "PAYMENT", title: "New Gcash Payment",
+            message: `Tenant ${user.name} has paid the rent for the condo "${createPaymentGcash.condo.name}". Please verify the gcash payment.`,
+            link: `/dashboard/gcash/verify/${createPaymentGcash.id}`
+        });
 
         return createPaymentGcash
     }
@@ -339,21 +349,23 @@ export class CondoPaymentService {
         const isPaid = isVerified; // same thing but this is used for paymongo
         
         const updatePayment = await this.prisma.condoPayment.update({
-            where: {
-                id: condoPaymentId,
-                condo: {
-                    ownerId: user.id
-                }
-            },
+            where: { id: condoPaymentId, condo: { ownerId: user.id } },
             data: {
-                isVerified,
-                isPaid,
-                gcashStatus: body.gcashStatus
+                isVerified, isPaid, gcashStatus: body.gcashStatus
             },
+            include: { condo: { select: { tenantId: true, name: true  } } }
         })
 
         // update to isPaid to the database
         await this.updateExpensesToPaid(updatePayment.condoId, updatePayment.billingMonth);
+
+        // notify the tenant if there is any
+        if(updatePayment.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(updatePayment.condo.tenantId, { 
+                type: "PAYMENT", title: "Gcash Payment Verification",
+                message: `Your Gcash payment for the condo "${updatePayment.condo.name}" has been ${body.gcashStatus.toLowerCase()}.`,
+            });
+        }
 
         return updatePayment
     }
@@ -382,11 +394,17 @@ export class CondoPaymentService {
                 tenantId: getCondo.tenantId,
 
                 billingMonth: billingMonth.billingMonth
-            }
+            }, include: { condo: { select: { ownerId: true, name: true } } }
         })
 
         // update expense to paid
         await this.updateExpensesToPaid(condoId, createManualPayment.billingMonth);
+
+        // notify the tenant
+        this.notificationService.sendNotificationToUser(getCondo.tenantId, { 
+            type: "PAYMENT", title: "Manual Payment",
+            message: `The landlord has added a manual payment for the your condo "${createManualPayment.condo.name}".`,
+        });
 
         return createManualPayment;
     }
@@ -451,6 +469,7 @@ export class CondoPaymentService {
                 linkId: true, // checkout_sessionId
                 billingMonth: true,
                 condoId: true,
+                condo: { select: { ownerId: true, name: true } }
             }
         })
 
@@ -468,9 +487,15 @@ export class CondoPaymentService {
             }
         }
 
-        // update to isPaid to the databas
+        // update to isPaid to the database
         await this.prisma.condoPayment.update({ where: { id: condoPaymentId }, data: { isPaid: true } })
         await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth);
+
+        // notify the landlord
+        this.notificationService.sendNotificationToUser(getSessionId.condo.ownerId, {
+            type: "PAYMENT", title: "Paymongo Payment", link: `/dashboard/condo/${getSessionId.condoId}`,
+            message: `the tenant ${user.name} has paid the rent for the condo "${getSessionId.condo.name}".`,
+        })
 
         return {
             name: "Condo Payment",

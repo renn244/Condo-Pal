@@ -6,6 +6,7 @@ import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { SenderType } from '@prisma/client';
 import { MaintenanceMessageGateway } from './maintenance-message.gateway';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class MaintenanceMessageService {
@@ -14,6 +15,7 @@ export class MaintenanceMessageService {
         private readonly fileUploadService: FileUploadService,
         private readonly maintenanceMessageGateway: MaintenanceMessageGateway,
         private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
+        private readonly notificationService: NotificationService
     ) {}
 
     async createMaintenanceMessageWithFile(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageWithFileDto, 
@@ -67,6 +69,9 @@ export class MaintenanceMessageService {
         // update the socket room for the maintenance
         this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
 
+        // if the sender is a worker and it has been a day since the last message, send a notification to the condo owner and tenant
+
+    
         return maintenanceMessage;
     }
 

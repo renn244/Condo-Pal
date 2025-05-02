@@ -32,7 +32,7 @@ const PaymentsOptions = ({
                 </Button>
                 {(payment.type === "GCASH" && payment.gcashStatus !== "APPROVED") && (
                     <Button variant="ghost" className="w-full justify-start" asChild>
-                        <Link to={`/condoPayments/gcash/verify/${payment.id}`}>
+                        <Link to={`/dashboard/gcash/verify/${payment.id}`}>
                             <FileCheck className="mr-2 h-4 w-4" />
                             Verify Payment
                         </Link>

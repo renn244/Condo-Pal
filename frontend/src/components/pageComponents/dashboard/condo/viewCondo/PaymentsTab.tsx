@@ -22,6 +22,7 @@ import PaymentsPagination from "../../payments/PaymentsPagination"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import PaymentsOptions from "../../payments/PaymentsOptions"
 import GetPaymentType from "../../payments/GetPaymentType"
+import { Link } from "react-router-dom"
 
 const chartConfig = {
     totalPaid: {
@@ -83,9 +84,11 @@ const PaymentsTab = ({
                 <CardHeader className="pb-2">
                     <div className="flex justify-between items-center">
                         <CardTitle>Payment History</CardTitle>
-                        <Button size="sm">
-                            <DollarSign className="mr-2 h-4 w-4" />
-                            Record Payment
+                        <Button size="sm" asChild>
+                            <Link to={`/dashboard/manual/${condoId}`}>
+                                <DollarSign className="mr-2 h-4 w-4" />
+                                Record Payment
+                            </Link>
                         </Button>
                     </div>
                     <CardDescription>

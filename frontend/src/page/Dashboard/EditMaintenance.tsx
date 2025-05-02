@@ -12,8 +12,8 @@ import { z } from "zod"
 
 // for the tenant
 const EditMaintenance = () => {
-    const { maintenanceId } = useParams<{ maintenanceId: string }>()
-    
+    const { maintenanceId } = useParams<{ maintenanceId: string }>();
+
     const onSubmit = async (data: z.infer<typeof formSchema>, previousPhotos?: string[]) => {
         const formData = toFormData({
             title: data.title,
@@ -41,7 +41,10 @@ const EditMaintenance = () => {
             throw new Error(response.data.message);
         }
 
-        toast.success('Maintenance Request updated!')
+
+
+        toast.success('Maintenance Request updated!');
+        history.back();
     }
 
     const { data, isLoading, error, refetch } = useQuery({
@@ -61,7 +64,8 @@ const EditMaintenance = () => {
             return response.data as MaintenanceGetRequest;
         },
         refetchOnWindowFocus: false,
-        retry: false
+        retry: false,
+        gcTime: 0
     })
 
     if(isLoading) {

@@ -18,6 +18,7 @@ import { MessageModule } from './message/message.module';
 import { GeneralGatewayModule } from './general-gateway/general-gateway.module';
 import { UserModule } from './user/user.module';
 import { ExpenseModule } from './expense/expense.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { ExpenseModule } from './expense/expense.module';
       isGlobal: true,
       ttl: 60 * 1000, // time to live of 60 seconds
     }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule, MessageModule, GeneralGatewayModule, UserModule, ExpenseModule
+    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule, MessageModule, GeneralGatewayModule, UserModule, ExpenseModule, NotificationModule
   ],
   controllers: [],
   providers: [],

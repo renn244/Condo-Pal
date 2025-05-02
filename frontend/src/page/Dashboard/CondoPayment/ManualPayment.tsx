@@ -68,7 +68,7 @@ const ManualPayment = () => {
                         The payment for {condoBillInfo.name} ({"March 2025"}) has been recorded in the system.
                     </AlertDescription>
                     <div className="mt-4">
-                        <Button onClick={() => window.location.assign('/condo')}>
+                        <Button onClick={() => window.history.back()}>
                             Return to Condo Dashboard
                         </Button>
                     </div>

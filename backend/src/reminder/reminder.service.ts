@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ReminderService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly emailSender: EmailSenderService
+        private readonly emailSender: EmailSenderService,
+        private readonly notificationService: NotificationService
     ) {}
 
     getLastDayOftheMonth() {
@@ -57,6 +59,12 @@ export class ReminderService {
 
             if(is1WeekBeforeDue) {
                 this.emailSender.sendDueReminderEmail(leaseAgreement.tenant.email, leaseAgreement);
+                
+                // send notification to the tenant
+                this.notificationService.sendNotificationToUser(leaseAgreement.tenant.id, {
+                    title: "Payment Reminder", type: "LEASE_AGREEMENT",
+                    message: `Your rent payment is due in 1 week for ${leaseAgreement.condo.name}. make sure to pay it before the due date.`,
+                })
             }
         })
 

@@ -11,6 +11,7 @@ import MaintenancePagination from "../../maintenance/MaintenancePagination"
 import useViewCondoParams from "@/hooks/useViewCondoParams"
 import MaintenanceHeader from "../MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import { Link } from "react-router-dom"
 
 type MaintenanceTablProps = {
     maintenance?: MaintenanceRequest,
@@ -30,9 +31,11 @@ const MaintenanceTable = ({
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                     <CardTitle>Maintenance History</CardTitle>
-                    <Button size="sm">
-                        <Wrench className="mr-2 h-4 w-4" />
-                        New Request
+                    <Button size="sm" asChild>
+                        <Link to={`/dashboard/maintenanceRequest/${condoId}`}>
+                            <Wrench className="mr-2 h-4 w-4" />
+                            New Request
+                        </Link>
                     </Button>
                 </div>
                 <CardDescription>

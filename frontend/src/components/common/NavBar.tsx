@@ -1,18 +1,18 @@
-import { Link, NavLink } from "react-router-dom";
-import UserNav from "./UserNav";
 import { useAuthContext } from "@/context/AuthContext";
+import { Link, NavLink } from "react-router-dom";
 import { Button } from "../ui/button";
+import UserNav from "./UserNav";
 
 const NavBar = () => {
     const { isLoggedIn, user } = useAuthContext()
-    const dashboardLink = user?.role === 'landlord' ? '/dashboard' : '/tenant/dashboard'
+    const dashboardLink = user?.role === 'landlord' ? '/dashboard/dashboard' : '/tenant/dashboard'
 
     return (
         <div className="flex items-center justify-between mx-4 mt-1 p-3 md:px-10 border-b-2 border-[#f3f3f3]">
             <div className="flex items-center gap-4 md:gap-16">
                 <div aria-label="logo">
                     <Link to={'/'}>
-                        <img src="/logo/Full_Logo.jpg" className="h-8" />
+                        <img src="/logo/Full_Logo.jpg" className="h-8 select-none pointer-events-none touch-none" />
                     </Link>
                 </div>
                 <div className="flex items-center justify-evenly gap-3" aria-label="links">
