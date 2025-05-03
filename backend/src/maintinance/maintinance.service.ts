@@ -409,14 +409,12 @@ export class MaintenanceService {
         })
 
         // get both landlordId and tenantId to notify
-        if(maintenanceRequest.condo.tenantId) {
-            this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId, {
-                title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
-                message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
-            })
-        }
+        this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId || undefined, {
+            title: "Maintenance In Progress", link: `/maintenance/worker/${maintenanceRequest.id}`, type: 'MAINTENANCE',
+            message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+        })
         this.notificationService.sendNotificationToUser(maintenanceRequest.condo.ownerId, {
-            title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+            title: "Maintenance In Progress", link: `/maintenance/worker/${maintenanceRequest.id}`, type: 'MAINTENANCE',
             message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
         })
 
@@ -455,12 +453,12 @@ export class MaintenanceService {
         // notify here both the tenantId and landlordId
         if(maintenanceRequest.condo.tenantId) {
             this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId, {
-                title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                title: "Maintenance Completed", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
                 message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
             })
         }
         this.notificationService.sendNotificationToUser(maintenanceRequest.condo.ownerId, {
-            title: "Maintenance In Progress", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+            title: "Maintenance Completed", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
             message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
         })
 

@@ -38,11 +38,28 @@ export class MaintenanceMessageService {
         if(senderType !== 'WORKER') {
             const getMaintenanece = await this.prisma.maintenance.findUnique({
                 where: { id: maintenanceId, },
-                select: { condo: { select: { ownerId: true, tenantId: true } } }
+                select: { 
+                    id:true, title: true,
+                    condo: { select: { ownerId: true, tenantId: true } },
+                    messages: { select: { createdAt: true }, take: 1, orderBy: { createdAt: 'desc', }, }
+                },
             })
 
             if(getMaintenanece?.condo.ownerId !== user?.id && getMaintenanece?.condo.tenantId !== user?.id) {
                 throw new ForbiddenException('You are not authorized to send a message for this maintenance.')
+            }
+
+            // if the sender is a worker and it has been a day since the last message, send a notification to the condo owner and tenant
+            if(getMaintenanece?.messages?.[0]?.createdAt! || new Date(getMaintenanece?.messages?.[0]?.createdAt) < new Date(Date.now() - 24 * 60 * 60 * 1000)) {
+                this.notificationService.sendNotificationToUser(getMaintenanece?.condo.ownerId, {
+                    title: `New message from ${getMaintenanece.title}`, type: 'MAINTENANCE',
+                    message: `You have a new message from the maintenance worker. Click here to view it.`, link: `/maintenance/worker/${getMaintenanece.id}`
+                })
+
+                this.notificationService.sendNotificationToUser(getMaintenanece?.condo.tenantId || undefined, {
+                    title: `New message from ${getMaintenanece.title}`, type: 'MAINTENANCE',
+                    message: `You have a new message from the maintenance worker. Click here to view it.`, link: `/maintenance/worker/${getMaintenanece.id}`
+                })
             }
         }
 
@@ -68,9 +85,6 @@ export class MaintenanceMessageService {
 
         // update the socket room for the maintenance
         this.maintenanceMessageGateway.io.to(maintenanceId).emit('newMessage', maintenanceMessage);
-
-        // if the sender is a worker and it has been a day since the last message, send a notification to the condo owner and tenant
-
     
         return maintenanceMessage;
     }

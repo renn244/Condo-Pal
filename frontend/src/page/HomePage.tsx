@@ -83,7 +83,7 @@ const HomePage = () => {
                             </div>
                             <div className="w-full xl:col-span-7 lg:col-span-6 block">
                                 <div className="hidden w-full lg:block sm:w-auto lg:w-[60.8125rem] xl:ml-16 border-2 rounded-2xl">
-                                    <img src="https://pagedone.io/asset/uploads/1694846193.png" alt="Dashboard image" className="rounded-l-3xl object-cover w-full lg:h-auto " />
+                                    <img src="/landing/LandingPage_Header.jpg" alt="Dashboard image" className="rounded-l-3xl object-cover w-full lg:h-auto " />
                                 </div>
                             </div>
                         </div>

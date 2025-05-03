@@ -8,7 +8,7 @@ import axiosFetch from "@/lib/axios"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import { useQuery } from "@tanstack/react-query"
-import { MoreVertical, Plus, Wrench } from "lucide-react"
+import { MoreVertical, Plus, SquareArrowOutUpRight, Wrench } from "lucide-react"
 import MaintenanceHeader from "../../dashboard/maintenance/MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import MaintenancePagination from "../../dashboard/maintenance/MaintenancePagination"
@@ -99,6 +99,14 @@ const MaintenanceTab = () => {
                                                 </PopoverTrigger>
                                                 <PopoverContent align="end" className="w-56 p-1">
                                                     <ViewDetails maintenance={request} />
+                                                    {(request.Status !== "PENDING" && request.Status !== "CANCELED") && (
+                                                        <Link to={`/maintenance/worker/${request.id}`}>
+                                                            <Button variant="ghost" className="w-full justify-start">
+                                                                <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
+                                                                View Chat With Worker
+                                                            </Button>
+                                                        </Link>
+                                                    )}
                                                     {request.Status === "PENDING" && (
                                                         <>
                                                             <Separator className="my-1" />

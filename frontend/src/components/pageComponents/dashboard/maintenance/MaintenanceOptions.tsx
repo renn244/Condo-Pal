@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { MoreVertical, Pencil } from 'lucide-react'
+import { MoreVertical, Pencil, SquareArrowOutUpRight } from 'lucide-react'
 import ViewDetails from './ViewDetails'
 import { Separator } from '@/components/ui/separator'
 import CancelMaintenance from './CancelMaintenance'
@@ -27,18 +27,28 @@ const MaintenanceOptions = ({
             </PopoverTrigger>
             <PopoverContent align="end" className="w-56 p-1">
                 <ViewDetails maintenance={maintenance} />
-                <ScheduleMaintenance 
-                maintenancePrefferredSchedule={maintenance.preferredSchedule}
-                maintenanceId={maintenance.id} 
-                maintenanceTitle={maintenance.title}
-                queryKey={queryKey}
-                />
+                {maintenance.Status === "PENDING" && (
+                    <ScheduleMaintenance 
+                    maintenancePrefferredSchedule={maintenance.preferredSchedule}
+                    maintenanceId={maintenance.id} 
+                    maintenanceTitle={maintenance.title}
+                    queryKey={queryKey}
+                    />
+                )}
                 <Link to={`/editMaintenanceRequest/${maintenance.id}`}>
                     <Button variant="ghost" className="w-full justify-start">
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit maintenance
                     </Button>
                 </Link>
+                {(maintenance.Status !== "PENDING" && maintenance.Status !== "CANCELED") && (
+                    <Link to={`/maintenance/worker/${maintenance.id}`}>
+                        <Button variant="ghost" className="w-full justify-start">
+                            <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
+                            View Chat With Worker
+                        </Button>
+                    </Link>
+                )}
                 {maintenance.Status === "PENDING" && (
                     <>
                         <Separator className="my-1" />

@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSocketContext } from "@/context/SocketContext"
 import axiosFetch from "@/lib/axios"
+import formatSmartDate from "@/lib/formatSmartDate"
+import { playAudio } from "@/lib/playAudio"
 import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Bell, ChevronRight, DollarSign, FileText, Wrench } from "lucide-react"
 import { useEffect } from "react"
@@ -55,6 +57,13 @@ const Notification = ({
         if(!socket) return;
 
         socket.on("newNotification", async (notification: notification) => {
+            // notitication
+            if(document.hidden) {
+                playAudio("/messages/messenger-notif-not-focus.mp3");
+            } else {
+                playAudio("/messages/chat-audio-focus.mp3");
+            }
+
             await queryClient.setQueryData(["notifications"], 
                 (oldData: InfiniteData<getNotifications> | undefined) => {
                     if(!oldData) return oldData;
@@ -82,6 +91,13 @@ const Notification = ({
         }
     }, [socket])
 
+    // markRead the Link
+    const markRead = async (notificationId: string) => {
+        const response = await axiosFetch.patch(`/notification/${notificationId}`);
+
+        return response.data;
+    }
+
     // markAllAsRead
     const { mutate: markAllAsRead, isPending } = useMutation({
         mutationKey: ["markAllAsRead"],
@@ -90,8 +106,25 @@ const Notification = ({
 
             return response.data;
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             toast.success("All notifications marked as read")
+
+            await queryClient.setQueryData(["notifications"], (oldData: InfiniteData<getNotifications> | undefined) => {
+                if(!oldData) return oldData;
+
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page, idx) => {
+                        if(idx === 0) {
+                            return {
+                                ...page, unreadCount: 0,
+                                notifications: page.notifications.map((notification) => ({ ...notification, isRead: true, })),
+                            }
+                        }
+                        return page;
+                    })
+                }
+            })
         },
         onError: () => {
             toast.error("Failed to mark all notifications as read")
@@ -115,20 +148,20 @@ const Notification = ({
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[350px]">
-                <div className="flex items-center justify-between px-4 py-2 border-b">
-                    <h3 className="font-medium">Notifications</h3>
-                    <Button disabled={isPending} variant="ghost" size="sm" onClick={() => markAllAsRead()}>
-                        {isPending ? <LoadingSpinner /> : "Mark all as read"}
-                    </Button>
-                </div>
+            <DropdownMenuContent align="end" className="w-[400px]">
+                    <div className="flex items-center justify-between px-4 py-2 border-b">
+                        <h3 className="font-medium">Notifications</h3>
+                        {unreadCount > 0 && (
+                            <Button disabled={isPending} variant="ghost" size="sm" onClick={() => markAllAsRead()}>
+                                {isPending ? <LoadingSpinner /> : "Mark all as read"}
+                            </Button>
+                        )}
+                    </div>
                 <div id="notificationContainer" className="max-h-[400px] overflow-y-auto">
                     <InfiniteScroll 
-                    style={{ display: 'flex', flexDirection: 'column-reverse' }}
                     dataLength={notifications.length}
                     next={() => fetchNextPage()}
                     hasMore={hasNextPage}
-                    inverse={true}
                     scrollableTarget={"notificationContainer"}
                     loader={<div className="flex justify-center"><LoadingSpinner /></div>}
                     endMessage={
@@ -148,12 +181,13 @@ const Notification = ({
                                         <div className="flex justify-between items-start">
                                             <h4 className="font-medium text-sm">{notification.title}</h4>
                                             <span className="text-xs text-muted-foreground">
-                                                {new Date(notification.createdAt).toLocaleDateString()}
+                                                {formatSmartDate(new Date(notification.createdAt))}
                                             </span>
                                         </div>
                                         <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
                                         {notification.link && (
                                             <Link
+                                            onClick={() => markRead(notification.id)}
                                             to={notification.link}
                                             className="text-sm text-primary flex items-center mt-2 hover:underline"
                                             >

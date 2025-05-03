@@ -11,7 +11,9 @@ export class NotificationService {
         private readonly prisma: PrismaService
     ) {}
 
-    async sendNotificationToUser(userId: string, body: CreateNotificationDto) {
+    async sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto) {
+        if(!userId) return;
+
         const notification = await this.prisma.notification.create({
             data: {
                 type: body.type, title: body.title, 
@@ -34,7 +36,7 @@ export class NotificationService {
             this.prisma.notification.findMany({
                 where: { userId: user.id }, orderBy: { createdAt: 'desc' },
                 cursor: query.cursor ? { id: query.cursor } : undefined,
-                take: 2, skip: query.cursor ? 1 : 0,
+                take: 4, skip: query.cursor ? 1 : 0,
             }),
             this.prisma.notification.count({ where: { userId: user.id, isRead: false } })
         ])

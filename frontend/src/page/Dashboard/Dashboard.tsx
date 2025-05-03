@@ -12,6 +12,7 @@ import RequestMaintenance from "./RequestMaintenance"
 import MainDashboard from "./MainDashboard"
 import ManualPayment from "./CondoPayment/ManualPayment"
 import VerifyGcashPayment from "./CondoPayment/VerifyGcashPayment"
+import Notification from "@/components/pageComponents/common/Notification"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -43,6 +44,8 @@ const Dashboard = () => {
                                     </BreadcrumbList>
                                 </Breadcrumb>
                             </div>
+
+                            <Notification linkToAllNotifications="" />
                         </div>
                     </header>
                     <main className="w-full min-h-[853px] p-4">
