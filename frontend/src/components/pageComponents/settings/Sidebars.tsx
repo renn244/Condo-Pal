@@ -6,16 +6,6 @@ import { Link, useLocation } from "react-router-dom"
 import { BadgeCheck, Bell, Building, CreditCard, HelpCircle, Lock, LogOut, Mail, User } from 'lucide-react'
 import { useAuthContext } from "@/context/AuthContext"
 
-// Navigation items
-const navItems = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "security", label: "Security", icon: Lock },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "property", label: "Property Settings", icon: Building },
-    { id: "subscription", label: "Subscription", icon: BadgeCheck },
-    { id: "billingInfo", label: "Billing Information", icon: CreditCard },
-]
-
 const Sidebars = () => {
     const { user } = useAuthContext();
     const location = useLocation();
@@ -27,6 +17,17 @@ const Sidebars = () => {
         localStorage.removeItem('refresh_token');
     
         window.location.reload();
+    }
+
+    const navItems = [
+        { id: "profile", label: "Profile", icon: User },
+        { id: "security", label: "Security", icon: Lock },
+        { id: "notifications", label: "Notifications", icon: Bell },
+        { id: "billingInfo", label: "Billing Information", icon: CreditCard },
+    ]
+
+    if(user?.role === "landlord") { 
+        navItems.push({ id: "property", label: "Property Settings", icon: Building }, { id: "subscription", label: "Subscription", icon: BadgeCheck })
     }
 
     return (

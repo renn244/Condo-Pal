@@ -11,8 +11,11 @@ import { useQuery } from "@tanstack/react-query"
 import { ArrowLeft, Settings as SettingsIcon } from "lucide-react"
 import { Link, Route, Routes } from "react-router-dom"
 import Subscription from "@/components/pageComponents/settings/Subscription/Subscription"
+import { useAuthContext } from "@/context/AuthContext"
 
 const Settings = () => {
+    const { user } = useAuthContext();
+
     const { data: initialData, isLoading, error, refetch } = useQuery({
         queryKey: ["user", "initial-data"],
         queryFn: async () => {
@@ -41,7 +44,7 @@ const Settings = () => {
             {/* Header */}
             <div className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-8 md:px-12 lg:px-10">
                 <Link
-                to="/dashboard"
+                to={user?.role === "landlord" ? "/dashboard" : "/tenant/dashboard"}
                 className="flex items-center gap-2 text-sm font-medium hover:opacity-80 transition-opacity"
                 >
                     <ArrowLeft className="h-4 w-4" />

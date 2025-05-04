@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useAuthContext } from "@/context/AuthContext"
-import { BadgeCheck, Bell, CreditCard, LayoutDashboard, LogOut, MessageSquare, Sparkles } from "lucide-react"
+import { BadgeCheck, Bell, LayoutDashboard, LogOut, MessageSquare, Settings2, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const navMain = [
@@ -105,26 +105,24 @@ const TenantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                   </div> 
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
+                  {/* <DropdownMenuItem asChild>
+                    <Link>
+                      <BadgeCheck />
+                      Account
+                    </Link>
+                  </DropdownMenuItem> */}
+                  <DropdownMenuItem asChild>
+                    <Link to={'/settings/notifications'}>
+                      <Bell />
+                      Notifications
+                    </Link>
                   </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <BadgeCheck />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell />
-                    Notifications
+                  <DropdownMenuItem asChild>
+                    <Link to={'/settings/profile'}>
+                      <Settings2 />
+                      Settings
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
