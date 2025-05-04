@@ -157,7 +157,7 @@ const Notification = ({
                             </Button>
                         )}
                     </div>
-                <div id="notificationContainer" className="max-h-[400px] overflow-y-auto">
+                <div id="notificationContainer" className="max-h-[350px] overflow-y-auto">
                     <InfiniteScroll 
                     dataLength={notifications.length}
                     next={() => fetchNextPage()}

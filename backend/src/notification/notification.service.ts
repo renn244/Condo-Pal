@@ -50,6 +50,16 @@ export class NotificationService {
         };
     }
 
+    async getRecentNotifications(user: UserJwt, take?: number) {
+        take = take || 3; 
+
+        const notifications = await this.prisma.notification.findMany({
+            where: { userId: user.id }, orderBy: { createdAt: 'desc' }, take: take
+        })
+
+        return [];
+    }
+
     async markAllAsRead(user: UserJwt) {
         const notifications = await this.prisma.notification.updateMany({
             where: { userId: user.id, isRead: false },

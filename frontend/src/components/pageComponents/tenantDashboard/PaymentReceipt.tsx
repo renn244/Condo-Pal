@@ -108,14 +108,14 @@ const PaymentReceipt = ({
                     </div>
                 ) : (
                     <div className="border-2 border-dashed rounded-md p-6 text-center mb-4">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <Label htmlFor="receipt" className="block mb-2 cursor-pointer">
-                        <span className="text-primary font-medium">Click to upload</span>
-                    </Label>
-                    <p className="text-xs text-muted-foreground">PNG, JPG or JPEG (max. 5MB)</p>
-                    <Input id="receipt" type="file" accept="image/*" className="hidden" 
-                    onChange={handleFileChange} 
-                    />
+                        <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                        <Label htmlFor="receipt" className="block mb-2 cursor-pointer">
+                            <span className="text-primary font-medium">Click to upload</span>
+                        </Label>
+                        <p className="text-xs text-muted-foreground">PNG, JPG or JPEG (max. 5MB)</p>
+                        <Input id="receipt" type="file" accept="image/*" className="hidden" 
+                        onChange={handleFileChange} 
+                        />
                     </div>
                 )}
 
