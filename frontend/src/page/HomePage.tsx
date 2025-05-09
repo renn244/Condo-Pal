@@ -71,11 +71,11 @@ const HomePage = () => {
                                 </button> */}
                                 <div className="flex items-center flex-col lg:flex-row mt-3">
                                     <div className="flex items-center">
-                                        <img src="https://scontent.fmnl4-4.fna.fbcdn.net/v/t39.30808-1/476438701_1831289464302906_579132043874563226_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=100&ccb=1-7&_nc_sid=e99d92&_nc_ohc=HwZGVwuQkTAQ7kNvwECS9oL&_nc_oc=Adm6JB8SaPmIigK3el6xP4B516m0FnbB0GGOb-gF53PmszIAEOsux-DFU0yp0hPW9UHmiPJfs-7EN9rRl4t2lrMh&_nc_zt=24&_nc_ht=scontent.fmnl4-4.fna&_nc_gid=tF7mRVC6GKAwqsqJWEZCQw&oh=00_AfHaCZGq_mKpo0vxGqaat2Ufi0CHlnMqEdO3pc9Hrm91Dg&oe=680AC4E6" alt="Rounded image "
+                                        <img src="/landing/profile/tristan.jpg" alt="Rounded image "
                                         className="border-2 border-solid border-indigo-50 rounded-full relative z-50 object-cover h-10" />
-                                        <img src="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-1/449657888_1444199612914122_4028637159301397245_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=104&ccb=1-7&_nc_sid=e99d92&_nc_ohc=LZ2RXL8rNfwQ7kNvwEA5E-D&_nc_oc=AdnW_WnsJCCQbdFCwV8JNffLdCCTbauwfO5xHNVq9BPWitjTCvr2EFk6rPHRekZ88xitPzoED5IOKkQznKebQToj&_nc_zt=24&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=7b2l9FSQnMJ7gvN9uPx3Mg&oh=00_AfEPvfa_m4_-cY6DLwRcOGpvpPykZ8c3uzty7hPgTQKOhw&oe=680AACA2" alt="Rounded image"
+                                        <img src="/landing/profile/paul.jpg" alt="Rounded image"
                                         className="border-2 border-solid border-indigo-50 rounded-full relative z-30 -ml-3 object-cover h-10" />
-                                        <img src="https://scontent.fmnl4-5.fna.fbcdn.net/v/t39.30808-1/491935753_2147078735811909_7695763110483343951_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=106&ccb=1-7&_nc_sid=e99d92&_nc_ohc=zc_flL6TibIQ7kNvwGxG04J&_nc_oc=AdlB_vCaUFqSCcYAhUtOe-C7eKSN-Hp7U41y3C-U_kCZia5t5bUyUhOULqCDICqTC6dMzePL-Io7tDYPixq-RKR0&_nc_zt=24&_nc_ht=scontent.fmnl4-5.fna&_nc_gid=vFS3r_ikYULNwua4IGeZXA&oh=00_AfGLFODIwsbjUYQ-55bDXDtdUwPhCccbaCqAankwWQKnig&oe=680AC6EE" alt="Rounded image"
+                                        <img src="/landing/profile/aki.jpg" alt="Rounded image"
                                         className="border-2 border-solid border-indigo-50 rounded-full relative z-20 -ml-3 object-cover h-10" />
                                     </div>
                                     <span className="mt-3 text-base text-gray-600 font-medium lg:ml-3">People have joined</span>
