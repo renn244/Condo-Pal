@@ -1,0 +1,13 @@
+{
+  "name": "condopal",
+  "version": "1.0.0",
+  "description": "A Project Prototype that we need to finished in final term of 2nd semester. this project is for Technopreneurship.",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd .. && cd backend && npm install && npm run build",
+    "start": "cd backend && npm run start:prod"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
