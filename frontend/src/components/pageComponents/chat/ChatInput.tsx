@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 type previewTypes = {
     isImage: boolean;
     url: string;
+    name?: string;
 }
 
 type ChatInputProps = {
@@ -52,11 +53,13 @@ const ChatInput = ({
                     const previewUrl = reader.result as string;
                     setPreviewAttachments(prev => [
                         ...prev, 
-                        { isImage: file.type.startsWith("image/"), url: previewUrl }
+                        { isImage: file.type.startsWith("image/"), url: previewUrl, name: file.name }
                     ]);
                 }
                 reader.readAsDataURL(file);
             })
+
+            e.target.value = ""; // reset the input file because if no file change then it won't trigger the onChange event again
         }
     }
 
@@ -70,7 +73,7 @@ const ChatInput = ({
         <>
             {/* Attachment preview */}
             {previewAttachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2 mx-2">
+                <div className="flex flex-wrap items-center gap-2 mb-2 mx-2">
                     {previewAttachments?.map((preview, index) => (
                         <div className="relative" key={index}>
                             {preview.isImage ? (
@@ -88,8 +91,9 @@ const ChatInput = ({
                                     </button>
                                 </div>
                             ) : (
-                                <div className="relative w-16 h-16 bg-muted rounded flex items-center justify-center">
+                                <div className="relative w-auto h-10 bg-muted rounded flex items-center px-2">
                                     <File className="h-6 w-6" />
+                                    <span className="ml-2 text-sm text-black font-medium truncate">{preview.name}</span>
                                     <button
                                     className="absolute -top-1 -right-1 bg-background rounded-full p-0.5 shadow"
                                     onClick={() => removeAttachment(index)}

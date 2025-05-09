@@ -5,6 +5,7 @@ import { FetchNextPageOptions, InfiniteQueryObserverResult } from "@tanstack/rea
 import { Eye } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 import ChatDetailCard from "./ChatDetailCard"
+import ChatAttachments from "./ChatAttachments"
 
 type ChatViewProps = {
     messages: messageswithSender,
@@ -55,39 +56,7 @@ const ChatView = ({
 
                                 {/* Attachments */}
                                 {message.attachment && message.attachment.length > 0 && (
-                                    <div className="mt-2 space-y-2">
-                                        {message.attachment.length <= 3 ? (
-                                            <div className="flex flex-wrap gap-2">
-                                                {message.attachment.map((attachment, index) => (
-                                                        <div
-                                                        key={index}
-                                                        className="relative cursor-pointer"
-                                                        onClick={() => openPhotoViewer(message.attachment)}
-                                                        >
-                                                            <img
-                                                            src={attachment || "/placeholder.svg"}
-                                                            alt="Attachment"
-                                                            className="max-h-40 rounded-md object-cover"
-                                                            />
-                                                        </div>
-                                                    )
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="relative cursor-pointer">
-                                                <div className="relative" onClick={() => openPhotoViewer(message.attachment)}>
-                                                    <img
-                                                    src={message.attachment[0] || "/placeholder.svg"}
-                                                    alt="Attachment"
-                                                    className="max-h-40 rounded-md object-cover"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
-                                                        <span className="text-white font-medium">+{message.attachment.length - 1} more</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                    <ChatAttachments openPhotoViewer={openPhotoViewer} attachments={message.attachment} />
                                 )}
 
                                 <div

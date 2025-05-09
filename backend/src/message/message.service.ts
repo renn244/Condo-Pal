@@ -18,7 +18,7 @@ export class MessageService {
 
         const photoUrls = await Promise.all(
             attachments?.map(async (file) => {
-                const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments' })
+                const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments', public_id: file.originalname.split('.')[0], overwrite: true })
                 return newPhoto.secure_url;
             })
         ) || [];

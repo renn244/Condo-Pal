@@ -10,7 +10,7 @@ import { playAudio } from "@/lib/playAudio";
 const ChatInputLandlord = () => {
     const [newMessage, setNewMessage] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
-    const [previewAttachments, setPreviewAttachments] = useState<{ isImage: boolean, url: string }[]>([]);
+    const [previewAttachments, setPreviewAttachments] = useState<{ isImage: boolean, url: string, name?: string }[]>([]);
 
     const queryClient = useQueryClient();
     const { leaseAgreementId } = useMessageParams();
