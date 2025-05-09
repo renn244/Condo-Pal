@@ -24,14 +24,15 @@ export const SocketProvider = ({
     useEffect(() => {
         if(!user) return;
 
-        const socket = io('http://localhost:5000', {
+        const isProduction = import.meta.env.VITE_SOFTWARE_ENV === 'production';
+        const socketUrl = isProduction ? '' : 'http://localhost:5000';
+
+        const socket = io(socketUrl, {
             autoConnect: true,
             reconnection: true,
             reconnectionAttempts: 5,
             transports: ['websocket'],
-            query: {
-                userId: user.id,
-            }
+            query: { userId: user.id }
         })
         setSocket(socket);
 

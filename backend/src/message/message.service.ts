@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { GeneralGateway } from 'src/general-gateway/general.gateway';
-import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 

@@ -20,7 +20,7 @@ const getNotificationIcon = (type: any) => {
 }
 
 const RecentNofitications = () => {
-    const { data: notifications, isLoading } = useQuery({
+    const { data: notifications } = useQuery({
         queryKey: ["notifications", "recent"],
         queryFn: async () => {
             const response = await axiosFetch.get("/notification/recent");

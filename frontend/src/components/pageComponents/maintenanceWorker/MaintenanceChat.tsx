@@ -45,7 +45,10 @@ const MaintenanceChat = ({
 
     useEffect(() => {
         // Define the socket connection in the effect
-        const socket = io("http://localhost:5000/maintenance-message", {
+        const isProduction = import.meta.env.VITE_SOFTWARE_ENV === 'production';
+        const socketUrl = isProduction ? '' : 'http://localhost:5000';
+
+        const socket = io(socketUrl + '/maintenance-message', {
             autoConnect: true,
             reconnection: true,
             reconnectionAttempts: 5,

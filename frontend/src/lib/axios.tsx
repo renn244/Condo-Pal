@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_BACKEND_URL;
+const isProduction = import.meta.env.VITE_SOFTWARE_ENV === 'production';
+const apiUrl = isProduction ? '/api' : import.meta.env.VITE_BACKEND_URL;
+
 const axiosFetch = axios.create({
     baseURL: apiUrl,
     headers: {

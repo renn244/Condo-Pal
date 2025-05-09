@@ -2,8 +2,14 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Send, X } from "lucide-react";
+import { Paperclip, Send, X, File } from "lucide-react";
 import { Dispatch, SetStateAction, useRef } from "react";
+import toast from "react-hot-toast";
+
+type previewTypes = {
+    isImage: boolean;
+    url: string;
+}
 
 type ChatInputProps = {
     sendMessage: (message: string, attachments: File[]) => void;
@@ -12,8 +18,8 @@ type ChatInputProps = {
     setNewMessage: (message: string) => void;
     attachments: File[];
     setAttachments: (attachments: File[]) => void;
-    previewAttachments: string[];
-    setPreviewAttachments: Dispatch<SetStateAction<string[]>>;
+    previewAttachments: previewTypes[];
+    setPreviewAttachments: Dispatch<SetStateAction<previewTypes[]>>;
 }
 
 const ChatInput = ({
@@ -35,9 +41,19 @@ const ChatInput = ({
 
             newFiles.forEach((file) => {
                 const reader = new FileReader();
+
+                const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+                if(MAX_SIZE < file.size) {
+                    toast.error("Some files are too large!");
+                    return;
+                } 
+
                 reader.onloadend = () => {
                     const previewUrl = reader.result as string;
-                    setPreviewAttachments(prev => [...prev, previewUrl]);
+                    setPreviewAttachments(prev => [
+                        ...prev, 
+                        { isImage: file.type.startsWith("image/"), url: previewUrl }
+                    ]);
                 }
                 reader.readAsDataURL(file);
             })
@@ -45,6 +61,7 @@ const ChatInput = ({
     }
 
     const removeAttachment = (index: number) => {
+        URL.revokeObjectURL(previewAttachments[index].url);        
         setAttachments(attachments.filter((_, i) => i !== index));
         setPreviewAttachments(previewAttachments.filter((_, i) => i !== index));
     }
@@ -53,20 +70,34 @@ const ChatInput = ({
         <>
             {/* Attachment preview */}
             {previewAttachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
+                <div className="flex flex-wrap gap-2 mb-2 mx-2">
                     {previewAttachments?.map((preview, index) => (
-                        <div key={index} className="relative h-16 w-16">
-                            <img
-                            src={preview || "/placeholder.svg"}
-                            alt={`Attachment preview ${index + 1}`}
-                            className="h-16 w-16 object-cover rounded-md border"
-                            />
-                            <button
-                            className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
-                            onClick={() => removeAttachment(index)}
-                            >
-                                <X className="h-3 w-3" />
-                            </button>
+                        <div className="relative" key={index}>
+                            {preview.isImage ? (
+                                <div className="relative h-16 w-16">
+                                    <img
+                                    src={preview.url || "/placeholder.svg"}
+                                    alt={`Attachment preview ${index + 1}`}
+                                    className="h-16 w-16 object-cover rounded-md border"
+                                    />
+                                    <button
+                                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
+                                    onClick={() => removeAttachment(index)}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="relative w-16 h-16 bg-muted rounded flex items-center justify-center">
+                                    <File className="h-6 w-6" />
+                                    <button
+                                    className="absolute -top-1 -right-1 bg-background rounded-full p-0.5 shadow"
+                                    onClick={() => removeAttachment(index)}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

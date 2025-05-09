@@ -57,7 +57,7 @@ export class NotificationService {
             where: { userId: user.id }, orderBy: { createdAt: 'desc' }, take: take
         })
 
-        return [];
+        return notifications;
     }
 
     async markAllAsRead(user: UserJwt) {

@@ -22,6 +22,26 @@ export class MaintenanceService {
         private readonly notificationService: NotificationService
     ) {}
 
+    private async isOwnerOrTenant(user: UserJwt, maintenanceId: string) {
+        const condoOfMaintenance = await this.prisma.maintenance.findFirst({
+            where: {
+                id: maintenanceId,
+            },
+            include: {
+                condo: {
+                    select: { name: true, tenantId: true, ownerId: true }
+                }
+            }
+        })
+
+        if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
+
+        const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
+        if(!isOwnerOrTenant) throw new ForbiddenException('you are not allowed to update this!')
+
+        return condoOfMaintenance
+    }
+
     async TenantMaintenanceRequest(tenantUser: UserJwt, body: MaintenaceRequestDto, photos: Array<Express.Multer.File>) {
         const condo = await this.prisma.condo.findUnique({
             where: {
@@ -338,21 +358,7 @@ export class MaintenanceService {
     async scheduleMaintenanceRequest(maintenanceId: string, user: UserJwt, body: ScheduleMaintenanceRequestDto,) {
         const token = body.manualLink ? body.generatedToken : uuidv4();
 
-        const condoOfMaintenance = await this.prisma.maintenance.findFirst({
-            where: {
-                id: maintenanceId,
-            },
-            include: {
-                condo: {
-                    select: { name: true, tenantId: true, ownerId: true }
-                }
-            }
-        })
-
-        if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
-
-        const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
-        if(!isOwnerOrTenant) throw new ForbiddenException('you are not allowed to update this!')
+        const condo = await this.isOwnerOrTenant(user, maintenanceId);
 
         const scheduleMaintenance = await this.prisma.maintenance.update({
             where: {
@@ -382,10 +388,10 @@ export class MaintenanceService {
         }
 
         // get tenantId to notify
-        if(condoOfMaintenance.condo.tenantId) {
-            this.notificationService.sendNotificationToUser(condoOfMaintenance.condo.tenantId, {
+        if(condo.condo.tenantId) {
+            this.notificationService.sendNotificationToUser(condo.condo.tenantId, {
                 title: "New Maintenance Scheduled", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
-                message: `${scheduleMaintenance.title} Maintenanece has been scheduled by ${user.name} from ${condoOfMaintenance.condo.name}`,
+                message: `${scheduleMaintenance.title} Maintenanece has been scheduled by ${user.name} from ${condo.condo.name}`,
             })
         }
 
@@ -468,15 +474,7 @@ export class MaintenanceService {
     // landlord // maybe add message why later?
     async cancelMaintenanceRequest(maintenanceId: string, user: UserJwt) {
         // make sure he owns the condo
-        const condoOfMaintenance = await this.prisma.maintenance.findFirst({
-            where: { id: maintenanceId },
-            include: { condo: { select: { tenantId: true, ownerId: true, name: true } } }
-        })
-        
-        if(!condoOfMaintenance) throw new NotFoundException('failed to maintenance!')
-
-        const isOwnerOrTenant = condoOfMaintenance.condo.ownerId === user.id || condoOfMaintenance.condo.tenantId === user.id;
-        if(!isOwnerOrTenant) throw new ForbiddenException('you are not allowed to update this!')
+        const condo = await this.isOwnerOrTenant(user, maintenanceId);
 
         // TODO LATER: when he cancel's we should be able to put message of the landlord or tenant
         const cancelMaintenance = await this.prisma.maintenance.update({
@@ -490,11 +488,11 @@ export class MaintenanceService {
         })
 
         // notify for the opposite of who canceled
-        if(condoOfMaintenance.condo.tenantId && condoOfMaintenance.condo.ownerId) {
-            const userToNotify = condoOfMaintenance.condo.ownerId === user.id ? condoOfMaintenance.condo.tenantId : condoOfMaintenance.condo.ownerId;
+        if(condo.condo.tenantId && condo.condo.ownerId) {
+            const userToNotify = condo.condo.ownerId === user.id ? condo.condo.ownerId : condo.condo.tenantId;
             this.notificationService.sendNotificationToUser(userToNotify, {
                 title: "Maintenance Canceled", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
-                message: `${cancelMaintenance.title} Maintenance has been canceled by ${user.name} from ${condoOfMaintenance.condo.name}`,
+                message: `${cancelMaintenance.title} Maintenance has been canceled by ${user.name} from ${condo.condo.name}`,
             })
         }
 

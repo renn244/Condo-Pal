@@ -19,20 +19,38 @@ import { GeneralGatewayModule } from './general-gateway/general-gateway.module';
 import { UserModule } from './user/user.module';
 import { ExpenseModule } from './expense/expense.module';
 import { NotificationModule } from './notification/notification.module';
+import { ServeStaticModule  } from '@nestjs/serve-static'
+import { join } from 'path';
+
+const imports = [
+  AuthModule, PrismaModule, 
+  ConfigModule.forRoot({
+    isGlobal: true
+  }),
+  CacheModule.register({
+    isGlobal: true,
+    ttl: 60 * 1000, // time to live of 60 seconds
+  }),
+  EmailSenderModule, PaymongoModule, 
+  SubscriptionModule, CondoModule, 
+  FileUploadModule, MaintenanceModule, 
+  CondoPaymentModule, LeaseAgreementModule, 
+  ReminderModule, MaintenanceMessageModule,
+  MaintenanceWorkerTokenModule, MessageModule, 
+  GeneralGatewayModule, UserModule, ExpenseModule, 
+  NotificationModule
+]
+
+if(process.env.SOFTWARE_ENV === 'production') {
+  imports.push(
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../', 'frontend', 'dist')
+    })
+  )
+}
 
 @Module({
-  imports: [
-    AuthModule, 
-    PrismaModule, 
-    ConfigModule.forRoot({
-      isGlobal: true
-    }),
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 60 * 1000, // time to live of 60 seconds
-    }),
-    EmailSenderModule, PaymongoModule, SubscriptionModule, CondoModule, FileUploadModule, MaintenanceModule, CondoPaymentModule, LeaseAgreementModule, ReminderModule, MaintenanceMessageModule, MaintenanceWorkerTokenModule, MessageModule, GeneralGatewayModule, UserModule, ExpenseModule, NotificationModule
-  ],
+  imports: imports,
   controllers: [],
   providers: [],
 })
