@@ -46,7 +46,7 @@ const ViewCondo = () => {
   }
 
   return (
-    <div className="container py-2">
+    <div className="py-2">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
         <Link to="/dashboard/condo" className="hover:text-foreground">

@@ -1,20 +1,23 @@
 import { cn } from "@/lib/utils"
+import { ComponentProps } from "react"
 
 type FeatureCardProps = {
     title: string,
     description: string,
     icon: React.ReactNode,
     index: number,
-}
+} & ComponentProps<"div">
 
 const FeatureCard = ({
     title, 
     description,
     icon,
     index,
+    ...props
 }: FeatureCardProps) => {
     return (
         <div
+        {...props}
         className={cn(
             "flex flex-col lg:border-r  py-10 relative group/feature dark:border-neutral-800",
             (index === 0 || index === 4) && "lg:border-l dark:border-neutral-800",
