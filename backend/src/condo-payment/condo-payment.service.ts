@@ -520,8 +520,8 @@ export class CondoPaymentService {
         
         const [allPayments, currMonthPayments, prevMonthPayments, pendingVerifications] = await Promise.all([
             this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }]}, _sum: { totalPaid: true } }),
-            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: currMonth }, _sum: { totalPaid: true } }),
-            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: prevMonthFormatted }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: currMonth,  OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }] }, _sum: { totalPaid: true } }),
+            this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, billingMonth: prevMonthFormatted, OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }] }, _sum: { totalPaid: true } }),
             this.prisma.condoPayment.aggregate({ where: { condoId: { in: condoIds }, gcashStatus: "PENDING", type: 'GCASH' }, _sum: { totalPaid: true } })
         ]);
 
