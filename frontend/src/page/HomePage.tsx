@@ -49,7 +49,6 @@ const HomePage = () => {
 
     return (
         <>
-            {/* Hero Section  */}
             <section className="pt-0 px-2 h-full mx-auto">
                 <div className="rounded-2xl py-5 overflow-hidden m-5 lg:m-0 2xl:py-11 xl:py-3  lg:rounded-tl-2xl lg:rounded-bl-2xl ">
                     <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
@@ -116,7 +115,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Video Demo to an app */}
             <section className="pt-0 px-2 h-full mx-auto">
                 <div className="relative z-10 md:mt-20 md:mb-8 max-w-7xl rounded-3xl border border-neutral-200 bg-neutral-100 p-2 md:p-4 shadow-md dark:border-neutral-800 dark:bg-neutral-900 mx-auto">
                     <div className="w-full overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700">
@@ -131,7 +129,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Features */}
             <section className="pt-0 px-2 h-full mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-10 max-w-[1480px] mx-auto">
                     {features.map((feature, index) => (

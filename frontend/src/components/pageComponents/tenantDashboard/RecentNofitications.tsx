@@ -1,23 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
+import getNotificationIcon from "@/lib/getNotificationIcon"
 import { useQuery } from "@tanstack/react-query"
-import { Bell, BellOff, DollarSign, ExternalLink, FileText, Wrench } from "lucide-react"
+import { BellOff, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
-
-// Get notification icon
-const getNotificationIcon = (type: any) => {
-    switch (type) {
-        case "PAYMENT":
-            return <DollarSign className="h-5 w-5 text-blue-500" />
-        case "MAINTENANCE":
-            return <Wrench className="h-5 w-5 text-purple-500" />
-        case "ANNOUNCEMENT":
-            return <Bell className="h-5 w-5 text-amber-500" />
-        case "LEASE":
-            return <FileText className="h-5 w-5 text-green-500" />
-    }
-}
 
 const RecentNofitications = () => {
     const { data: notifications } = useQuery({

@@ -379,6 +379,7 @@ model Notification {
   title       String
   message     String
   isRead      Boolean   @default(false)
+  isDeleted   Boolean   @default(false) // soft delete // not yet used
 
   link        String?
 

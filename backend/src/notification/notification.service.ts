@@ -3,6 +3,8 @@ import { GeneralGateway } from 'src/general-gateway/general.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/notification.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
+import { NotificationType, Prisma } from '@prisma/client';
+import { queryObjects } from 'v8';
 
 @Injectable()
 export class NotificationService {
@@ -50,6 +52,33 @@ export class NotificationService {
         };
     }
 
+    async getNotificationsWithFilter(user: UserJwt, query: { 
+        cursor?: string, type?: string, isRead?: boolean
+    }) {
+        const where: Prisma.NotificationWhereInput = {
+            userId: user.id,
+            ...((query.type && query.type !== "ALL") && { type: query.type as NotificationType }),
+            ...(query.isRead && { isRead: query.isRead })
+        }
+
+        const [notifications, unreadCount] = await Promise.all([
+            this.prisma.notification.findMany({
+                where: where, orderBy: { createdAt: 'desc' },
+                cursor: query.cursor ? { id: query.cursor } : undefined,
+                take: 10, skip: query.cursor ? 1 : 0,
+            }),
+            this.prisma.notification.count({ where: { userId: user.id, isRead: false } })
+        ])
+
+        const nextCursor = notifications.length > 0 ? notifications[notifications.length - 1].id : null;
+
+        return {
+            notifications,
+            unreadCount,
+            nextCursor
+        }
+    }
+
     async getRecentNotifications(user: UserJwt, take?: number) {
         take = take || 3; 
 
@@ -79,5 +108,17 @@ export class NotificationService {
         })
 
         return notification
+    }
+
+    async deleteNotification(user: UserJwt, notificationId: string) {
+        const notification = await this.prisma.notification.update({
+            where: {
+                id: notificationId,
+                userId: user.id
+            },
+            data: { isDeleted: true }
+        })
+
+        return notification;
     }
 }

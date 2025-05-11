@@ -1,18 +1,19 @@
+import Notification from "@/components/pageComponents/common/Notifications/Notification"
 import DashboardSidebar from "@/components/pageComponents/dashboard/Sidebar"
-import { Route, Routes, useLocation } from "react-router-dom"
-import Condo from "./Condo"
-import Maintenance from "./Maintenance"
-import Payments from "./Payments"
-import ViewCondo from "./ViewCondo"
-import Chat from "./Chat"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
-import RequestMaintenance from "./RequestMaintenance"
-import MainDashboard from "./MainDashboard"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { Route, Routes, useLocation } from "react-router-dom"
+import Chat from "./Chat"
+import Condo from "./Condo"
 import ManualPayment from "./CondoPayment/ManualPayment"
 import VerifyGcashPayment from "./CondoPayment/VerifyGcashPayment"
-import Notification from "@/components/pageComponents/common/Notification"
+import MainDashboard from "./MainDashboard"
+import Maintenance from "./Maintenance"
+import Payments from "./Payments"
+import RequestMaintenance from "./RequestMaintenance"
+import ViewCondo from "./ViewCondo"
+import AllNotifications from "../AllNotifications"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -45,7 +46,7 @@ const Dashboard = () => {
                                 </Breadcrumb>
                             </div>
 
-                            <Notification linkToAllNotifications="" />
+                            <Notification linkToAllNotifications="/dashboard/all-notifications" />
                         </div>
                     </header>
                     <main className="w-full min-h-[853px] p-4">
@@ -58,10 +59,11 @@ const Dashboard = () => {
                             <Route path="/chats" element={<Chat />} />
 
                             <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
-
                             {/* Condo Payments */}
                             <Route path="/manual/:condoId" element={<ManualPayment />} />
                             <Route path="/gcash/verify/:condoPaymentId" element={<VerifyGcashPayment />} />
+
+                            <Route path="/all-notifications" element={<AllNotifications />} />
                         </Routes>
                     </main>
                 </SidebarInset>

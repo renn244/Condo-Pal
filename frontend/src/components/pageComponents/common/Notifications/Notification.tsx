@@ -3,27 +3,14 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSocketContext } from "@/context/SocketContext"
 import axiosFetch from "@/lib/axios"
-import formatSmartDate from "@/lib/formatSmartDate"
 import { playAudio } from "@/lib/playAudio"
 import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Bell, ChevronRight, DollarSign, FileText, Wrench } from "lucide-react"
+import { Bell } from "lucide-react"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { Link } from "react-router-dom"
-
-const getNotificationIcon = (type: any) => {
-    switch (type) {
-        case "PAYMENT":
-            return <DollarSign className="h-5 w-5 text-blue-500" />
-        case "MAINTENANCE":
-            return <Wrench className="h-5 w-5 text-purple-500" />
-        case "ANNOUNCEMENT":
-            return <Bell className="h-5 w-5 text-amber-500" />
-        case "LEASE":
-            return <FileText className="h-5 w-5 text-green-500" />
-    }
-}
+import NotificationCard from "./NotificationCard"
 
 type NotificationProps = {
     linkToAllNotifications: string,
@@ -149,14 +136,14 @@ const Notification = ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[400px]">
-                    <div className="flex items-center justify-between px-4 py-2 border-b">
-                        <h3 className="font-medium">Notifications</h3>
-                        {unreadCount > 0 && (
-                            <Button disabled={isPending} variant="ghost" size="sm" onClick={() => markAllAsRead()}>
-                                {isPending ? <LoadingSpinner /> : "Mark all as read"}
-                            </Button>
-                        )}
-                    </div>
+                <div className="flex items-center justify-between px-4 py-2 border-b">
+                    <h3 className="font-medium">Notifications</h3>
+                    {unreadCount > 0 && (
+                        <Button disabled={isPending} variant="ghost" size="sm" onClick={() => markAllAsRead()}>
+                            {isPending ? <LoadingSpinner /> : "Mark all as read"}
+                        </Button>
+                    )}
+                </div>
                 <div id="notificationContainer" className="max-h-[350px] overflow-y-auto">
                     <InfiniteScroll 
                     dataLength={notifications.length}
@@ -171,33 +158,7 @@ const Notification = ({
                     }
                     >
                         {notifications.map((notification) => (
-                            <div
-                            key={notification.id}
-                            className={`px-4 py-3 border-b hover:bg-muted/50 ${!notification.isRead ? "bg-blue-50/50" : ""}`}
-                            >
-                                <div className="flex gap-3">
-                                    <div className="mt-1">{getNotificationIcon(notification.type)}</div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <h4 className="font-medium text-sm">{notification.title}</h4>
-                                            <span className="text-xs text-muted-foreground">
-                                                {formatSmartDate(new Date(notification.createdAt))}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                                        {notification.link && (
-                                            <Link
-                                            onClick={() => markRead(notification.id)}
-                                            to={notification.link}
-                                            className="text-sm text-primary flex items-center mt-2 hover:underline"
-                                            >
-                                                View Details
-                                                <ChevronRight className="h-3 w-3 ml-1" />
-                                            </Link>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            <NotificationCard notification={notification} markRead={markRead} />
                         ))}
                     </InfiniteScroll>
                 </div>

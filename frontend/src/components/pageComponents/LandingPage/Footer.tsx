@@ -22,10 +22,10 @@ const Footer = () => {
                                 <a href="/dashboard" className="text-gray-600 hover:text-gray-900">Dashboard</a>
                             </li>
                             <li className="mb-6">
-                                <Link to="/contact"  className=" text-gray-600 hover:text-gray-900">Contact</Link>
+                                <Link to="/contact" onClick={() => window.scrollTo(0, 0)} className=" text-gray-600 hover:text-gray-900">Contact</Link>
                             </li>
                             <li>
-                                <a href="javascript:;"  className=" text-gray-600 hover:text-gray-900">About us</a>
+                                <Link to="/aboutus" onClick={() => window.scrollTo(0, 0)} className=" text-gray-600 hover:text-gray-900">About us</Link>
                             </li>
                         </ul>
                     </div>
@@ -58,10 +58,10 @@ const Footer = () => {
                                 <a href="javascript:;"  className="text-gray-600 hover:text-gray-900">Customer Support</a>
                             </li>
                             <li className="mb-6">
-                                <Link to="/terms&conditions" reloadDocument className=" text-gray-600 hover:text-gray-900">Terms & Conditions</Link>
+                                <Link to="/terms&conditions" onClick={() => window.scrollTo(0, 0)} className=" text-gray-600 hover:text-gray-900">Terms & Conditions</Link>
                             </li>
                             <li >
-                                <Link to="/privacy-policy" reloadDocument   className=" text-gray-600 hover:text-gray-900">Privacy Policy</Link>
+                                <Link to="/privacy-policy" onClick={() => window.scrollTo(0, 0)}   className=" text-gray-600 hover:text-gray-900">Privacy Policy</Link>
                             </li>
                         </ul>
                     </div>

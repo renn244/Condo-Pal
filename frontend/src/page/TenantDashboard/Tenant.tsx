@@ -1,15 +1,16 @@
-import { Route, Routes, useLocation } from "react-router-dom"
-import Chat from "./Chat"
-import TenantDashboard from "./TenantDashboard"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import Notification from "@/components/pageComponents/common/Notifications/Notification"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { Route, Routes, useLocation } from "react-router-dom"
 import TenantSidebar from "../../components/pageComponents/tenantDashboard/TenantSidebar"
+import Chat from "./Chat"
 import GcashPayment from "./CondoPayment/GcashPayment"
 import PaymongoPayment from "./CondoPayment/PaymongoPayment"
 import VerifyPaymongoPayment from "./CondoPayment/VerifyPaymongoPayment"
 import RequestMaintenance from "./RequestMaintenance"
-import Notification from "@/components/pageComponents/common/Notification"
+import TenantDashboard from "./TenantDashboard"
+import AllNotifications from "../AllNotifications"
 
 const Tenant = () => {
     const location = useLocation();
@@ -41,7 +42,7 @@ const Tenant = () => {
                                     </BreadcrumbList>
                                 </Breadcrumb>
                             </div>
-                            <Notification linkToAllNotifications="/tenant/allNotifications" />
+                            <Notification linkToAllNotifications="/tenant/all-notifications" />
                         </div>
                     </header>
                     <main className="flex-1 p-4">
@@ -53,6 +54,8 @@ const Tenant = () => {
                             <Route path='/paymongo/verify' element={<VerifyPaymongoPayment />} />
 
                             <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
+
+                            <Route path='/all-notifications' element={<AllNotifications />} />
                         </Routes>
                     </main>
                 </SidebarInset>

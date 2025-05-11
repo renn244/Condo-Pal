@@ -5,7 +5,7 @@ const NotificationType = {
     PAYMENT: 'PAYMENT',
     EXPENSE: 'EXPENSE',
     MESSAGE: 'MESSAGE',
-    LEASE: 'LEASE_AGREEMENT',
+    LEASE_AGREEMENT: 'LEASE_AGREEMENT',
     SUBSCRIPTION: 'SUBSCRIPTION',
 } as const;
 type NotificationType = typeof NotificationType[keyof typeof NotificationType];
@@ -19,6 +19,7 @@ type notification = {
     title: string;
     message: string;
     isRead: boolean;
+    isDeleted: boolean;
 
     link?: string;
 
