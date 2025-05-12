@@ -33,6 +33,8 @@ type CondoCard = {
         profile: user['profile']
     } | undefined;
 
+    agreements: { id: string }[]
+
     rentAmount: condo['rentAmount'],
     isActive: condo['isActive'],
 

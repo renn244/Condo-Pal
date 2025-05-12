@@ -20,7 +20,7 @@ import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module
       }),
       inject: [ConfigService]
     }),
-    EmailSenderModule
+    EmailSenderModule, LeaseAgreementModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, GoogleStrategy, JwtStrategy]

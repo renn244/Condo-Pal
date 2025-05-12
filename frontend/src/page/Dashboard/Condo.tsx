@@ -50,7 +50,7 @@ const Condo = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {condos?.getCondos && condos.getCondos.length > 0 ? (
                     condos.getCondos.map((condo) => (
-                        <CondoCard condo={condo} />
+                        <CondoCard key={condo.id} condo={condo} />
                     ))
                 ) : null}
                 {/* null for now but maybe create a component for this later on */}

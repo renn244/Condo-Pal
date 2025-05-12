@@ -19,6 +19,7 @@ export class AuthService {
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
         private readonly emailSender: EmailSenderService,
+        private readonly leaseAgreementService: LeaseAgreementService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
@@ -282,6 +283,17 @@ export class AuthService {
             name: createTenantTransactions.name,
             profile: createTenantTransactions.profile,
         }
+    }
+
+    async removeTenant(landlord: UserJwt, leaseAgreementId: string) {
+        const removedLeaseAgreeement = await this.leaseAgreementService.endLeaseAgreement(landlord, leaseAgreementId);
+    
+        const removedTenant = await this.prisma.condo.update({
+            where: { id: removedLeaseAgreeement.condoId },
+            data: { tenantId: null, isActive: false }
+        });
+
+        return removedTenant;
     }
 
     // forgot password

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, Response, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query, Request, Response, UseGuards } from '@nestjs/common';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
 import { GoogleAuthGuard } from 'src/passport/google.strategy';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
@@ -54,6 +54,12 @@ export class AuthController {
         return this.authService.registerTenant(user, body);
     }
     
+    @UseGuards(JwtAuthGuard)
+    @Delete('remove-tenant')
+    async removeTenant(@User() user: UserJwt, @Query('leaseAgreementId') leaseAgreementId: string) {
+        return this.authService.removeTenant(user, leaseAgreementId);
+    }
+
     @Post('forgot-password')
     async forgotPassword(@Body() body: ForgotPasswordDto) {
         return this.authService.forgotPassword(body)

@@ -10,6 +10,7 @@ import DeleteCondo from "./DeleteCondo"
 import { Separator } from "@/components/ui/separator"
 import AddTenant from "../tenant/AddTenant"
 import { useNavigate } from "react-router-dom"
+import RemoveTenant from "../tenant/RemoveTenant"
 
 type CondoCardProps = {
     condo: CondoCard
@@ -49,7 +50,12 @@ const CondoCard = ({
                             </PopoverTrigger>
                             <PopoverContent align="start" className="w-48 p-1">
                                 <UpdateCondo condoId={condo.id} initialCondo={condo as condo} />
-                                <AddTenant condoId={condo.id} />
+                                {condo.agreements?.length === 1 ? (
+                                    <RemoveTenant leaseAgreementId={condo.agreements?.[0].id}
+                                    tenantName={condo.tenant?.name || ""} propertyName={condo.name} />
+                                ) : (
+                                    <AddTenant condoId={condo.id} />
+                                )}
                                 <Separator className="my-1" />
                                 <DeleteCondo condoId={condo.id} />
                             </PopoverContent>

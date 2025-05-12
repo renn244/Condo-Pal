@@ -146,7 +146,7 @@ const Notification = ({
                 </div>
                 <div id="notificationContainer" className="max-h-[350px] overflow-y-auto">
                     <InfiniteScroll 
-                    dataLength={notifications.length}
+                    dataLength={notifications?.length || 0}
                     next={() => fetchNextPage()}
                     hasMore={hasNextPage}
                     scrollableTarget={"notificationContainer"}
@@ -158,7 +158,7 @@ const Notification = ({
                     }
                     >
                         {notifications.map((notification) => (
-                            <NotificationCard notification={notification} markRead={markRead} />
+                            <NotificationCard key={notification.id} notification={notification} markRead={markRead} />
                         ))}
                     </InfiniteScroll>
                 </div>

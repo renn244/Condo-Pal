@@ -70,7 +70,8 @@ export class LeaseAgreementService {
 
         const endLeaseAgreement = await this.prisma.leaseAgreement.update({
             where: {
-                id: leaseAgreementId
+                id: leaseAgreementId,
+                condo: { ownerId: user.id }
             },
             data: {
                 isLeaseEnded: true,

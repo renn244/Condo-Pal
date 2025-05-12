@@ -1,9 +1,8 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
-import { InfiniteData, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import NotificationCard from "../../common/Notifications/NotificationCard"
 
 const RecentNotification = () => {
@@ -12,10 +11,12 @@ const RecentNotification = () => {
         data: notifications,
         isLoading,
     } = useQuery({
-        queryKey: ["notifications"],
+        queryKey: ["notifications", "recent"],
         queryFn: async () => {
-            const res = await axiosFetch.get("/notification");
-            return res.data as InfiniteData<getNotifications>; // Assume this is the full list
+            const response = await axiosFetch.get("/notification/recent", { 
+                params: { take: 4 }
+            });
+            return response.data as notifications;
         },
     });
 
@@ -23,19 +24,13 @@ const RecentNotification = () => {
     
     if(!notifications) return null;
 
-    const unreadNotifications = notifications.pages?.[0]?.unreadCount;;
-    const notification = notifications.pages?.[0]?.notifications || [];
-
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Notifications</CardTitle>
-                {unreadNotifications > 0 && (
-                    <Badge>{unreadNotifications}</Badge>
-                )}
             </CardHeader>
             <CardContent className="space-y-4">
-                {notification.slice(0, 4).map((notification) => (
+                {notifications.map((notification) => (
                     <NotificationCard notification={notification} />
                 ))}
             </CardContent>

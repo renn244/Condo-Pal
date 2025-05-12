@@ -96,6 +96,12 @@ export class CondoService {
                         profile: true,
                         name: true,
                     }
+                },
+                agreements: {
+                    where: { isLeaseEnded: false },
+                    select: { id: true },
+                    orderBy: { createdAt: 'desc' }, 
+                    take: 1,
                 }
             },
             take: take,

@@ -110,7 +110,7 @@ const PaymentsTab = ({
                         <TableBody>
                             {(payments?.getCondoPayments && payments.getCondoPayments.length > 0) ? (
                                 payments.getCondoPayments.map((payment) => (
-                                    <TableRow>
+                                    <TableRow key={payment.id}>
                                         <TableCell className="font-medium">{formatDate(new Date(payment.payedAt))}</TableCell>
                                         <TableCell>{formatBillingMonth(payment.billingMonth)}</TableCell>
                                         <TableCell>
