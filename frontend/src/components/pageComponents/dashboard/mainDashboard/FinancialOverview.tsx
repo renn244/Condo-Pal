@@ -6,15 +6,16 @@ import axiosFetch from "@/lib/axios"
 import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import NetDistributionChartTootip from "../common/NetDistributionChartTootip"
 
 const chartConfig = {
     revenue: {
         label: "Revenue",
-        color: "hsl(var(--chart-1))",
+        color: "#4ade80",
     },
     expenses: {
         label: "Expenses",
-        color: "hsl(var(--chart-2))",
+        color: "#f87171",
     },
 } satisfies ChartConfig
 
@@ -65,11 +66,17 @@ const FinancialOverview = () => {
                                     <ChartTooltipContent 
                                     labelFormatter={(label: any) => `BillingMonth: ${label}`}
                                     indicator="dot"
+                                    formatter={(value, name, item, index) => (
+                                        <NetDistributionChartTootip values={["revenue"]} minusValues={["expenses"]}
+                                        chartConfig={chartConfig} value={value} name={name} item={item} index={index}
+                                        lastIndex={1} NetLabel="Net Income"                                    
+                                        />
+                                    )}
                                     />
                                 }
                                 />
-                                <Bar dataKey="revenue" name="Revenue" fill="#4ade80" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="expenses" name="Expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="revenue" fill="#4ade80" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ChartContainer>
                     </ResponsiveContainer>

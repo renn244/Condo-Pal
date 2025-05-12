@@ -23,15 +23,16 @@ import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import PaymentsOptions from "../../payments/PaymentsOptions"
 import GetPaymentType from "../../payments/GetPaymentType"
 import { Link } from "react-router-dom"
+import NetDistributionChartTootip from "../../common/NetDistributionChartTootip"
 
 const chartConfig = {
     totalPaid: {
-      label: "Payments",
-      color: "hsl(var(--chart-1))",
+      label: "Payment",
+      color: "#4ade80",
     },
     additionalCost: {
-      label: "additionalCost",
-      color: "hsl(var(--chart-2))",
+      label: "Expense",
+      color: "#f87171",
     },
 } satisfies ChartConfig
 
@@ -149,7 +150,7 @@ const PaymentsTab = ({
             <Card>
                 <CardHeader>
                     <CardTitle>Payment vs Expenses</CardTitle>
-                    <CardDescription>Monthly comparison of payments received and expenses incurred</CardDescription>
+                    <CardDescription>Monthly comparison of payments received and expenses(including maintenance) incurred</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {condoStats ? (
@@ -169,7 +170,16 @@ const PaymentsTab = ({
                                     content={
                                         <ChartTooltipContent 
                                         labelFormatter={(label: any) => `BillingMonth: ${label}`}
-                                        indicator="dot" />
+                                        indicator="dot" 
+                                        formatter={(value, name, item, index) => {
+                                            return (
+                                                <NetDistributionChartTootip values={["totalPaid"]} minusValues={["additionalCost"]}
+                                                chartConfig={chartConfig} value={value} name={name} item={item} index={index} 
+                                                lastIndex={1} 
+                                                />
+                                            )
+                                        }}
+                                        />
                                     }
                                     />
                                     <Area 

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import CostDistributionChartTooltip from "../../common/CostDistributionChartTooltip";
 
 const chartConfig = {
     landlord: {
@@ -53,7 +53,8 @@ const MaintenanceCostDistributionChart = ({
                                 labelFormatter={(label: any) => `Month: ${label}`}
                                 className="w-[180px]"
                                 formatter={(value, name, item, index) => (
-                                    <MaintenanceCostDistributionTooltip value={value} name={name} item={item} index={index} />
+                                    <CostDistributionChartTooltip payloads={['landlord', 'tenant']}
+                                    chartConfig={chartConfig} value={value} name={name} item={item} index={index} />
                                 )}
                                 />
                             } />
@@ -77,45 +78,5 @@ const MaintenanceCostDistributionChart = ({
         </Card>
     )
 }
-
-type MaintenanceCostDistributionTooltipProps = {
-    value: ValueType
-    name: NameType
-    item: any
-    index: number
-}
-
-const MaintenanceCostDistributionTooltip = ({
-    value,
-    name,
-    item,
-    index,
-}: MaintenanceCostDistributionTooltipProps) => {
-    const color = (chartConfig as any)[name]?.color;
-
-    return (
-        <>
-            <div className={`h-2.5 w-2.5 shrink-0 rounded-[2px]`} style={{ backgroundColor: color }} />
-            {chartConfig[name as keyof typeof chartConfig]?.label || name}
-            <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                {value}
-                <span className="font-normal text-muted-foreground">
-                    PHP
-                </span>
-            </div>
-            {index === 1 && (
-                <div className="mt-1.5 flex basis-full items-center border-t pt-1.5 text-xs font-medium text-foreground">
-                    Total
-                    <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground ">
-                        {item.payload.landlord + item.payload.tenant}
-                        <span className="font-normal text-muted-foreground">
-                        PHP
-                        </span>
-                    </div>
-                </div>
-            )}
-        </>
-    )
-} 
 
 export default MaintenanceCostDistributionChart
