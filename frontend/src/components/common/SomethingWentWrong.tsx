@@ -2,11 +2,14 @@ import { AlertCircle, ChevronLeft, HomeIcon, RefreshCcw } from "lucide-react"
 import { Button } from "../ui/button"
 import { Link } from "react-router-dom"
 
+type SomethingWentWrongProps = {
+    reset: () => void,
+    message?: string,
+}
+
 const SomethingWentWrong = ({
-    reset
-} : {
-    reset: () => void
-}) => {
+    reset, message
+}: SomethingWentWrongProps) => {
     return (
         <div className="h-[849px] w-full bg-white flex flex-col items-center justify-center">
             <div className="container px-4 md:px-6 flex flex-col items-center text-center space-y-4">
@@ -18,7 +21,7 @@ const SomethingWentWrong = ({
                 </div>
 
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-8">
-                    Something went wrong!
+                    {message ? message : "Something went wrong!"}
                 </h1>
                 <p className="text-gray-500 max-w-lg mt-2">
                     We apologize for the inconvenience. An unexpected error has occured. Our team has been notified and is

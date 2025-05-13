@@ -9,6 +9,7 @@ import { JwtStrategy } from 'src/passport/jwt.strategy';
 import { GoogleStrategy } from 'src/passport/google.strategy';
 import { EmailSenderModule } from 'src/email-sender/email-sender.module';
 import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { LeaseAgreementModule } from 'src/lease-agreement/lease-agreement.module
       }),
       inject: [ConfigService]
     }),
-    EmailSenderModule, LeaseAgreementModule
+    EmailSenderModule, LeaseAgreementModule, NotificationModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, GoogleStrategy, JwtStrategy]

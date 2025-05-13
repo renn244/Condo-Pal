@@ -1,10 +1,10 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import NotFound from "@/components/common/NotFound";
 import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import ExpenseTab from "@/components/pageComponents/tenantDashboard/tabs/ExpenseTab";
 import MaintenanceTab from "@/components/pageComponents/tenantDashboard/tabs/MaintenanceTab";
 import OverviewTab from "@/components/pageComponents/tenantDashboard/tabs/OverviewTab";
 import PaymentsTab from "@/components/pageComponents/tenantDashboard/tabs/PaymentsTab";
+import TenantNotice from "@/components/pageComponents/tenantDashboard/TenantNotice";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/AuthContext"
 import axiosFetch from "@/lib/axios";
@@ -17,7 +17,7 @@ const TenantDashboard = () => {
     const { data: paymentSummary, isLoading, refetch, error } = useQuery({
         queryKey: ["paymentSummary"],
         queryFn: async () => {
-            const response = await axiosFetch.get(`/condo-payment/getBill?condoId=${user!.condo.id}`)
+            const response = await axiosFetch.get(`/condo-payment/getBill?condoId=${user!.condo?.id}`)
 
             if(response.status === 404) {
                 return null;
@@ -36,7 +36,8 @@ const TenantDashboard = () => {
 
     if(error) return <SomethingWentWrong reset={refetch} />
 
-    if(!paymentSummary) return <NotFound />;
+    // if no payment summary is found, it means the user is not a tenant anymore of any condo that is from condoPal
+    if(!paymentSummary) return <TenantNotice />;
 
     return (
         <div className="container mx-auto mt-3">

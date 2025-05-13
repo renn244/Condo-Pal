@@ -84,7 +84,6 @@ export class MessageService {
             where: {
                 AND: [
                     { condo: { ownerId: user.id } },
-                    { isLeaseEnded: false },
                     { tenant: { name: { contains: query.search, mode: 'insensitive' } } }
                 ]
             },
@@ -137,7 +136,6 @@ export class MessageService {
             where: {
                 AND: [
                     { tenantId: user.id },
-                    { isLeaseEnded: false },
                     { condo: { owner: { name: { contains: query.search, mode: 'insensitive' } } } }
                 ]
             },
@@ -236,9 +234,7 @@ export class MessageService {
             include: {
                 sender: {
                     select: {
-                        id: true,
-                        name: true,
-                        profile: true,
+                        id: true, name: true, profile: true,
                     }
                 }
             },

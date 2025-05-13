@@ -4,7 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/notification.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { NotificationType, Prisma } from '@prisma/client';
-import { queryObjects } from 'v8';
 
 @Injectable()
 export class NotificationService {

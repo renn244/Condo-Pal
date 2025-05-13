@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ForgotPasswordDto, RegisterLandLordDto, RegisterTenantDto, ResetPasswordForgotPasswordDto } from './dto/auth.dto';
 import { LeaseAgreementService } from 'src/lease-agreement/lease-agreement.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly emailSender: EmailSenderService,
         private readonly leaseAgreementService: LeaseAgreementService,
+        private readonly notificationService: NotificationService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
@@ -292,6 +294,12 @@ export class AuthService {
             where: { id: removedLeaseAgreeement.condoId },
             data: { tenantId: null, isActive: false }
         });
+
+        // send email to tenant
+        this.notificationService.sendNotificationToUser(removedLeaseAgreeement.tenantId, {
+            title: "Tenant Status Changed", type: "LEASE_AGREEMENT",
+            message: `You have been removed from ${removedLeaseAgreeement.condo.name} by ${landlord.name}.`,
+        })
 
         return removedTenant;
     }
