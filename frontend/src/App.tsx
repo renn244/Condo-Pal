@@ -25,7 +25,7 @@ import TermsAndCondition from './page/TermsAndCondition';
 import PrivacyPolicy from './page/PrivacyPolicy';
 
 const App = () => {
-  const { user, isLoading } = useAuthContext();
+  const { isLoggedIn, user, isLoading } = useAuthContext();
   
   if(isLoading) {
     return 
@@ -56,12 +56,16 @@ const App = () => {
         <Route path='/settings/*' element={<AuthenticatedRoute><Settings /></AuthenticatedRoute>} />
 
         {/* Subscription related routes */}
-        <Route path='/pricing' element={<MainNav><Pricing /></MainNav>} />
-        <Route path='/payment-status' element={
-          <AuthenticatedRoute>
-            <PaymentSuccess />
-          </AuthenticatedRoute>
-        } />
+        {(!isLoggedIn || (user && user.role === 'landlord')) && (
+          <>
+            <Route path='/pricing' element={<MainNav><Pricing /></MainNav>} />
+            <Route path='/payment-status' element={
+              <AuthenticatedRoute>
+                <PaymentSuccess />
+              </AuthenticatedRoute>
+            } />
+          </>
+        )} 
         
         {/* Dashboards Landlord */}
         <Route path='/dashboard/*' element={

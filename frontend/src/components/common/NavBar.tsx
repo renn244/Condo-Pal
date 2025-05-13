@@ -30,13 +30,15 @@ const NavBar = () => {
                     to={'/aboutus'}>
                         About Us
                     </NavLink>
-                    <NavLink 
-                    className={({ isActive }) => `
-                        px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
-                    `} 
-                    to={'/pricing'}>
-                        Pricing
-                    </NavLink>
+                    {(!isLoggedIn || (user && user.role === 'landlord')) && (
+                        <NavLink 
+                        className={({ isActive }) => `
+                            px-2 py-1 select-none text-sm hover:bg-[#f3f3f3] rounded-full ${isActive ? 'bg-[#f3f3f3]' : ''}
+                        `} 
+                        to={'/pricing'}>
+                            Pricing
+                        </NavLink>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-3">

@@ -2,8 +2,10 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import InputPassword from "@/components/common/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import axiosFetch from "@/lib/axios";
 import handleValidationError from "@/lib/handleValidationError";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,6 +39,7 @@ const formSchema = z.object({
 })
 
 const SignUp = () => {
+  const [TermsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -132,7 +135,13 @@ const SignUp = () => {
                     <FormMessage />
                   </FormItem>
               )} />
-              <Button disabled={isLoading} type="submit" className="w-full mt-3">
+              <div className="flex mt-1 gap-1">
+                <Checkbox checked={TermsAccepted} onCheckedChange={(value) => value !== 'indeterminate' && setTermsAccepted(value)} id="terms" />
+                <Label htmlFor="terms">
+                  I accept the <Link className="text-blue-500" to={'/privacy-policy'}>Privacy Policy</Link> and the <Link className="text-blue-500" to={'/terms&conditions'}>Terms and Conditions</Link>
+                </Label>
+              </div>
+              <Button disabled={isLoading || !TermsAccepted} type="submit" className="w-full mt-3">
                 {isLoading ? <LoadingSpinner /> : "Sign Up"}
               </Button>
             </form>
