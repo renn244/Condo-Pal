@@ -3,7 +3,7 @@ import AuthenticatedRoute from './components/common/Authorization/AuthenticatedR
 import NotFound from './components/common/NotFound';
 import { useAuthContext } from './context/AuthContext';
 import Dashboard from './page/Dashboard/Dashboard';
-import EditMaintenance from './page/Dashboard/EditMaintenance';
+import EditMaintenance from './page/TenantDashboard/EditMaintenance';
 import ForgotPassword from './page/ForgotPassword';
 import HomePage from './page/HomePage';
 import Login from './page/Login';

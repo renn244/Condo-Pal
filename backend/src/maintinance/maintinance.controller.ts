@@ -66,7 +66,6 @@ export class MaintenanceController {
         return this.maintenanceService.getMaintenanceRequestByToken(query.maintenanceId, query.token, user);
     }
 
-    @UseGuards(LandLordGuard)
     @Patch('editMaintenanceRequest')
     @UseInterceptors(FilesInterceptor('photos', 3, {
         storage: multer.memoryStorage()

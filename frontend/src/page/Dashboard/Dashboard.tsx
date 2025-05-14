@@ -14,6 +14,7 @@ import Payments from "./Payments"
 import RequestMaintenance from "./RequestMaintenance"
 import ViewCondo from "./ViewCondo"
 import AllNotifications from "../AllNotifications"
+import EditMaintenance from "./EditMaintenance"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -59,6 +60,8 @@ const Dashboard = () => {
                             <Route path="/chats" element={<Chat />} />
 
                             <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
+                            <Route path="/editMaintenance/:maintenanceId" element={<EditMaintenance />} />
+
                             {/* Condo Payments */}
                             <Route path="/manual/:condoId" element={<ManualPayment />} />
                             <Route path="/gcash/verify/:condoPaymentId" element={<VerifyGcashPayment />} />

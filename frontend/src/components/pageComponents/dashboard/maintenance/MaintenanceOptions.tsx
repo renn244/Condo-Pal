@@ -35,7 +35,7 @@ const MaintenanceOptions = ({
                     queryKey={queryKey}
                     />
                 )}
-                <Link to={`/editMaintenanceRequest/${maintenance.id}`}>
+                <Link to={`/dashboard/editMaintenance/${maintenance.id}`}>
                     <Button variant="ghost" className="w-full justify-start">
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit maintenance

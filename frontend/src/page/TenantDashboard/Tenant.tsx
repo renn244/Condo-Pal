@@ -11,6 +11,7 @@ import VerifyPaymongoPayment from "./CondoPayment/VerifyPaymongoPayment"
 import RequestMaintenance from "./RequestMaintenance"
 import TenantDashboard from "./TenantDashboard"
 import AllNotifications from "../AllNotifications"
+import EditMaintenance from "./EditMaintenance"
 
 const Tenant = () => {
     const location = useLocation();
@@ -54,6 +55,7 @@ const Tenant = () => {
                             <Route path='/paymongo/verify' element={<VerifyPaymongoPayment />} />
 
                             <Route path='/maintenanceRequest' element={<RequestMaintenance />} />
+                            <Route path='/editMaintenanceRequest/:maintenanceId' element={<EditMaintenance />} />
 
                             <Route path='/all-notifications' element={<AllNotifications />} />
                         </Routes>

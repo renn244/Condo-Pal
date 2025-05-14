@@ -1,15 +1,16 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner";
-import NotFound from "@/components/common/NotFound";
-import SomethingWentWrong from "@/components/common/SomethingWentWrong";
-import AllMaintenanceForm, { formSchema } from "@/components/form/AllMaintenanceForm";
-import axiosFetch from "@/lib/axios";
-import { ValidationError } from "@/lib/handleValidationError";
-import { useQuery } from "@tanstack/react-query";
-import { toFormData } from "axios";
-import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
-import { z } from "zod";
+import LoadingSpinner from "@/components/common/LoadingSpinner"
+import NotFound from "@/components/common/NotFound"
+import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import MaintenanceForm, { formSchema } from "@/components/form/MaintenanceForm"
+import axiosFetch from "@/lib/axios"
+import { ValidationError } from "@/lib/handleValidationError"
+import { useQuery } from "@tanstack/react-query"
+import { toFormData } from "axios"
+import toast from "react-hot-toast"
+import { useParams } from "react-router-dom"
+import { z } from "zod"
 
+// for the tenant
 const EditMaintenance = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
 
@@ -21,55 +22,60 @@ const EditMaintenance = () => {
             priorityLevel: data.priorityLevel,
             preferredSchedule: data.preferredSchedule,
             previousPhotos: previousPhotos
-        });
+        })
         data?.photos?.forEach((file) => {
-            formData.append('photos', file);
+            formData.append('photos', file)
         })
 
-        const response = await axiosFetch.patch(`/maintenance/editMaintenanceRequest`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }, params: { maintenanceId: maintenanceId }
-        });
+        const response = await axiosFetch.patch(`/maintenance/editMaintenanceRequest?maintenanceId=${maintenanceId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+        })
 
-        if (response.status === 400) {
+        if(response.status === 400) {
             throw new ValidationError(response);
         }
 
-        if (response.status >= 401) {
+        if(response.status >= 401) {
             throw new Error(response.data.message);
         }
 
-        toast.success('Maintenance Request update!');
+
+
+        toast.success('Maintenance Request updated!');
         history.back();
     }
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['getMaintenance', maintenanceId],
         queryFn: async () => {
-            const response = await axiosFetch.get(`/maintenance/getRequest`, { params: { maintenanceId: maintenanceId} })
+            const response = await axiosFetch.get(`/maintenance/getRequest?maintenanceId=${maintenanceId}`)
         
             if(response.status === 404) {
-                return null;
+                return null
             }
 
             if(response.status >= 400) {
                 toast.error(response.data.message);
-                throw new Error(response.data.message);
+                throw new Error(response.data.message)
             }
 
             return response.data as MaintenanceGetRequest;
         },
         refetchOnWindowFocus: false,
-        retry: false, gcTime: 0,
+        retry: false,
+        gcTime: 0
     })
 
     if(isLoading) {
         return <LoadingSpinner />
     }
-    
-    if(error) {
-        return <SomethingWentWrong reset={refetch} />
-    }
 
+    if(error) {
+        return <SomethingWentWrong reset={refetch}  />
+    }
+    
     if(!data) {
         return <NotFound />
     }
@@ -80,7 +86,7 @@ const EditMaintenance = () => {
                 <h1 className="text-3xl font-bold text-primary">
                     Maintenance Request
                 </h1>
-                <AllMaintenanceForm initialData={data} onsubmit={onSubmit} />
+                <MaintenanceForm isUpdate initialData={data} onsubmit={onSubmit} />
             </div>
         </div>
     )

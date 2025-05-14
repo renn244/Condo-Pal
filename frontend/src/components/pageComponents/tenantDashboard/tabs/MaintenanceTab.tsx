@@ -8,7 +8,7 @@ import axiosFetch from "@/lib/axios"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import { useQuery } from "@tanstack/react-query"
-import { MoreVertical, Plus, SquareArrowOutUpRight, Wrench } from "lucide-react"
+import { MoreVertical, Pencil, Plus, SquareArrowOutUpRight, Wrench } from "lucide-react"
 import MaintenanceHeader from "../../dashboard/maintenance/MaintenanceHeader"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import MaintenancePagination from "../../dashboard/maintenance/MaintenancePagination"
@@ -104,6 +104,14 @@ const MaintenanceTab = () => {
                                                             <Button variant="ghost" className="w-full justify-start">
                                                                 <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
                                                                 View Chat With Worker
+                                                            </Button>
+                                                        </Link>
+                                                    )}
+                                                    {request.Status === "PENDING" && (
+                                                        <Link to={`/tenant/editMaintenanceRequest/${request.id}`}>
+                                                            <Button variant="ghost" className="w-full justify-start">
+                                                                <Pencil className="mr-2 h-4 w-4" />
+                                                                Edit maintenance
                                                             </Button>
                                                         </Link>
                                                     )}
