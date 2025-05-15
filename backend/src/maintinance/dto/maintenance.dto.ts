@@ -1,4 +1,4 @@
-import { MaintenanceType, PaymentResponsibility, PriorityLevel } from "@prisma/client";
+import { MaintenanceStatus, MaintenanceType, PaymentResponsibility, PriorityLevel } from "@prisma/client";
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
 
 export class MaintenaceRequestDto {
@@ -26,6 +26,41 @@ export class TenantEditMaintenanceRequest extends MaintenaceRequestDto {
     @IsArray()
     @IsOptional()
     previousPhotos?: string[];
+}
+
+export class LandlordEditMaintenanceRequest extends MaintenaceRequestDto {
+    @IsString()
+    @IsEnum(MaintenanceStatus)
+    Status: MaintenanceStatus;
+
+    @IsNumberString()
+    @IsOptional()
+    estimatedCost?: string;
+
+    @IsNumberString()
+    @IsOptional()
+    totalCost?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsEnum(PaymentResponsibility)
+    paymentResponsibility?: PaymentResponsibility;
+
+    @IsDateString()
+    @IsOptional()
+    scheduledDate: string;
+
+    @IsDateString()
+    @IsOptional()
+    completionDate: string;
+
+    @IsArray()
+    @IsOptional()
+    previousPhotos?: string[];
+
+    @IsArray()
+    @IsOptional()
+    previousCompletionPhotos?: string[];
 }
 
 export class ScheduleMaintenanceRequestDto {

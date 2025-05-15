@@ -15,18 +15,19 @@ const EditMaintenance = () => {
 
     const onSubmit = async (data: z.infer<typeof formSchema>, previousPhotos?: string[]) => {
         const formData = toFormData({
-            title: data.title,
-            description: data.description,
-            type: data.type,
-            priorityLevel: data.priorityLevel,
-            preferredSchedule: data.preferredSchedule,
-            previousPhotos: previousPhotos
+            title: data.title, description: data.description,
+            type: data.type, priorityLevel: data.priorityLevel,
+            preferredSchedule: data.preferredSchedule, Status: data.Status,
+            estimatedCost: data.estimatedCost, totalCost: data.totalCost,
+            paymentResponsibility: data.paymentResponsibility,
+            scheduledDate: data.scheduledDate, completionDate: data.completionDate,
+            previousPhotos: previousPhotos,
         });
         data?.photos?.forEach((file) => {
             formData.append('photos', file);
         })
 
-        const response = await axiosFetch.patch(`/maintenance/editMaintenanceRequest`, formData, {
+        const response = await axiosFetch.patch(`/maintenance/editMaintenanceRequestLandlord`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }, params: { maintenanceId: maintenanceId }
         });
 

@@ -282,19 +282,6 @@ const AllMaintenanceForm = ({
                             )}
                             />
                         </div>
-                        <FormField 
-                        control={form.control}
-                        name="preferredSchedule"
-                        render={() => (
-                            <FormItem>
-                                <FormLabel>Preferred Schedule (Optional)</FormLabel>
-                                <FormControl>
-                                    <DateTimePicker form={form} field="preferredSchedule" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
                     </TabsContent>
                     
                     <TabsContent value="scheduling" className="space-y-6">
@@ -343,9 +330,9 @@ const AllMaintenanceForm = ({
                             name="scheduledDate"
                             render={() => (
                                 <FormItem>
-                                    <FormLabel>Preferred Schedule (Optional)</FormLabel>
+                                    <FormLabel>Scheduled Date</FormLabel>
                                     <FormControl>
-                                        <DateTimePicker form={form} field="preferredSchedule" />
+                                        <DateTimePicker form={form} field="scheduledDate" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

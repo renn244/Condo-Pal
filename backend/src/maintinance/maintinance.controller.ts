@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MaintenanceService } from './maintinance.service';
 import { User, UserJwt } from 'src/lib/decorators/User.decorator';
-import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, LandlordEditMaintenanceRequest, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
+import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { JwtAuthGuard } from 'src/passport/jwt.strategy';
 import { Public } from 'src/lib/decorators/isPublic.decorator';
@@ -73,6 +73,21 @@ export class MaintenanceController {
     async editMaintenanceRequest(@Query('maintenanceId') maintenanceId: string, @User() user: UserJwt, @Body() body: TenantEditMaintenanceRequest,
     @UploadedFiles() photos: Array<Express.Multer.File>) {
         return this.maintenanceService.editMaintenanceRequest(maintenanceId, user, body, photos);
+    }
+
+    @Patch('editMaintenanceRequestLandlord')
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: 'photos', maxCount: 3 },
+            { name: 'completionPhotos', maxCount: 3 }
+        ], { storage: multer.memoryStorage() })
+    )
+    async editMaintenanceRequestLandlord(@Query('maintenanceId') maintenanceId: string, @User() user: UserJwt, @Body() body: LandlordEditMaintenanceRequest,
+    @UploadedFiles() files: {
+        photos: Array<Express.Multer.File>,
+        completionPhotos: Array<Express.Multer.File>        
+    }) {
+        return this.maintenanceService.editMaintenanceRequestLandlord(maintenanceId, user, body, files.photos, files.completionPhotos);
     }
 
     @UseGuards(LandLordGuard)

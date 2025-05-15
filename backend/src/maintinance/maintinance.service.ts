@@ -4,7 +4,7 @@ import { eachMonthOfInterval, format, startOfYear } from 'date-fns';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
+import { CompleteMaintenanceRequestDto, InProgressMaintenanceRequestDto, LandlordEditMaintenanceRequest, MaintenaceRequestDto, ScheduleMaintenanceRequestDto, TenantEditMaintenanceRequest } from './dto/maintenance.dto';
 import { MaintenanceMessageService } from 'src/maintenance-message/maintenance-message.service';
 import { v4 as uuidv4 } from 'uuid';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
@@ -352,7 +352,56 @@ export class MaintenanceService {
             }
         })
 
-        return editedMaintenance
+        return editedMaintenance;
+    }
+
+    async editMaintenanceRequestLandlord(maintenanceId: string, user: UserJwt, body: LandlordEditMaintenanceRequest, 
+    photos: Array<Express.Multer.File>, completionPhotos: Array<Express.Multer.File>) {
+        const getPhotosOfMaintenance = await this.prisma.maintenance.findFirst({
+            where: { id: maintenanceId },
+            select: { photos: true, proofOfCompletion: true }
+        })
+        const prevPhotos = body.previousPhotos || [];
+        const prevCompletionPhotos = body.previousCompletionPhotos || [];
+
+        // delete certain photos that will be replace
+        if(getPhotosOfMaintenance) {
+            await Promise.all([
+                ...getPhotosOfMaintenance.photos.filter((photo) => !prevPhotos.includes(photo))
+                .map((photo) => this.fileUploadService.deleteFile(photo)),
+                ...getPhotosOfMaintenance.proofOfCompletion.filter((photo) => !prevCompletionPhotos.includes(photo))
+                .map((photo) => this.fileUploadService.deleteFile(photo))
+            ])
+        }
+
+        // upload photos maximum of 3 each
+        const [newphotos, newcompletionPhotos] = await Promise.all([
+            Promise.all(photos.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url
+            })),
+            Promise.all(completionPhotos.map(async (photo) => {
+                const newPhoto = await this.fileUploadService.upload(photo);
+                return newPhoto.secure_url
+            }))
+        ])
+
+        const editedMaintenance = await this.prisma.maintenance.update({
+            where: { id: maintenanceId, condo: { ownerId: user.id } },
+            data: {
+                photos: [...prevPhotos, ...newphotos],
+                proofOfCompletion: [...prevCompletionPhotos, ...newcompletionPhotos],
+                title: body.title, description: body.description, type: body.type,
+                priorityLevel: body.priorityLevel, preferredSchedule: body.preferredSchedule,
+                Status: body.Status, 
+                estimatedCost: body.estimatedCost ? parseInt(body.estimatedCost) : undefined, 
+                totalCost: body.totalCost ? parseInt(body.totalCost) : undefined,
+                paymentResponsibility: body.paymentResponsibility, scheduledDate: body.scheduledDate,
+                completionDate: body.completionDate
+            }
+        })
+
+        return editedMaintenance;
     }
 
     async scheduleMaintenanceRequest(maintenanceId: string, user: UserJwt, body: ScheduleMaintenanceRequestDto,) {
