@@ -35,7 +35,7 @@ export const formSchema = z.object({
     scheduledDate: z.date().optional(),
     completionDate: z.date().optional(),
     proofOfCompletion: z.array(z.instanceof(File)).optional(),
-}).superRefine(({  }, ctx) => {
+}).superRefine(() => {
     // TODO LATER!!!
 })
 

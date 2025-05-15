@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Calculator, Calendar, CalendarCheck, CheckCircle, Clock, Home, PenTool } from "lucide-react"
+import { Calculator, Calendar, CalendarCheck, CheckCircle, Clock, Home, PenTool, User } from "lucide-react"
 import MaintenanceOptions from "./MaintenanceOptions"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import formatDateTime from "@/lib/formatDateTime"
@@ -96,6 +96,14 @@ const MaintenanceCard = ({
                                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-muted-foreground">Completed: {
                                     maintenance.completionDate ? formatDateTime(new Date(maintenance.completionDate)) : 'anytime'
+                                }</span>
+                            </>
+                        )}
+                        {maintenance.Status === 'CANCELED' && (
+                            <>
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Canceled By: {
+                                    maintenance.canceledBy ? maintenance.canceledBy : 'Not Specified'    
                                 }</span>
                             </>
                         )}
