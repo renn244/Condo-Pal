@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateLeaseAgreementDto } from './dto/lease-agreement.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
-import { truncateByDomain } from 'recharts/types/util/ChartUtils';
 
 @Injectable()
 export class LeaseAgreementService {
