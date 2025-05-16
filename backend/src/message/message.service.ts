@@ -102,6 +102,13 @@ export class MessageService {
                         address: true,
                     }
                 },
+                tenant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile: true,
+                    }
+                },
                 messages: {
                     orderBy: { createdAt: 'desc' },
                     take: 1
@@ -116,7 +123,7 @@ export class MessageService {
         const formattedConversatons = conversations.map((conversation) => {
             return {
                 id: conversation.id,
-                sender: conversation.condo.tenant,
+                sender: conversation.tenant,
                 condo: {
                     name: conversation.condo.name,
                     address: conversation.condo.address
