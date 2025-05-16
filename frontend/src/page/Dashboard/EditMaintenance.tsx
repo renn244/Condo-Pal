@@ -13,7 +13,7 @@ import { z } from "zod";
 const EditMaintenance = () => {
     const { maintenanceId } = useParams<{ maintenanceId: string }>();
 
-    const onSubmit = async (data: z.infer<typeof formSchema>, previousPhotos?: string[]) => {
+    const onSubmit = async (data: z.infer<typeof formSchema>, previousPhotos?: string[], previousProofPhotos?: string[]) => {
         const formData = toFormData({
             title: data.title, description: data.description,
             type: data.type, priorityLevel: data.priorityLevel,
@@ -21,10 +21,13 @@ const EditMaintenance = () => {
             estimatedCost: data.estimatedCost, totalCost: data.totalCost,
             paymentResponsibility: data.paymentResponsibility,
             scheduledDate: data.scheduledDate, completionDate: data.completionDate,
-            previousPhotos: previousPhotos,
+            previousPhotos: previousPhotos, previousCompletionPhotos: previousProofPhotos,
         });
         data?.photos?.forEach((file) => {
             formData.append('photos', file);
+        })
+        data?.proofOfCompletion?.forEach((file) => {
+            formData.append('completionPhotos', file);
         })
 
         const response = await axiosFetch.patch(`/maintenance/editMaintenanceRequestLandlord`, formData, {

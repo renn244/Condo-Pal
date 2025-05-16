@@ -35,8 +35,31 @@ export const formSchema = z.object({
     scheduledDate: z.date().optional(),
     completionDate: z.date().optional(),
     proofOfCompletion: z.array(z.instanceof(File)).optional(),
-}).superRefine(() => {
-    // TODO LATER!!!
+}).superRefine(({ Status, totalCost, scheduledDate, paymentResponsibility }, ctx) => {
+    if(Status === 'COMPLETED' && !totalCost) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'Total cost is required when status is Completed',
+            path: ['totalCost'],
+        })
+    }
+
+    if(totalCost && !paymentResponsibility) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'Payment responsibility is required when total cost is set',
+            path: ['paymentResponsibility'],
+        })
+    }
+
+    if(Status === 'SCHEDULED' && !scheduledDate) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'Scheduled date is required when status is Scheduled',
+            path: ['scheduledDate']
+        })
+    }
+
 })
 
 type previewFiles = {
@@ -46,7 +69,7 @@ type previewFiles = {
 
 type AllMaintenanceFormProps = {
     initialData?: maintenance,
-    onsubmit: (data: z.infer<typeof formSchema>, previousPhotos?: string[]) => Promise<void>
+    onsubmit: (data: z.infer<typeof formSchema>, previousPhotos?: string[], previousProofPhotos?: string[]) => Promise<void>
 }
 
 const AllMaintenanceForm = ({
@@ -57,6 +80,9 @@ const AllMaintenanceForm = ({
     const [activeTab, setActiveTab] = useState('details');
 
     const [previewFiles, setPreviewFiles]  = useState<previewFiles[]>(() => initialData?.photos.map(
+        (photo, idx) => ({ name: `Photo ${idx + 1}`, url: photo }) // getting the previous data
+    ) || [])
+    const [proofPreviewFiles, setProofPreviewFiles] = useState<previewFiles[]>(() => initialData?.proofOfCompletion.map(
         (photo, idx) => ({ name: `Photo ${idx + 1}`, url: photo }) // getting the previous data
     ) || [])
 
@@ -81,7 +107,9 @@ const AllMaintenanceForm = ({
         setIsLoading(true);
         try {
             const previousPhotos = previewFiles.flatMap((preview) => preview.url.includes('https') ? preview.url : '').filter((p) => !!p);
-            await onsubmit(data, previousPhotos);
+            const previousProofPhotos = proofPreviewFiles.flatMap((preview) => preview.url.includes('https') ? preview.url : '').filter((p) => !!p);
+
+            await onsubmit(data, previousPhotos, previousProofPhotos);
         } catch (error: any) {
             if(error instanceof ValidationError) {
                 handleValidationError(error.response, error.response.data.errors, form.setError);
@@ -94,11 +122,12 @@ const AllMaintenanceForm = ({
         }
     }
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // make this usable for photos and proof of completion
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>, type: 'photos' | 'proofOfCompletion') => {
         if(e.target.files) {
-            const prevFiles = form.getValues("photos") || [];
+            const prevFiles = form.getValues(type) || [];
             const newFiles = Array.from(e.target.files);
-            form.setValue('photos', [...newFiles, ...prevFiles], {
+            form.setValue(type, [...newFiles, ...prevFiles], {
                 shouldValidate: true
             })
             
@@ -106,41 +135,55 @@ const AllMaintenanceForm = ({
             if(prevFiles.length >= 3) {
                 const prevFile = previewFiles || []
                 prevFile?.pop();
-                setPreviewFiles(prevFile)
 
+                if(type === 'photos') {
+                    setPreviewFiles(prevFile)
+                } else {
+                    setProofPreviewFiles(prevFile)
+                }
             }
 
             if(prevFiles.length) {
-                handleDisplay(newFiles)
+                handleDisplay(newFiles, type)
                 return
             }
 
             // make it displayable if there is previous files no need to make it displayable again
-            handleDisplay([...prevFiles, ...newFiles])
+            handleDisplay([...prevFiles, ...newFiles], type)
         }
     }
 
-    const handleDisplay = (files: File[]) => {
+    const handleDisplay = (files: File[], type: 'photos' | 'proofOfCompletion') => {
         files?.forEach((file) => {
             const reader = new FileReader();
             reader.onload = () => {
                 const fileUrl = reader.result as string
                 
-                setPreviewFiles(prev => 
-                    prev ? [...prev, { name: file.name, url: fileUrl }] : [{ name: file.name, url: fileUrl }]
-                )
+                if(type === 'photos') {
+                    setPreviewFiles(prev => 
+                        prev ? [...prev, { name: file.name, url: fileUrl }] : [{ name: file.name, url: fileUrl }]
+                    )
+                } else {
+                    setProofPreviewFiles(prev => 
+                        prev ? [...prev, { name: file.name, url: fileUrl }] : [{ name: file.name, url: fileUrl }]
+                    )
+                }
             }
             reader.readAsDataURL(file)
         })
     }
 
-    const removePhoto = (fileName: string) => {
+    const removePhoto = (fileName: string, type: 'photos' | 'proofOfCompletion') => {
         //removing it from the form
         const previousFiles = form.watch('photos') || [] as File[];
-        form.setValue('photos', previousFiles.filter((file) => file.name !== fileName));
+        form.setValue(type, previousFiles.filter((file) => file.name !== fileName));
     
         //removing it from the previewFiles
-        setPreviewFiles(prev => prev.filter((file) => file.name !== fileName))
+        if(type === 'photos') {
+            setPreviewFiles(prev => prev.filter((file) => file.name !== fileName));
+        } else {
+            setProofPreviewFiles(prev => prev.filter((file) => file.name !== fileName));
+        }
     }
 
     const currentStatus = form.watch("Status");
@@ -175,7 +218,7 @@ const AllMaintenanceForm = ({
                                                 variant="destructive"
                                                 size="icon"
                                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => removePhoto(photo.name)}
+                                                onClick={() => removePhoto(photo.name, 'photos')}
                                                 >
                                                     <X className="h-4 w-4" />
                                                 </Button>
@@ -189,7 +232,7 @@ const AllMaintenanceForm = ({
                                                 type="file"
                                                 accept="image/*"
                                                 className="absolute inset-0 opacity-0 cursor-pointer h-full"
-                                                onChange={handleFileChange}
+                                                onChange={(e) => handleFileChange(e, 'photos')}
                                                 />
                                                 <Plus className="h-8 w-8 mb-2 text-muted-foreground" />
                                                 <p className="text-sm text-muted-foreground">Add Photo</p>
@@ -355,6 +398,55 @@ const AllMaintenanceForm = ({
                         </div>
 
                         {/* Proof of Completion Here! */}
+                        {currentStatus === MaintenanceStatus.COMPLETED && (
+                            <FormField 
+                            control={form.control}
+                            name="proofOfCompletion"
+                            render={() => (
+                                <FormItem>
+                                    <FormLabel>proofOfCompletion</FormLabel>
+                                    <FormControl>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {proofPreviewFiles?.map((photo) => (
+                                                <div key={photo.name} className="relative group">
+                                                    <div className="aspect-square rounded-lg overflow-hidden border bg-muted/20">
+                                                        <img src={photo.url || "/placeholder.svg"} alt={photo.name} className="object-cover w-full h-full" />
+                                                    </div>
+                                                    <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => removePhoto(photo.name, 'proofOfCompletion')}
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                    <p className="text-xs mt-1 truncate text-muted-foreground">{photo.name}</p>
+                                                </div>
+                                            ))}
+                                            {proofPreviewFiles.length < 3 && (
+                                                <div className="aspect-square rounded-lg border border-dashed flex flex-col items-center justify-center bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative">
+                                                    <Input
+                                                    id="proofOfCompletion"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer h-full"
+                                                    onChange={(e) => handleFileChange(e, 'proofOfCompletion')}
+                                                    />
+                                                    <Plus className="h-8 w-8 mb-2 text-muted-foreground" />
+                                                    <p className="text-sm text-muted-foreground">Add Photo</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                        Maximum of 3 photo's
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                        )}
                     </TabsContent>
 
                     <TabsContent value="financial" className="space-y-6">

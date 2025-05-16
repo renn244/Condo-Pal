@@ -356,7 +356,7 @@ export class MaintenanceService {
     }
 
     async editMaintenanceRequestLandlord(maintenanceId: string, user: UserJwt, body: LandlordEditMaintenanceRequest, 
-    photos: Array<Express.Multer.File>, completionPhotos: Array<Express.Multer.File>) {
+    photos?: Array<Express.Multer.File>, completionPhotos?: Array<Express.Multer.File>) {
         const getPhotosOfMaintenance = await this.prisma.maintenance.findFirst({
             where: { id: maintenanceId },
             select: { photos: true, proofOfCompletion: true }
@@ -376,14 +376,14 @@ export class MaintenanceService {
 
         // upload photos maximum of 3 each
         const [newphotos, newcompletionPhotos] = await Promise.all([
-            Promise.all(photos.map(async (photo) => {
+            Promise.all(photos?.map(async (photo) => {
                 const newPhoto = await this.fileUploadService.upload(photo);
                 return newPhoto.secure_url
-            })),
-            Promise.all(completionPhotos.map(async (photo) => {
+            }) || []),
+            Promise.all(completionPhotos?.map(async (photo) => {
                 const newPhoto = await this.fileUploadService.upload(photo);
                 return newPhoto.secure_url
-            }))
+            }) || [])
         ])
 
         const editedMaintenance = await this.prisma.maintenance.update({
