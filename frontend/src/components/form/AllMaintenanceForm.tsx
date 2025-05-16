@@ -59,7 +59,6 @@ export const formSchema = z.object({
             path: ['scheduledDate']
         })
     }
-
 })
 
 type previewFiles = {
@@ -191,7 +190,7 @@ const AllMaintenanceForm = ({
 
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-3 mb-6">
+            <TabsList className="grid grid-cols-3 mb-6 w-full">
                 <TabsTrigger value="details">Request Details</TabsTrigger>
                 <TabsTrigger value="scheduling">Scheduling Status</TabsTrigger>
                 <TabsTrigger value="financial">Financial Details</TabsTrigger>
