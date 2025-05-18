@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useAuthContext } from "@/context/AuthContext"
-import { Bell, CreditCard, Hotel, LayoutDashboard, LogOut, MessageSquare, Settings2, Sparkles, Wrench } from "lucide-react"
+import { Bell, CreditCard, Hotel, LayoutDashboard, LogOut, MessageSquare, Settings2, Sparkles, Wrench, LandmarkIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const DashboardSidebar = ({
@@ -26,7 +26,8 @@ const DashboardSidebar = ({
         { icon: Hotel, title: 'Condo', url: '/dashboard/condo' },
         { icon: Wrench , title: 'Maintenance', url: '/dashboard/maintenance' },
         { icon: CreditCard, title: 'Payments', url: '/dashboard/payments'  },
-        { icon: MessageSquare, title: 'Chats', url: '/dashboard/chats' }
+        { icon: LandmarkIcon, title: 'Payout', url: '/dashboard/payout' },
+        { icon: MessageSquare, title: 'Chats', url: '/dashboard/chats' },
     ]
 
     return (

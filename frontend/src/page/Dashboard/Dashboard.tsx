@@ -15,6 +15,7 @@ import RequestMaintenance from "./RequestMaintenance"
 import ViewCondo from "./ViewCondo"
 import AllNotifications from "../AllNotifications"
 import EditMaintenance from "./EditMaintenance"
+import Payout from "./Payout"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -58,7 +59,8 @@ const Dashboard = () => {
                             <Route path="/maintenance" element={<Maintenance />} />
                             <Route path="/payments" element={<Payments />} />
                             <Route path="/chats" element={<Chat />} />
-
+                            <Route path="/payout" element={<Payout />} />
+ 
                             <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
                             <Route path="/editMaintenance/:maintenanceId" element={<EditMaintenance />} />
 
