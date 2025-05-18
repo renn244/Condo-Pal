@@ -74,40 +74,38 @@ const MaintenanceCard = ({
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2">
-                        {maintenance.Status === 'PENDING' && (
-                            <>
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">Preferred Scheduled: {
-                                    maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
-                                }</span>
-                            </>
-                        )}
-                        {maintenance.Status === 'SCHEDULED' && (
-                            <>
-                                <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">Scheduled: {
-                                    maintenance.scheduledDate ? formatDateTime(new Date(maintenance.scheduledDate)) : 'anytime'
-                                }</span>
-                            </>
-                        )}
-                        {maintenance.Status === 'COMPLETED' && (
-                            <>
-                                <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">Completed: {
-                                    maintenance.completionDate ? formatDateTime(new Date(maintenance.completionDate)) : 'anytime'
-                                }</span>
-                            </>
-                        )}
-                        {maintenance.Status === 'CANCELED' && (
-                            <>
-                                <User className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">Canceled By: {
-                                    maintenance.canceledBy ? maintenance.canceledBy : 'Not Specified'    
-                                }</span>
-                            </>
-                        )}
-                    </div>
+                    {maintenance.Status === 'PENDING' && (
+                        <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Preferred Scheduled: {
+                                maintenance.preferredSchedule ? formatDate(new Date(maintenance.preferredSchedule)) : 'anytime'
+                            }</span>
+                        </div>
+                    )}
+                    {maintenance.Status === 'SCHEDULED' && (
+                        <div className="flex items-center gap-2">
+                            <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Scheduled: {
+                                maintenance.scheduledDate ? formatDateTime(new Date(maintenance.scheduledDate)) : 'anytime'
+                            }</span>
+                        </div>
+                    )}
+                    {maintenance.Status === 'COMPLETED' && (
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Completed: {
+                                maintenance.completionDate ? formatDateTime(new Date(maintenance.completionDate)) : 'anytime'
+                            }</span>
+                        </div>
+                    )}
+                    {maintenance.Status === 'CANCELED' && (
+                        <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Canceled By: {
+                                maintenance.canceledBy ? maintenance.canceledBy : 'Not Specified'    
+                            }</span>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
