@@ -37,6 +37,7 @@ const AddTenant = ({
         }
 
         toast.success('Tenant has been added!')
+        setOpen(false);
         await queryClient.setQueryData(['condos', page, search], (oldData: CondoResponse) => {
             const tenantData = response.data;
 
@@ -46,10 +47,14 @@ const AddTenant = ({
                     if(condo.id === condoId) {
                         return {
                             ...condo,
+                            agreements: [
+                                { id: tenantData.leaseAgreementId }
+                            ],
+                            isActive: true,
                             tenant: {
                                id: tenantData.id,
                                name: tenantData.name,
-                               profile: tenantData.profile || '', 
+                               profile: tenantData.profile || '',
                             }
                         }
                     }

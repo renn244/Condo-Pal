@@ -166,7 +166,7 @@ export class CondoPaymentService {
             billingMonth = this.getBillingMonthOfDate(leaseStartDate);
             const month = leaseStartDate.getMonth() + 1; 
             const year = leaseStartDate.getFullYear();
-            const day = tenantLease.due_date === -1 ? new Date(year, month + 1, 0).getDate() : tenantLease.due_date
+            const day = tenantLease.due_date === -1 ? new Date(year, month, 0).getDate() : tenantLease.due_date
 
             const dueDate = `${year}-${month.toString().padStart(2, '0')}-${day}`;
 
@@ -185,7 +185,7 @@ export class CondoPaymentService {
             nextMonth = 1; 
             nextYear += 1;
         }
-        const day = tenantLease.due_date === -1 ? new Date(nextYear, nextMonth + 1, 0).getDate() : tenantLease.due_date
+        const day = tenantLease.due_date === -1 ? new Date(nextYear, nextMonth, 0).getDate() : tenantLease.due_date
 
         // TODO LATER: should also find out if it's an advanced payment
         billingMonth = `${nextMonth.toString().padStart(2, '0')}-${nextYear.toString()}`;

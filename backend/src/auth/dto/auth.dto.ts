@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsBoolean } from 'class-validator';
+import { IsString, IsEmail, IsBoolean, IsNumber } from 'class-validator';
 import { Match } from 'src/lib/decorators/isMatch';
 
 export class RegisterLandLordDto {
@@ -28,6 +28,9 @@ export class RegisterTenantDto {
 
     @IsString()
     condoId: string;
+
+    @IsNumber()
+    due_date: number;
 }
 
 export class LoginDto {

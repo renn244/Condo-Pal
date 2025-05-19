@@ -1,14 +1,15 @@
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import handleValidationError, { ValidationError } from "@/lib/handleValidationError"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
 import { useState } from "react"
-import LoadingSpinner from "../common/LoadingSpinner"
+import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import handleValidationError, { ValidationError } from "@/lib/handleValidationError"
+import { z } from "zod"
+import LoadingSpinner from "../common/LoadingSpinner"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
 
 // use for the add tenant in the condo card
 export const formSchema = z.object({
@@ -20,6 +21,9 @@ export const formSchema = z.object({
     name: z.string().nonempty({
         message: 'name is required'
     }),
+    due_date: z.number({
+        required_error: 'Due date is required'
+    })
 })
 
 type TenantFormProps = {
@@ -36,7 +40,8 @@ const TenantForm = ({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            email: ""
+            email: "",
+            due_date: -1,
         }
     })
 
@@ -86,6 +91,37 @@ const TenantForm = ({
                         </FormControl>
                         <FormDescription>
                             The Tenant's real name so that we can easily identify them.
+                        </FormDescription>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField 
+                control={form.control}
+                name="due_date"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Days Due Date</FormLabel>
+                        <FormControl>
+                            <Select value={field.value.toString()} onValueChange={(value) => field.onChange(Number(value))}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a Day" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Days</SelectLabel>
+                                        {Array.from({ length: 28 }, (_, i) => (
+                                            <SelectItem className="hover:bg-muted" key={i} value={(i + 1).toString()}>
+                                                {i + 1}
+                                            </SelectItem>
+                                        ))}
+                                        <SelectItem className="hover:bg-muted" value="-1">last day of the month</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormDescription>
+                            The day when the tenant's payment is due everymonth. This is used to calculate the payment schedule.
                         </FormDescription>
                         <FormMessage />
                     </FormItem>

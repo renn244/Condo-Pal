@@ -256,20 +256,21 @@ export class AuthService {
                     }
                 },
                 data: {
-                    tenantId: createTenantAccount.id
+                    tenantId: createTenantAccount.id,
+                    isActive: true
                 }
             })
             
             const createLeaseAgreement = await txprisma.leaseAgreement.create({
                 data: {
                     leaseStart: new Date(),
-                    due_date: -1, // -1 for now
+                    due_date: body.due_date || -1, // -1 end of the month
                     condoId: body.condoId,
                     tenantId: createTenantAccount.id
                 }
             })
 
-            return createTenantAccount
+            return {...createTenantAccount, leaseAgreementId: createLeaseAgreement.id}
         })
         
         // send email
@@ -281,6 +282,7 @@ export class AuthService {
 
         return {
             id: createTenantTransactions.id,
+            leaseAgreementId: createTenantTransactions.leaseAgreementId,
             email: createTenantTransactions.email,
             name: createTenantTransactions.name,
             profile: createTenantTransactions.profile,
