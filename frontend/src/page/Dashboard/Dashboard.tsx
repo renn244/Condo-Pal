@@ -16,6 +16,7 @@ import ViewCondo from "./ViewCondo"
 import AllNotifications from "../AllNotifications"
 import EditMaintenance from "./EditMaintenance"
 import Payout from "./Payout"
+import { SubscriptionProvider } from "@/context/SubscriptionSocket"
 
 const Dashboard = () => {
     const location = useLocation();
@@ -52,24 +53,26 @@ const Dashboard = () => {
                         </div>
                     </header>
                     <main className="w-full min-h-[853px] p-4">
-                        <Routes>
-                            <Route path="/dashboard" element={<MainDashboard />} />
-                            <Route path="/condo" element={<Condo />} />
-                            <Route path="/condo/:condoId" element={<ViewCondo />} />
-                            <Route path="/maintenance" element={<Maintenance />} />
-                            <Route path="/payments" element={<Payments />} />
-                            <Route path="/chats" element={<Chat />} />
-                            <Route path="/payout" element={<Payout />} />
- 
-                            <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
-                            <Route path="/editMaintenance/:maintenanceId" element={<EditMaintenance />} />
+                        <SubscriptionProvider>
+                            <Routes>
+                                <Route path="/dashboard" element={<MainDashboard />} />
+                                <Route path="/condo" element={<Condo />} />
+                                <Route path="/condo/:condoId" element={<ViewCondo />} />
+                                <Route path="/maintenance" element={<Maintenance />} />
+                                <Route path="/payments" element={<Payments />} />
+                                <Route path="/chats" element={<Chat />} />
+                                <Route path="/payout" element={<Payout />} />
+    
+                                <Route path="/maintenanceRequest/:condoId" element={<RequestMaintenance />} />
+                                <Route path="/editMaintenance/:maintenanceId" element={<EditMaintenance />} />
 
-                            {/* Condo Payments */}
-                            <Route path="/manual/:condoId" element={<ManualPayment />} />
-                            <Route path="/gcash/verify/:condoPaymentId" element={<VerifyGcashPayment />} />
+                                {/* Condo Payments */}
+                                <Route path="/manual/:condoId" element={<ManualPayment />} />
+                                <Route path="/gcash/verify/:condoPaymentId" element={<VerifyGcashPayment />} />
 
-                            <Route path="/all-notifications" element={<AllNotifications />} />
-                        </Routes>
+                                <Route path="/all-notifications" element={<AllNotifications />} />
+                            </Routes>
+                        </SubscriptionProvider>
                     </main>
                 </SidebarInset>
             </SidebarProvider>

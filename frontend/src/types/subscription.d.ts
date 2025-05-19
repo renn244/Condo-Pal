@@ -57,3 +57,5 @@ type getCurrentPlan = {
     description: string;
     features: string[];
 }
+
+type getLatestSubscription = subscription

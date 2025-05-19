@@ -23,6 +23,7 @@ import AboutUs from './page/AboutUs';
 import Settings from './page/Settings';
 import TermsAndCondition from './page/TermsAndCondition';
 import PrivacyPolicy from './page/PrivacyPolicy';
+import SubscriptionExpired from './page/SubscriptionExpired';
 
 const App = () => {
   const { isLoggedIn, user, isLoading } = useAuthContext();
@@ -59,6 +60,7 @@ const App = () => {
         {(!isLoggedIn || (user && user.role === 'landlord')) && (
           <>
             <Route path='/pricing' element={<MainNav><Pricing /></MainNav>} />
+            <Route path='/subscription-expired' element={<MainNav><SubscriptionExpired /></MainNav>} />
             <Route path='/payment-status' element={
               <AuthenticatedRoute>
                 <PaymentSuccess />

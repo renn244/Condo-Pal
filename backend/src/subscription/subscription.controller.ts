@@ -26,6 +26,11 @@ export class SubscriptionController {
         return this.subscriptionService.getCurrentPlan(user)
     }
 
+    @Get('latest')
+    async getLatestSubscription(@User() user: UserJwt) {
+        return this.subscriptionService.getLatestSubscription(user)
+    }
+
     @Get('getBillingHistory')
     async getBillingHistory(@User() user: UserJwt, @Query() query: { page?: string }) {
         return this.subscriptionService.getBillingHistory(user, query)

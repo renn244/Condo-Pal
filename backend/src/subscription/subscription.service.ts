@@ -158,6 +158,22 @@ export class SubscriptionService {
         };
     }
 
+    // expired or not
+    async getLatestSubscription(user: UserJwt) {
+        const subscription = await this.prisma.subscription.findFirst({
+            where: { userId: user.id, isPaid: true },
+        })
+
+        if(!subscription) {
+            throw new NotFoundException({
+                name: 'subscription',
+                message: 'failed to find subscription'
+            })
+        }
+
+        return subscription;
+    }
+
     async getBillingHistory(user: UserJwt, query: { page?: string }) {
         const take = 10;
         const skip = (parseInt(query.page || '1') - 1) * take || 0;
