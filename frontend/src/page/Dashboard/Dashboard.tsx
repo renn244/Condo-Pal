@@ -16,7 +16,7 @@ import ViewCondo from "./ViewCondo"
 import AllNotifications from "../AllNotifications"
 import EditMaintenance from "./EditMaintenance"
 import Payout from "./Payout"
-import { SubscriptionProvider } from "@/context/SubscriptionSocket"
+import { SubscriptionProvider } from "@/context/SubscriptionContext"
 
 const Dashboard = () => {
     const location = useLocation();

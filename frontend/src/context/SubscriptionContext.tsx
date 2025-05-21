@@ -2,6 +2,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { useAuthContext } from "./AuthContext";
 import SubscriptionExpiredDialog from "@/components/pageComponents/dashboard/SubscriptionExpiredDialog";
 import NoSubscription from "@/components/pageComponents/dashboard/NoSubscription";
+import { useLocation } from "react-router-dom";
 
 type SubscriptionSocketContextType = {
     isLoading: boolean;
@@ -24,12 +25,13 @@ export const useSubscriptionContext = () => {
 }
 
 export const SubscriptionProvider = ({
-    children   
+    children
 }: PropsWithChildren) => {
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const [isActive, setIsActive] = useState<boolean>(false);
     const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
-
+    
+    const { pathname } = useLocation();
     const { user, isLoading } = useAuthContext();
 
     const checkSubscription = () => {
@@ -48,6 +50,8 @@ export const SubscriptionProvider = ({
 
         return isActive;
     }
+
+    const exludedPaths = ['/payout', '/chats']
 
     useEffect(() => {
         if(!user) return;
@@ -73,10 +77,16 @@ export const SubscriptionProvider = ({
 
     if(isLoading) return null;
 
+    const isNotAllowed = (!isActive && !exludedPaths.some((path) => pathname.endsWith(path)))
+
     return (
         <SubscriptionContext.Provider value={value}>
-            {isActive ? children : <NoSubscription />}
-            <SubscriptionExpiredDialog open={showDialog} onOpenChange={setShowDialog} />
+            {isNotAllowed ? (
+                <NoSubscription />                
+            ) : (
+                children
+            )}
+            {isNotAllowed && <SubscriptionExpiredDialog open={showDialog} onOpenChange={setShowDialog} />}
         </SubscriptionContext.Provider>
     )
 }
