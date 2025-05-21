@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import LatestSubscriptionCard from "@/components/pageComponents/subscriptionExpired/LatestSubscriptionCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
@@ -9,15 +10,13 @@ import { Link } from "react-router-dom"
 
 const SubscriptionExpired = () => {
 
-    // make a request to the backend to get if there is a subscription or not and if it's expired or not
-    // to also get the latest info of the subscription
     const { data, isLoading, error } = useQuery({
         queryKey: ["subscription", "latest"],
         queryFn: async () => {
             const response = await axiosFetch.get("/subscription/latest");
 
             if(response.status === 404) {
-                return null;
+                return null
             }
 
             if(response.status >= 400) {
@@ -32,6 +31,11 @@ const SubscriptionExpired = () => {
 
     if(error) {
         return
+    }
+
+    if(!data) {
+        window.location.assign("/pricing");
+        return null
     }
 
     const formmatedExpiryDate = data?.expiresAt ?
@@ -50,6 +54,8 @@ const SubscriptionExpired = () => {
                     features and continue managing your properties.
                 </p>
             </div>
+
+            <LatestSubscriptionCard subscriptionInfo={data} />
 
             <div className="grid gap-6 mb-10">
                 <div className="flex flex-col md:flex-row gap-4 p-4 rounded-lg border bg-muted/30">

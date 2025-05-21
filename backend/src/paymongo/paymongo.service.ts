@@ -103,7 +103,7 @@ export class PaymongoService {
                 `${process.env.PAYMONGO_API_URL}/checkout_sessions/${checkout_sessionId}`,
                 {...this.getHeaders('secret'), validateStatus: () => true}
             )
-
+            
             return response.data.data
         } catch (error) {
             throw new InternalServerErrorException('Error getting payment links')

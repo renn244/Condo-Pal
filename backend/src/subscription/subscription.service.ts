@@ -29,7 +29,7 @@ export class SubscriptionService {
             },
             'Pro': {
                 price: 1450,
-                title: 'Pro',
+                title: 'Professional',
                 description: 'For growing businesses',
                 features: [
                     "Unlimited projects",
@@ -171,7 +171,10 @@ export class SubscriptionService {
             })
         }
 
-        return subscription;
+        return {
+            ...subscription,
+            ...this.handleTypeSubscription(subscription.type),
+        };
     }
 
     async getBillingHistory(user: UserJwt, query: { page?: string }) {
@@ -180,7 +183,7 @@ export class SubscriptionService {
 
         const [billingHistory, totalCount] = await Promise.all([
             this.prisma.subscription.findMany({
-                where: { userId: user.id },
+                where: { userId: user.id, isPaid: true },
                 select: {
                     id: true, type: true,  linkId: true,
                     createdAt: true, expiresAt: true, canceledAt: true, 
