@@ -24,6 +24,7 @@ import Settings from './page/Settings';
 import TermsAndCondition from './page/TermsAndCondition';
 import PrivacyPolicy from './page/PrivacyPolicy';
 import SubscriptionExpired from './page/SubscriptionExpired';
+import ReminderCron from './page/ReminderCron';
 
 const App = () => {
   const { isLoggedIn, user, isLoading } = useAuthContext();
@@ -92,6 +93,9 @@ const App = () => {
 
         {/* Error Pages */}
         <Route path='*' element={<NotFound />} />
+
+        {/* Not For User Page*/}
+        <Route path='/service/reminder-cron' element={<ReminderCron />} />        
       </Routes>
     </div>
   )

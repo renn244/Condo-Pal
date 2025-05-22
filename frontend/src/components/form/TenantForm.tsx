@@ -110,11 +110,15 @@ const TenantForm = ({
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Days</SelectLabel>
-                                        {Array.from({ length: 28 }, (_, i) => (
-                                            <SelectItem className="hover:bg-muted" key={i} value={(i + 1).toString()}>
-                                                {i + 1}
-                                            </SelectItem>
-                                        ))}
+                                        {Array.from({ length: 28 }, (_, i) => {
+                                            if(i < 14) return null
+
+                                            return (
+                                                <SelectItem className="hover:bg-muted" key={i} value={(i + 1).toString()}>
+                                                    {i + 1}
+                                                </SelectItem>
+                                            )
+                                        })}
                                         <SelectItem className="hover:bg-muted" value="-1">last day of the month</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>

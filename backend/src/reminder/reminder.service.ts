@@ -29,7 +29,11 @@ export class ReminderService {
         return "Already Waked Up From Sleep";
     }
 
-    async runPaymentReminder() {
+    async runPaymentReminder(token: string) {
+        if(token !== process.env.CRON_JOB_TOKEN) {
+            return "Invalid Token";
+        }
+
         // get all the lease Agreement to get the due date
         const notEndedLeaseAgreement = await this.prisma.leaseAgreement.findMany({
             where: {

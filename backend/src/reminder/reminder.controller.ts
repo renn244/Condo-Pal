@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ReminderService } from './reminder.service';
 
 @Controller('reminder')
@@ -13,7 +13,7 @@ export class ReminderController {
     }
 
     @Get('Cron-PaymentReminder')
-    async runPaymentReminder() {
-        return this.reminderService.runPaymentReminder();
+    async runPaymentReminder(@Query('token') token: string) {
+        return this.reminderService.runPaymentReminder(token);
     }
 }
