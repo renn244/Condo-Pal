@@ -60,7 +60,6 @@ export class ReminderService {
                 : leaseAgreement.due_date === new Date().getDate() + 7;
             
             // TODOLATER: check if already paid
-
             if(is1WeekBeforeDue) {
                 this.emailSender.sendDueReminderEmail(leaseAgreement.tenant.email, leaseAgreement);
                 

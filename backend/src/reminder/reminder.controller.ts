@@ -14,6 +14,7 @@ export class ReminderController {
 
     @Get('Cron-PaymentReminder')
     async runPaymentReminder(@Query('token') token: string) {
+        console.log("Cron Job Running");
         return this.reminderService.runPaymentReminder(token);
     }
 }
