@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 
 const FAQ = () => {
@@ -32,11 +31,6 @@ const FAQ = () => {
                     </p>
                 </div>
             </CardContent>
-            <CardFooter className="border-t pt-4">
-                <Button variant="ghost" className="w-full">
-                    View All FAQs
-                </Button>
-            </CardFooter>
         </Card>
     )
 }

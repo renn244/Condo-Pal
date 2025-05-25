@@ -38,6 +38,7 @@ model User {
   condos        Condo[]  @relation("Owner")
   condo         Condo?   @relation("Tenant") 
 
+  payout        UserPayout? // this is the payout of the user if they are a landlord
   billingInfo   BillingInfo? // this is the billing info of the landlord
   payments      CondoPayment[]
   agreement     LeaseAgreement? // if it's a landlord then this should be null
@@ -51,6 +52,35 @@ model User {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model UserPayout {
+  id              String   @id @default(cuid())
+  
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+
+  totalAmount     Int // this is the total amount that the user has earned from the condo payments
+  availableAmount Int // this is the amount that the user can withdraw
+
+  payouts         Payouts[] // this is the payouts that the user has made
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// actual payout transactions
+model Payouts {
+  id              String   @id @default(cuid())
+
+  userPayoutId    String
+  userPayout      UserPayout @relation(fields: [userPayoutId], references: [id])
+
+  amount          Int
+  status          String // e.g., "pending", "completed", "failed"
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model BillingInfo {

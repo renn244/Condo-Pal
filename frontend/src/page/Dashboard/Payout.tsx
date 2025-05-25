@@ -17,9 +17,10 @@ const Payout = () => {
 
     return (
         <div className="">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-primary">Payouts</h1>
+                    <p className="text-base text-muted-foreground">This is where you can get the payment from paymongo (manual and gcash goes directly to you so they are exluded)</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button>

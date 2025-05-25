@@ -3,12 +3,8 @@ import PendingRequests from "@/components/pageComponents/dashboard/mainDashboard
 import PropertiesOverview from "@/components/pageComponents/dashboard/mainDashboard/PropertiesOverview"
 import RecentNotification from "@/components/pageComponents/dashboard/mainDashboard/RecentNotification"
 import SummaryCards from "@/components/pageComponents/dashboard/mainDashboard/SummaryCards"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, DollarSign, FileText, Plus, Wallet } from "lucide-react"
 
 const MainDashboard = () => {
-
 
     return (
         <div>
@@ -38,7 +34,7 @@ const MainDashboard = () => {
 
                 <div className="space-y-6">
                     {/* Quick Actions */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle>Quick Actions</CardTitle>
                         </CardHeader>
@@ -64,7 +60,7 @@ const MainDashboard = () => {
                                 Schedule Property Viewing
                             </Button>
                         </CardContent>
-                    </Card>
+                    </Card> */}
 
                     {/* Notifications */}
                     <RecentNotification />

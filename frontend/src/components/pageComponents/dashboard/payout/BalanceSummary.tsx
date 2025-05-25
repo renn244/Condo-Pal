@@ -1,17 +1,19 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import axiosFetch from "@/lib/axios"
 import formatToPesos from "@/lib/formatToPesos"
+import { useQuery } from "@tanstack/react-query"
 
-type BalanceSummaryProps = {
-    total: number,
-    pending: number,
-    available: number,
-}
+const BalanceSummary = () => {
 
-const BalanceSummary = ({
-    total,
-    pending,
-    available
-}: BalanceSummaryProps) => {
+    const { data, isLoading } = useQuery({
+        queryKey: ['balanceSummary'],
+        queryFn: async () => {
+            const response = await axiosFetch.get('/payout/balance-summary');
+
+            return response.data as getBalanceSummary;
+        }
+    })
 
     return (
         <Card>
@@ -23,17 +25,29 @@ const BalanceSummary = ({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">Total Balance</p>
-                        <p className="text-2xl font-bold text-primary">{formatToPesos(total)}</p>
+                        {isLoading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <p className="text-2xl font-bold text-primary">{formatToPesos(data?.total || 0)}</p>
+                        )}
                         <p className="text-xs text-muted-foreground">All collected payments</p>
                     </div>
                     <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Pending</p>
-                        <p className="text-2xl font-bold text-amber-500">{formatToPesos(pending)}</p>
-                        <p className="text-xs text-muted-foreground">Processing payments</p>
+                        <p className="text-sm text-muted-foreground">Withdrawn</p>
+                        {isLoading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <p className="text-2xl font-bold text-amber-500">{formatToPesos(data?.withdrawn || 0)}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">Withdrawn </p>
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">Available for Payout</p>
-                        <p className="text-2xl font-bold text-green-600">{formatToPesos(available)}</p>
+                        {isLoading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <p className="text-2xl font-bold text-green-600">{formatToPesos(data?.available || 0)}</p>
+                        )}
                         <p className="text-xs text-muted-foreground">Ready to withdraw</p>
                     </div>
                 </div>

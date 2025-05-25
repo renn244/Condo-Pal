@@ -4,51 +4,25 @@ import { Input } from "@/components/ui/input"
 import { ChevronRightIcon, SearchIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 import RecentPaymentCard from "./RecentPaymentCard"
-
-const transactions = [
-    {
-        id: "txn_123456",
-        date: "2023-07-28",
-        amount: 2500,
-        description: "July 2023 Rent",
-        tenant: "Alice Johnson",
-        property: "Seaside Retreat",
-        status: "completed",
-        paymentMethod: "card",
-    },
-    {
-        id: "txn_123457",
-        date: "2023-07-25",
-        amount: 3200,
-        description: "July 2023 Rent",
-        tenant: "Bob Smith",
-        property: "Downtown Loft",
-        status: "completed",
-        paymentMethod: "gcash",
-    },
-    {
-        id: "txn_123458",
-        date: "2023-07-24",
-        amount: 2800,
-        description: "July 2023 Rent",
-        tenant: "Jennifer Garcia",
-        property: "Mountain View",
-        status: "completed",
-        paymentMethod: "bank",
-    },
-    {
-        id: "txn_123459",
-        date: "2023-08-01",
-        amount: 3500,
-        description: "August 2023 Rent",
-        tenant: "Michael Brown",
-        property: "Sunset Heights",
-        status: "pending",
-        paymentMethod: "maya",
-    }
-]
+import { useQuery } from "@tanstack/react-query"
+import axiosFetch from "@/lib/axios"
+import LoadingSpinner from "@/components/common/LoadingSpinner"
+import { useState } from "react"
 
 const RecentPayments = () => {
+    const [search, setSearch] = useState("");
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["recent", "payments", search],
+        queryFn: async () => {
+            const response = await axiosFetch.get("/condo-payment/condoPayments", {
+                params: { page: "1", paymentType: "PAYMONGO", search: search || "" }
+            });
+
+            return response.data as CondoPaymentsDashboard;
+        }
+    })
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -58,16 +32,27 @@ const RecentPayments = () => {
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="relative">
-                        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Search payments..." className="pl-8 w-[200px]" />
+                        <SearchIcon className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input value={search} onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search payments..." className="pl-8 w-[300px]" />
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {transactions.map((transaction) => (
-                        <RecentPaymentCard transaction={transaction} />
-                    ))}
+                <div className="space-y-2">
+                    {isLoading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        data?.getCondoPayments && data.getCondoPayments.length > 0 ? (
+                            data.getCondoPayments.map((transaction) => (
+                                <RecentPaymentCard transaction={transaction} />
+                            ))
+                        ) : (
+                            <div className="text-center text-muted-foreground">
+                                No payments found.
+                            </div>
+                        )
+                    )}
                 </div>
             </CardContent>
             <CardFooter className="border-t pt-4">
