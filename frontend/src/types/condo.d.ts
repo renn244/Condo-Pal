@@ -114,6 +114,7 @@ type getCondoOverview = {
 type getMainDashboardSummary = {
     totalActive: number,
     totalCondo: number,
+    totalPaidThisMonth: number,
     pendingMaintenance: number,
     pendingGcashPayment: number,
 }

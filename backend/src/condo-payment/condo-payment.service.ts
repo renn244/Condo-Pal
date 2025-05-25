@@ -124,7 +124,7 @@ export class CondoPaymentService {
         return expensesId
     }
 
-    private getBillingMonthOfDate(date: Date) {
+    getBillingMonthOfDate(date: Date) {
         const month = date.getMonth() + 1; // base 1 means january is 1
         const year = date.getFullYear();
 

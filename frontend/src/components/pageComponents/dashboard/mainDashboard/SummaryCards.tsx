@@ -2,7 +2,7 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
-import { Building2, IdCard, TrendingUp, Wrench } from "lucide-react"
+import { Building2, IdCard, Wallet2, Wrench } from "lucide-react"
 
 const SummaryCards = () => {
     const { data, isLoading } = useQuery({
@@ -36,15 +36,15 @@ const SummaryCards = () => {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Payment this month</CardTitle>
+                    <Wallet2 className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        75%
+                        {data.totalPaidThisMonth}
                     </div>
                     <p className="text-xs text-muted-foreground pt-1">
-                        Profit Margin Percentage
+                        Number of payments received this month
                     </p>
                 </CardContent>
             </Card>

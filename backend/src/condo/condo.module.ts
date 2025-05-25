@@ -8,6 +8,6 @@ import { CondoPaymentModule } from 'src/condo-payment/condo-payment.module';
   providers: [CondoService],
   controllers: [CondoController],
   exports: [CondoService],
-  imports: [FileUploadModule, CondoPaymentModule],
+  imports: [FileUploadModule, CondoPaymentModule, CondoPaymentModule],
 })
 export class CondoModule {}

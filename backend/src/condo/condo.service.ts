@@ -12,6 +12,7 @@ export class CondoService {
         private readonly prisma: PrismaService,
         private readonly fileUploadService: FileUploadService,
         private readonly condoPaymentService: CondoPaymentService,
+        private readonly condoPaymentModule: CondoPaymentService,
     ) {}
 
     async createCondo(user: UserJwt, condoInfo: CreateCondoDto, condoPhoto: Express.Multer.File) {
@@ -51,10 +52,12 @@ export class CondoService {
             where: { ownerId: user.id }, select: { id: true }
         })
         const condoIds = condo.flatMap((condo) => condo.id)
+        const currentBillingMonth = this.condoPaymentService.getBillingMonthOfDate(new Date());
 
-        const [totalActive, totalCondo, pendingMaintenance, pendingGcashPayment] = await Promise.all([
+        const [totalActive, totalCondo, totalPaidThisMonth, pendingMaintenance, pendingGcashPayment] = await Promise.all([
             this.prisma.condo.count({ where: { id: { in: condoIds } ,isActive: true } }),
             this.prisma.condo.count({ where: { id: { in: condoIds } } }),
+            this.prisma.condoPayment.count({ where: { condoId: { in: condoIds }, billingMonth: currentBillingMonth, OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }] } }),
             this.prisma.maintenance.count({ where: { condoId: { in: condoIds }, Status: 'PENDING' } }),
             this.prisma.condoPayment.count({ where: { condoId: { in: condoIds }, gcashStatus: 'PENDING' } }),
         ])
@@ -62,6 +65,7 @@ export class CondoService {
         return {
             totalActive,
             totalCondo,
+            totalPaidThisMonth,
             pendingMaintenance,
             pendingGcashPayment,
         }
