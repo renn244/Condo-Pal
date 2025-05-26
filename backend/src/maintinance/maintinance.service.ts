@@ -114,7 +114,7 @@ export class MaintenanceService {
         // get tenantId to notify the tenant
         if(getCondo.tenantId) {
             this.notificationService.sendNotificationToUser(getCondo.tenantId, {
-                title: "New Maintenance Request", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                title: "New Maintenance Request", type: 'MAINTENANCE',
                 message: `new Maintenanece request has been created by ${user.name} from ${getCondo.name}`,
             })
         }

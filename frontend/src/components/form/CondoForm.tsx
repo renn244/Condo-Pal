@@ -172,7 +172,6 @@ const CondoForm = ({
                                 </FormControl>
                                 <FormDescription>
                                     This is to know whether the condo is occupied (isActive)
-                                    
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>

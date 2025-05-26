@@ -22,6 +22,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ServeStaticModule  } from '@nestjs/serve-static'
 import { join } from 'path';
 import { PayoutModule } from './payout/payout.module';
+import { PayoutMethodModule } from './payout-method/payout-method.module';
 
 const imports = [
   AuthModule, PrismaModule, 
@@ -39,7 +40,7 @@ const imports = [
   ReminderModule, MaintenanceMessageModule,
   MaintenanceWorkerTokenModule, MessageModule, 
   GeneralGatewayModule, UserModule, ExpenseModule, 
-  NotificationModule, PayoutModule
+  NotificationModule, PayoutModule, PayoutMethodModule
 ]
 
 if(process.env.SOFTWARE_ENV === 'production') {
