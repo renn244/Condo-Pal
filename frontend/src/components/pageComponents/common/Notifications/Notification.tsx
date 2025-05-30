@@ -82,6 +82,23 @@ const Notification = ({
     const markRead = async (notificationId: string) => {
         const response = await axiosFetch.patch(`/notification/${notificationId}`);
 
+        await queryClient.setQueryData(["notifications"], (oldData: InfiniteData<getNotifications> | undefined) => {
+            if(!oldData) return oldData;
+
+            return {
+                ...oldData,
+                pages: oldData.pages.map((page, idx) => {
+                    if(idx === 0) {
+                        return {
+                            ...page, unreadCount: page.unreadCount - 1,
+                            notifications: page.notifications.map((notification) => ({ ...notification, isRead: true, })),
+                        }
+                    }
+                    return page;
+                })
+            }
+        })
+
         return response.data;
     }
 

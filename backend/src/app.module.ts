@@ -47,7 +47,7 @@ if(process.env.SOFTWARE_ENV === 'production') {
   imports.push(
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../', 'frontend', 'dist'),
-      exclude: ['/api/reminder/*']
+      exclude: ['/api/reminder']
     })
   )
 }
