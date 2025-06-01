@@ -538,9 +538,10 @@ export class MaintenanceService {
 
         // notify for the opposite of who canceled
         if(condo.condo.tenantId && condo.condo.ownerId) {
-            const userToNotify = condo.condo.ownerId === user.id ? condo.condo.tenantId : condo.condo.ownerId;
+            const isOwnerCancelled = condo.condo.ownerId === user.id;
+            const userToNotify = isOwnerCancelled ? condo.condo.tenantId : condo.condo.ownerId;
             this.notificationService.sendNotificationToUser(userToNotify, {
-                title: "Maintenance Canceled", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
+                title: "Maintenance Canceled", link: isOwnerCancelled ? undefined : `/dashboard/maintenance`, type: 'MAINTENANCE',
                 message: `${cancelMaintenance.title} Maintenance has been canceled by ${user.name} from ${condo.condo.name}`,
             })
         }

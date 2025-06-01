@@ -7,9 +7,9 @@ const LandlordRoute = ({
     children
 }: PropsWithChildren) => {
     const { user, isLoggedIn } = useAuthContext();
+    const location = useLocation();
 
     if(!user || !isLoggedIn) {
-        const location = useLocation();
         const nextUrl = location.pathname;
 
         // redirect
@@ -18,6 +18,9 @@ const LandlordRoute = ({
     }
 
     if(user.role !== 'landlord') {
+        if(location.pathname === '/tenant/dashboard') {
+            window.location.assign('/dashboard')
+        }
         return <Forbidden message="This area is only for landlords" />
     }
 

@@ -7,9 +7,10 @@ const TenantRoute = ({
     children
 }: PropsWithChildren) => {
     const { user, isLoggedIn }  = useAuthContext()
+    const location = useLocation()
+
     
     if(!user || !isLoggedIn) {
-        const location = useLocation()
         const nextUrl = location.pathname
 
         // redirect
@@ -18,6 +19,9 @@ const TenantRoute = ({
     }
 
     if(user.role !== 'tenant') {
+        if(location.pathname === '/dashboard') {
+            window.location.assign('/tenant/dashboard')
+        }
         return <Forbidden message="This area is only for tenants and active(with leaseAgreement) tenants" />
     }
 
