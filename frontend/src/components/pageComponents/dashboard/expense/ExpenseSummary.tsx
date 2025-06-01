@@ -59,7 +59,7 @@ const ExpenseSummary = ({
                     ) : (
                         <>
                             <div className="text-2xl font-bold">{formatToPesos(totalExpenses)}</div>
-                            <p className="text-xs text-muted-foreground">Overall expense for all your bills (including the future)</p>
+                            <p className="text-xs text-muted-foreground">Overall expense for all your bills (including the next billing month if paid)</p>
                         </>
                     )}
                 </CardContent>

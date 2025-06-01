@@ -69,9 +69,11 @@ const TenantExpenseTable = () => {
                                                             {expense.recurrence?.toLocaleLowerCase()}
                                                         </Badge>
                                                     )}
-                                                    <Badge variant={expense.isPaid ? "default" : "destructive"}>
-                                                        {expense.isPaid ? "Paid" : "Unpaid"}
-                                                    </Badge>
+                                                    {!expense.recurring && (
+                                                        <Badge variant={expense.isPaid ? "default" : "destructive"}>
+                                                            {expense.isPaid ? "Paid" : "Unpaid"}
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                                 {expense.notes && <p className="text-sm text-muted-foreground truncate">{expense.notes}</p>}
                                                 <div className="flex items-center space-x-4 text-xs text-muted-foreground">

@@ -47,13 +47,10 @@ const UserNav = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => window.location.assign('/settings/billingInfo')}>
                         Billing
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => window.location.assign('/settings/profile')}>
                         Settings
                     </DropdownMenuItem>
                 </DropdownMenuGroup>

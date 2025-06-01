@@ -72,6 +72,8 @@ const MaintenanceForm = ({
                     type: 'min',
                     message: "At least one image is required"
                 })
+
+                return;
             }
             
             // getting all the previous files only for update

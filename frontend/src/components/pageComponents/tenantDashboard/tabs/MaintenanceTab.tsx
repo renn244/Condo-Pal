@@ -136,7 +136,7 @@ const MaintenanceTab = () => {
                                 <h3 className="font-medium text-lg mb-2">No Maintenance Requests</h3>
                                 <p className="text-muted-foreground mb-4">You don't have any maintenance requests at the moment.</p>
                                 <Button asChild>
-                                    <Link to="/maintenanceRequest">
+                                    <Link to="/tenant/maintenanceRequest">
                                         Submit a Request
                                     </Link>
                                 </Button>
