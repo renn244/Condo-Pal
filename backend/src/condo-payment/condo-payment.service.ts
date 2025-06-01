@@ -553,7 +553,7 @@ export class CondoPaymentService {
                 select: { id: true, billingMonth: true, additionalCost: true, totalPaid: true },
             }),
             this.prisma.maintenance.findMany({
-                where: { condoId, paymentResponsibility: 'TENANT', Status: 'COMPLETED' },
+                where: { condoId, paymentResponsibility: 'LANDLORD', Status: 'COMPLETED' },
                 select: { completionDate: true, totalCost: true },
             }),
         ]);
