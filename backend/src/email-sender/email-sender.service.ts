@@ -15,7 +15,7 @@ export class EmailSenderService{
   async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {
     const msg = {
         to: to,
-        from: 'renatodsantosjr9@gmail.com',
+        from: 'condopal.management@gmail.com',
         subject: subject,
         html: content,
         ...options
@@ -25,7 +25,7 @@ export class EmailSenderService{
         const response = await sgMail.send(msg)
         return response
     } catch (error) {
-        console.log(`Error sending email: ${error.message}`)
+        console.log(`Error sending email: ${error}`)
     }
   }
 
