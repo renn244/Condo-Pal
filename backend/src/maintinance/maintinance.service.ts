@@ -509,12 +509,12 @@ export class MaintenanceService {
         if(maintenanceRequest.condo.tenantId) {
             this.notificationService.sendNotificationToUser(maintenanceRequest.condo.tenantId, {
                 title: "Maintenance Completed", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
-                message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+                message: `${maintenanceRequest.title} Maintenance has been completed by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
             })
         }
         this.notificationService.sendNotificationToUser(maintenanceRequest.condo.ownerId, {
             title: "Maintenance Completed", link: `/dashboard/maintenance`, type: 'MAINTENANCE',
-            message: `${maintenanceRequest.title} Maintenance has been started by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
+            message: `${maintenanceRequest.title} Maintenance has been completed by ${getWorker.workerName} from ${maintenanceRequest.condo.name}`,
         })
 
         return maintenanceRequest
