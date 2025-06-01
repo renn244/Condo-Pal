@@ -567,6 +567,13 @@ export class CondoPaymentService {
             }
         });
     
+        // order the payments by payedAt
+        payments.sort((a, b) => {
+            const [monthA, yearA] = a.billingMonth.split('-').map(Number);
+            const [monthB, yearB] = b.billingMonth.split('-').map(Number);
+            return yearA - yearB || monthA - monthB; // Sort by year first, then by month
+        });
+
         return payments.map((payment) => ({
             ...payment,
             additionalCost: (payment.additionalCost || 0) + (maintenanceByMonth.get(payment.billingMonth) || 0),
@@ -676,9 +683,13 @@ export class CondoPaymentService {
             OR: [{ isVerified: true }, { isPaid: true }, { gcashStatus: 'APPROVED' }],
         }
 
-        const [condoPayments, currentYearData] = await Promise.all([
+        const [condoPayments, currentYearData, maintenance] = await Promise.all([
             this.prisma.condoPayment.findMany({ where: where, select: { totalPaid: true, additionalCost: true, billingMonth: true } }),
             this.prisma.condoPayment.aggregate({ where: where, _sum: { totalPaid: true, additionalCost: true } }),
+            this.prisma.maintenance.findMany({
+                where: { condoId: { in: condoIds }, paymentResponsibility: 'LANDLORD', Status: 'COMPLETED' },
+                select: { completionDate: true, totalCost: true },
+            })
         ])
 
         const formattedFinancialStat = condoPayments.reduce((acc, payment) => {
@@ -693,6 +704,17 @@ export class CondoPaymentService {
 
             return acc;
         }, { } as Record<string, { totalPaid: number; additionalCost: number }>);
+
+        // Add maintenance costs to the financial statistics
+        maintenance.forEach(({ completionDate, totalCost }) => {
+            if (completionDate) {
+                const month = this.getBillingMonthOfDate(completionDate);
+                if (!formattedFinancialStat[month]) {
+                    formattedFinancialStat[month] = { totalPaid: 0, additionalCost: 0 };
+                }
+                formattedFinancialStat[month].additionalCost += totalCost || 0;
+            }
+        });
 
         const financialStat = Object.entries(formattedFinancialStat).map(([month, { totalPaid, additionalCost }]) => ({
             billingMonth: month, revenue: totalPaid, expenses: additionalCost 

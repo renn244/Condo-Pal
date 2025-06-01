@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TabsContent } from "@/components/ui/tabs"
 import useViewCondoParams from "@/hooks/useViewCondoParams"
 import axiosFetch from "@/lib/axios"
@@ -34,7 +33,7 @@ const ExpensesTab = ({
             <ExpenseTable expenses={expenses} isLoading={isLoading} condoId={condo.id} />
 
             {/* Expense Chart */}
-            <Card>
+            {/* <Card>
                 <CardHeader>
                     <CardTitle>Expense Breakdown</CardTitle>
                     <CardDescription>Distribution of expense by category</CardDescription>
@@ -44,7 +43,7 @@ const ExpensesTab = ({
                         Expense breakdown chart visualization would go here
                     </div>
                 </CardContent>
-            </Card>
+            </Card> */}
         </TabsContent>
     )
 }

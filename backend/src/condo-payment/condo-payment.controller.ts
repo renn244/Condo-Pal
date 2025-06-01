@@ -80,7 +80,7 @@ export class CondoPaymentController {
         return this.condoPaymentService.getCondoPaymentsLandlord(user, query);
     }
 
-    @Get('condoPaymentsTenant')
+    @Get('condoPaymentsStatsDashboard')
     async getFinancialStats(@User() user: UserJwt) {
         return this.condoPaymentService.getFinancialStats(user);
     } 

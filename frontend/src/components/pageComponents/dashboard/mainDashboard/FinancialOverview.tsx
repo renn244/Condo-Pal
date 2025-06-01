@@ -23,7 +23,7 @@ const FinancialOverview = () => {
     const { data, isLoading } = useQuery({
         queryKey: ["financials", "overview"],
         queryFn: async () => {
-            const response = await axiosFetch.get("/condo-payment/condoPaymentsTenant");
+            const response = await axiosFetch.get("/condo-payment/condoPaymentsStatsDashboard");
 
             return response.data as CondoPaymentsTenant;
         }
