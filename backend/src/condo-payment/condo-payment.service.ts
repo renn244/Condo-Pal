@@ -491,18 +491,13 @@ export class CondoPaymentService {
         await this.prisma.condoPayment.update({ where: { id: condoPaymentId }, data: { isPaid: true } })
         await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth);
         
+        
         // transfer this to userpayout module later on
+        const paymentAmount = getPayment.attributes.payment_intent.attributes.amount / 100;
         await this.prisma.userPayout.upsert({
             where: { userId: getSessionId.condo.ownerId },
-            create: {
-                userId: getSessionId.condo.ownerId,
-                totalAmount: getPayment.attributes.amount,
-                availableAmount: getPayment.attributes.amount,
-            },
-            update: {
-                totalAmount: { increment: getPayment.attributes.amount },
-                availableAmount: { increment: getPayment.attributes.amount },
-            }
+            create: { userId: getSessionId.condo.ownerId, totalAmount: paymentAmount, availableAmount: paymentAmount },
+            update: { totalAmount: { increment: paymentAmount }, availableAmount: { increment: paymentAmount } }
         })
 
         // notify the landlord
