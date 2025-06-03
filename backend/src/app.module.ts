@@ -54,7 +54,5 @@ if(process.env.SOFTWARE_ENV === 'production') {
 
 @Module({
   imports: imports,
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

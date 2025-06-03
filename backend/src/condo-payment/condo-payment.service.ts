@@ -490,6 +490,20 @@ export class CondoPaymentService {
         // update to isPaid to the database
         await this.prisma.condoPayment.update({ where: { id: condoPaymentId }, data: { isPaid: true } })
         await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth);
+        
+        // transfer this to userpayout module later on
+        await this.prisma.userPayout.upsert({
+            where: { userId: getSessionId.condo.ownerId },
+            create: {
+                userId: getSessionId.condo.ownerId,
+                totalAmount: getPayment.attributes.amount,
+                availableAmount: getPayment.attributes.amount,
+            },
+            update: {
+                totalAmount: { increment: getPayment.attributes.amount },
+                availableAmount: { increment: getPayment.attributes.amount },
+            }
+        })
 
         // notify the landlord
         this.notificationService.sendNotificationToUser(getSessionId.condo.ownerId, {
