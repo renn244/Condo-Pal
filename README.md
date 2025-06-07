@@ -17,6 +17,7 @@ CondoPal is a hassle-free platform for condo landlords and property managers, si
 This is the technology that i sed for building this application
 
 **Frontend**
+
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
 ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -28,6 +29,7 @@ This is the technology that i sed for building this application
 ![Recharts](https://img.shields.io/badge/Recharts-2.15.1-FF6B81?logo=recharts&logoColor=white&style=flat-square)
 
 **Backend**
+
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
 ![Nest Js](https://img.shields.io/badge/nestjs-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
