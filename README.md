@@ -2,6 +2,8 @@
 
 CondoPal is a hassle-free platform for condo landlords and property managers, simplifying rental management with automated rent collection, financial tracking, and tenant communication. Tenants can pay via digital methods, cash (manually recorded), or GCash with photo verification, while landlords get real-time insights into income and expenses. Maintenance requests can be submitted and tracked online, and built-in chat ensures smooth communication. Designed for individual condo owners, small property managers, and overseas Filipino workers (OFWs), CondoPal eliminates scattered processes with an all-in-one solution. It operates on a subscription model with optional add-ons like legal support—making condo rentals easier, more efficient, and more profitable.
 
+![Admin Dashboard](https://res.cloudinary.com/dslm0pp9s/image/upload/v1749274417/CondoPal_Dashboard_iepbw0.jpg)
+
 ## Features
 - Dashboards, analytics and tables for payment, maintenance and expenses as well as charts on certain parts of application
 - Authentication with Google Oauth 2.0 and Local Credentials (No confirmation email yet)
