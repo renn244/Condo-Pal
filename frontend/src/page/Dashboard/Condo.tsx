@@ -1,7 +1,8 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import CondoCard from "@/components/pageComponents/dashboard/condo/CondoCard"
+import CondoPagination from "@/components/pageComponents/dashboard/condo/CondoPagination"
 import CreateCondo from "@/components/pageComponents/dashboard/condo/CreateCondo"
+import CondoCardSkeleton from "@/components/skeleton/CondoCardSkeleton"
 import useCondoParams from "@/hooks/useCondoParams"
 import axiosFetch from "@/lib/axios"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
@@ -9,10 +10,11 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query"
 export type CondoResponse = {
     getCondos: CondoCard[]
     hasNext: boolean
+    totalPages: number
 }
 
 const Condo = () => {
-    const { page, search } = useCondoParams();
+    const { page, setPage, search } = useCondoParams();
 
     const { data: condos, isLoading, isError, refetch } = useQuery({
         queryKey: ['condos', page, search],
@@ -29,10 +31,6 @@ const Condo = () => {
         placeholderData: keepPreviousData
     })
 
-    if(isLoading) {
-        return <LoadingSpinner />
-    }
-
     if(isError) {
         return <SomethingWentWrong reset={refetch} />
     }
@@ -48,14 +46,22 @@ const Condo = () => {
             <div className="">
                 {/* for searching */}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {condos?.getCondos && condos.getCondos.length > 0 ? (
-                    condos.getCondos.map((condo) => (
-                        <CondoCard key={condo.id} condo={condo} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:grid-rows-3 lg:grid-rows-2 gap-6 md:min-h-[828px]">
+                {isLoading ? (
+                    Array.from({ length: 6 }).map((_) => (
+                        <CondoCardSkeleton />
                     ))
-                ) : null}
+                ) : (
+                    condos?.getCondos && condos.getCondos.length > 0 ? (
+                        condos.getCondos.map((condo) => (
+                            <CondoCard key={condo.id} condo={condo} />
+                        ))
+                    ) : null
+                )}
                 {/* null for now but maybe create a component for this later on */}
             </div>
+
+            <CondoPagination page={page} setPage={setPage} totalPages={condos?.totalPages || 1} hasNext={condos?.hasNext || false} />
         </div>
     )
 }

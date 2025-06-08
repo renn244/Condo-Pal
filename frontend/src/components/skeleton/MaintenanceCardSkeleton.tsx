@@ -10,7 +10,7 @@ const MaintenanceCardSkeleton = () => {
                 <div className="flex justify-between items-center">
                     <div className="flex gap-2">
                         <Skeleton className="w-[72px] h-[22px]" />
-                        <Skeleton className="w-[48] h-[22px]" />
+                        <Skeleton className="w-[48px] h-[22px]" />
                     </div>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => undefined}>
                         <MoreVertical className="h-4 w-4" />

@@ -86,36 +86,27 @@ export class CondoService {
     
     // landlord
     async getMyCondos(user: UserJwt, page: number) {
-        const take = 10;
+        const take = 6;
         const skip = Math.max((page - 1) * take, 0);
 
-        const getCondos = await this.prisma.condo.findMany({
-            where: {
-                ownerId: user.id
-            },
-            include: {
-                tenant: {
-                    select: {
-                        id: true,
-                        profile: true,
-                        name: true,
+        const [getCondos, totalCount] = await Promise.all([
+            this.prisma.condo.findMany({
+                where: { ownerId: user.id }, take: take, skip: skip,
+                include: {
+                    tenant: { select: { id: true, profile: true, name: true } },
+                    agreements: {
+                        where: { isLeaseEnded: false }, select: { id: true },
+                        orderBy: { createdAt: 'desc' }, take: 1,
                     }
-                },
-                agreements: {
-                    where: { isLeaseEnded: false },
-                    select: { id: true },
-                    orderBy: { createdAt: 'desc' }, 
-                    take: 1,
                 }
-            },
-            take: take,
-            skip: skip
-        })
+            }),
+            this.prisma.condo.count({ where: { ownerId: user.id } })
+        ])
 
-        const getCondoCount = await this.prisma.condo.count({ where: { ownerId: user.id } });
-        const hasNext = getCondoCount > (skip + getCondos.length);
+        const totalPages = Math.ceil(totalCount / take);
+        const hasNext = totalCount > (skip + getCondos.length);
 
-        return { getCondos, hasNext }
+        return { getCondos, hasNext, totalPages }
     }
 
     async getMyCondoList(user: UserJwt, page: number) {
