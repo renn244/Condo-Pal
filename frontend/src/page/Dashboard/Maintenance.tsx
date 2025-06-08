@@ -2,14 +2,15 @@ import MaintenanceCard from "@/components/pageComponents/dashboard/maintenance/M
 import MaintenanceHeader from "@/components/pageComponents/dashboard/maintenance/MaintenanceHeader"
 import MaintenancePagination from "@/components/pageComponents/dashboard/maintenance/MaintenancePagination"
 import NewRequestDialog from "@/components/pageComponents/dashboard/maintenance/NewRequestDialog"
+import MaintenanceCardSkeleton from "@/components/skeleton/MaintenanceCardSkeleton"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import axiosFetch from "@/lib/axios"
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 const Maintenance = () => {
     const { search, status, priority, page, setPage, setStatus, setPriority, setSearch } = useMaintenanceParams();
 
-    const { data: getMaintenance } = useQuery({
+    const { data: getMaintenance, isLoading } = useQuery({
         queryKey: ['maintenance', page, search, status, priority],
         queryFn: async () => {
             // add search ang page later as well as the filters of status and priority
@@ -18,6 +19,7 @@ const Maintenance = () => {
             return response.data as MaintenanceRequest
         },
         refetchOnWindowFocus: false,
+        placeholderData: keepPreviousData
     })
 
     return (
@@ -37,9 +39,15 @@ const Maintenance = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {getMaintenance?.maintenanceRequests.map((maintenance) => (
-                    <MaintenanceCard key={maintenance.id} maintenance={maintenance} />
-                ))}
+                {isLoading ? (
+                    Array.from({ length: 6 }).map((_, index) => (
+                        <MaintenanceCardSkeleton key={index} />
+                    ))
+                ) : (
+                    getMaintenance?.maintenanceRequests.map((maintenance) => (
+                        <MaintenanceCard key={maintenance.id} maintenance={maintenance} />
+                    ))
+                )}
             </div>
 
             {(getMaintenance && getMaintenance?.maintenanceRequests.length === 0) && (

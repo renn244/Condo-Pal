@@ -14,7 +14,7 @@ import axiosFetch from "@/lib/axios"
 import { formatBillingMonth } from "@/lib/formatBillingMonth"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { ArrowUpDown } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -38,7 +38,8 @@ const Payments = () => {
 
             return response.data as CondoPaymentsDashboard;
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        placeholderData: keepPreviousData
     })
 
     if(error || (!isLoading && !data)) {

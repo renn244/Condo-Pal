@@ -4,7 +4,7 @@ import CondoCard from "@/components/pageComponents/dashboard/condo/CondoCard"
 import CreateCondo from "@/components/pageComponents/dashboard/condo/CreateCondo"
 import useCondoParams from "@/hooks/useCondoParams"
 import axiosFetch from "@/lib/axios"
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 export type CondoResponse = {
     getCondos: CondoCard[]
@@ -25,7 +25,8 @@ const Condo = () => {
 
             return response.data as CondoResponse // for now
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        placeholderData: keepPreviousData
     })
 
     if(isLoading) {

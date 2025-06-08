@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { getPriorityBadgeVariant, getStatusBadgeVariant } from "@/lib/badgeVariant"
 import formatDate from "@/lib/formatDate"
 import formatToPesos from "@/lib/formatToPesos"
-import { Calculator, Calendar, CalendarCheck, CheckCircle, Clock, Home, PenTool, User } from "lucide-react"
+import { Calculator, Calendar, CalendarCheck, CheckCircle, Clock, Home, PenTool, ReceiptCent, User } from "lucide-react"
 import MaintenanceOptions from "./MaintenanceOptions"
 import useMaintenanceParams from "@/hooks/useMaintenanceParams"
 import formatDateTime from "@/lib/formatDateTime"
@@ -28,8 +28,8 @@ const MaintenanceCard = ({
                     <MaintenanceOptions queryKey={['maintenance', page, search, status, priority]} maintenance={maintenance} />
                 </div>
             </CardHeader>
-            <CardContent className="p-4 pt-2">
-                <div className="mb-4 ,mb-auto">
+            <CardContent className="p-4 pt-0">
+                <div>
                     <h3 className="font-semibold mb-1">{maintenance.title}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 h-[40px] max-w-[497.45px]">
                         {maintenance.description}
@@ -61,18 +61,34 @@ const MaintenanceCard = ({
                         <span className="text-muted-foreground">{maintenance.type.replace(/_/g, " ")}</span>
                     </div>
 
-                    {maintenance.estimatedCost && (
-                        <div className="flex items-center gap-2">
-                            <Calculator className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">
-                                Estimated: {" "}
-                                {formatToPesos(maintenance.estimatedCost)}
-                                {maintenance.paymentResponsibility && (
-                                    <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
-                                )}
-                            </span>
-                        </div>
-                    )}
+                    {maintenance.Status == "COMPLETED" ? (
+                            maintenance.totalCost ? (
+                                <div className="flex items-center gap-2">
+                                    <ReceiptCent className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">
+                                        totalCost: {" "}
+                                        {formatToPesos(maintenance.totalCost)}
+                                        {maintenance.paymentResponsibility && (
+                                            <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
+                                        )}
+                                    </span>
+                                </div>
+                            ) : null
+                        ) : (
+                            maintenance.estimatedCost ? (
+                                <div className="flex items-center gap-2">
+                                    <Calculator className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">
+                                        Estimated: {" "}
+                                        {formatToPesos(maintenance.estimatedCost)}
+                                        {maintenance.paymentResponsibility && (
+                                            <span className="ml-1">({maintenance.paymentResponsibility.toLowerCase()})</span>
+                                        )}
+                                    </span>
+                                </div>
+                            ) : null
+                        )
+                    }
 
                     {maintenance.Status === 'PENDING' && (
                         <div className="flex items-center gap-2">
