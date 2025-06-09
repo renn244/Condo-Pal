@@ -16,7 +16,7 @@ const NotificationCard = ({
     return (
         <div
         key={notification.id}
-        className={`px-4 py-3 border-b hover:bg-muted/50 ${!notification.isRead ? "bg-blue-50/50" : ""}`}
+        className={`px-4 py-3 border-b last:border-b-0 hover:bg-muted/50 ${!notification.isRead ? "bg-blue-50/50" : ""}`}
         >
             <div className="flex gap-3">
                 <div className="mt-1">{getNotificationIcon(notification.type)}</div>

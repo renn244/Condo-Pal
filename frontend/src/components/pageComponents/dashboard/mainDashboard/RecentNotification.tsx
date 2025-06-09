@@ -1,9 +1,9 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import NotificationCard from "../../common/Notifications/NotificationCard"
+import RecentNotificationSkeleton from "@/components/skeleton/RecentNotificationSkeleton"
 
 const RecentNotification = () => {
 
@@ -20,7 +20,7 @@ const RecentNotification = () => {
         },
     });
 
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <RecentNotificationSkeleton />
     
     if(!notifications) return null;
 

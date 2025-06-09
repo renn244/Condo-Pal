@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
+import PropertiesOverviewSkeleton from "@/components/skeleton/PropertiesOverviewSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +18,7 @@ const PropertiesOverview = () => {
         }
     })
 
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <PropertiesOverviewSkeleton />
 
     if(!data) return null
 

@@ -33,34 +33,6 @@ const MainDashboard = () => {
                 </div>
 
                 <div className="space-y-6">
-                    {/* Quick Actions */}
-                    {/* <Card>
-                        <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <Button variant="outline" className="w-full justify-start">
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add New Property
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                <DollarSign className="mr-2 h-4 w-4" />
-                                Record Payment
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                <Wallet className="mr-2 h-4 w-4" />
-                                Create Maintenance Request
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                <FileText className="mr-2 h-4 w-4" />
-                                Generate Financial Report
-                            </Button>
-                            <Button variant="outline" className="w-full justify-start">
-                                <Calendar className="mr-2 h-4 w-4" />
-                                Schedule Property Viewing
-                            </Button>
-                        </CardContent>
-                    </Card> */}
 
                     {/* Notifications */}
                     <RecentNotification />

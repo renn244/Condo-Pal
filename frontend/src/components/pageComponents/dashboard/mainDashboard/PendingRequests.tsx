@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
+import PendingRequestsSkeleton from "@/components/skeleton/PendingRequestsSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,7 +19,7 @@ const PendingRequests = () => {
         }
     })
     
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <PendingRequestsSkeleton />
 
     if(!data) return null;
 

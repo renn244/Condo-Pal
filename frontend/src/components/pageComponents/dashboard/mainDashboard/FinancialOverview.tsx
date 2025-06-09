@@ -1,4 +1,3 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -7,6 +6,7 @@ import formatToPesos from "@/lib/formatToPesos"
 import { useQuery } from "@tanstack/react-query"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import NetDistributionChartTootip from "../common/NetDistributionChartTootip"
+import FinancialOverviewSkeleton from "@/components/skeleton/FinancialOverviewSkeleton"
 
 const chartConfig = {
     revenue: {
@@ -29,7 +29,7 @@ const FinancialOverview = () => {
         }
     })
 
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <FinancialOverviewSkeleton />
 
     if(!data) return null
     
