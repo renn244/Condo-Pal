@@ -1,10 +1,10 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
+import ChatHeaderSkeleton from "@/components/skeleton/Message/ChatHeader"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import useMessageParams from "@/hooks/useMessageParams"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
-import { Building2, ChevronLeft, MoreVertical } from "lucide-react"
+import { Building2, ChevronLeft } from "lucide-react"
 
 type ChatHeaderProps = {
     setShowMobile: (show: boolean) => void
@@ -33,7 +33,7 @@ const ChatHeader = ({
         refetchOnWindowFocus: false
     })
 
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <ChatHeaderSkeleton />
 
     if(!selectedChatInfo) return null
 
@@ -64,10 +64,6 @@ const ChatHeader = ({
                     </div>
                 </div>
             </div>
-
-            <Button variant="ghost" size="icon">
-                <MoreVertical className="h-5 w-5" />
-            </Button>
         </div>
     )
 }

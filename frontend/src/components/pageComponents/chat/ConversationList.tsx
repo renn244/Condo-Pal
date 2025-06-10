@@ -1,4 +1,5 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
+
+import ConversationListSkeleton from "@/components/skeleton/Message/ConversationListSkeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { useAuthContext } from "@/context/AuthContext"
@@ -113,7 +114,7 @@ const ConversationList = ({
             <ConversationListHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
             {isLoading ? (
-                <LoadingSpinner />
+                <ConversationListSkeleton />
             ) : (
                 <div className="flex-1 overflow-y-auto">
                     {sortedConversations.map((conversation) => (
@@ -130,7 +131,7 @@ const ConversationList = ({
                             setShowMobileChat(true)
                         }}
                         >
-                            <div className="relative flex-shrink-0">
+                            <div className="relative shrink-0">
                                 <Avatar>
                                     <AvatarImage src={conversation.sender?.profile || ''} />
                                     <AvatarFallback>{conversation.sender?.name.charAt(0)}</AvatarFallback>

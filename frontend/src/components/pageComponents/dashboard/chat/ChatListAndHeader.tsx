@@ -1,5 +1,5 @@
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
-import ChatHeader from "../../chat/ChatHeader"
+import ChatHeader from "../../chat/ChatHeaderSkeleton"
 import ChatView from "../../chat/ChatView"
 import axiosFetch from "@/lib/axios"
 import { useEffect } from "react"

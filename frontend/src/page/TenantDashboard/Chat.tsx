@@ -17,8 +17,8 @@ const Chat = () => {
     }
 
     return (
-        <div className="min-h-[90vh]">
-            <div className="flex flex-1 min-h-[90vh] h-full max-h-[843px]">
+        <div className="h-full">
+            <div className="flex flex-1 h-full max-h-[843px]">
                 <ConversationList 
                 showMobileChat={showMobileChat}
                 setShowMobileChat={setShowMobileChat}
@@ -41,7 +41,7 @@ const Chat = () => {
                             </div>
                             <h3 className="text-xl font-semibold mb-2">No conversation selected</h3>
                             <p className="text-muted-foreground max-w-md">
-                                Please select a resident from the list to start chatting or continue a conversation.
+                                Please select a user from the list to start chatting or continue a conversation.
                             </p>
                         </div>
                     )}

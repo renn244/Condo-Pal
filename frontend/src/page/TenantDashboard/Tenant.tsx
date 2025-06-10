@@ -46,7 +46,7 @@ const Tenant = () => {
                             <Notification linkToAllNotifications="/tenant/all-notifications" />
                         </div>
                     </header>
-                    <main className="flex-1 p-4">
+                    <main className="w-full min-h-[853px] p-4">
                         <Routes>
                             <Route path="/chats" element={<Chat />} />
                             <Route path="/dashboard" element={<TenantDashboard />} />

@@ -6,7 +6,6 @@ import useMessageParams from "@/hooks/useMessageParams"
 import { MessageSquare } from "lucide-react"
 import { useState } from "react"
 
-
 const Chat = () => {
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [viewingPhotos, setViewingPhotos] = useState<string[]>([])
