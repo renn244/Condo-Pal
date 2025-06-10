@@ -1,3 +1,4 @@
+import TenantRecentNotificationSkeleton from "@/components/skeleton/TenantRecentNotificationSkeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
@@ -7,7 +8,7 @@ import { BellOff, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const RecentNofitications = () => {
-    const { data: notifications } = useQuery({
+    const { data: notifications, isLoading } = useQuery({
         queryKey: ["notifications", "recent"],
         queryFn: async () => {
             const response = await axiosFetch.get("/notification/recent");
@@ -16,11 +17,13 @@ const RecentNofitications = () => {
         }
     })
 
+    if(isLoading) return <TenantRecentNotificationSkeleton />
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Recent Notifications</CardTitle>
-                </CardHeader>
+            </CardHeader>
             <CardContent>
                 <div className="space-y-4">
                     {notifications && notifications.length > 0 ? (

@@ -1,10 +1,10 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import ExpenseTab from "@/components/pageComponents/tenantDashboard/tabs/ExpenseTab";
 import MaintenanceTab from "@/components/pageComponents/tenantDashboard/tabs/MaintenanceTab";
 import OverviewTab from "@/components/pageComponents/tenantDashboard/tabs/OverviewTab";
 import PaymentsTab from "@/components/pageComponents/tenantDashboard/tabs/PaymentsTab";
 import TenantNotice from "@/components/pageComponents/tenantDashboard/TenantNotice";
+import TenantDashboardSkeleton from "@/components/skeleton/TenantDashboardSkeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/context/AuthContext"
 import axiosFetch from "@/lib/axios";
@@ -32,7 +32,7 @@ const TenantDashboard = () => {
         refetchOnWindowFocus: false,
     })
 
-    if(isLoading) return <LoadingSpinner />
+    if(isLoading) return <TenantDashboardSkeleton />
 
     if(error) return <SomethingWentWrong reset={refetch} />
 
