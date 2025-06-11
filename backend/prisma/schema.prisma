@@ -81,6 +81,8 @@ model PayoutMethod {
   mobileNumber    String // e.g., "09123456789" for GCASH or MAYA
   accountName     String // e.g., "Juan Dela Cruz" for GCASH or MAYA
 
+  transactions    Payouts[] // this is the payout transactions that the user has made
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -92,8 +94,11 @@ model Payouts {
   userPayoutId    String
   userPayout      UserPayout @relation(fields: [userPayoutId], references: [id])
 
+  payoutMethodId  String
+  payoutMethod    PayoutMethod @relation(fields: [payoutMethodId], references: [id])
+
   amount          Int
-  status          String // e.g., "pending", "completed", "failed"
+  status          String // e.g., "pending", "completed", "failed" // this was meant for banks but of course we can't make a system that big yet
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

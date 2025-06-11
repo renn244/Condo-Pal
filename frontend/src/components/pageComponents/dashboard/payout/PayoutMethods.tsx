@@ -1,24 +1,12 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useQuery } from "@tanstack/react-query"
-import axiosFetch from "@/lib/axios"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import PayoutMethodCard from "./payoutMethod/PayoutMethodCard"
 import AddPayoutMethod from "./payoutMethod/AddPayoutMethod"
+import payoutMethodsQuery from "@/hooks/useQuery/payoutMethodsQuery"
 
 const PayoutMethods = () => {
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['payout', 'methods'],
-        queryFn: async () => {
-            const response = await axiosFetch('/payout-method');
-
-            if(response.status >= 400) {
-                throw new Error('Something went wrong!');
-            }
-
-            return response.data as payoutMethods;
-        }
-    }) 
+    const { data, isLoading } = payoutMethodsQuery()
 
     return (
         <Card>

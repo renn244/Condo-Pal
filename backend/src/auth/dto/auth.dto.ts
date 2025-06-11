@@ -10,7 +10,6 @@ export class RegisterLandLordDto {
     email: string;
 
     @IsString()
-    // add match custom validator later on
     password: string;
 
     @IsString()

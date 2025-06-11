@@ -12,4 +12,26 @@ type payoutMethod = {
     updatedAt: string;
 }
 
+type payout = {
+    id: string;
+
+    userPayoutId: string;
+    payoutMethodId: string;
+    amount: number;
+    status: string; // e.g, "pending", "completed", "failed" // use if banks which we will not do because it's too big.
+
+    createdAt: string;
+    updatedAt: string;
+}
+
+type payoutWithMethod = payout & {
+    payoutMethod: {
+        id: string;
+        accountName: string;
+        methodType: string; // e.g, "GCASH", "MAYA", "GRABPAY"
+    }
+}
+
 type payoutMethods = payoutMethod[];
+
+type payoutforHistory = payoutWithMethod[];

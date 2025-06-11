@@ -227,6 +227,8 @@ export class AuthService {
             }
         })
         
+        this.prisma.userPayout.create({ data: { userId: createLandlordAccount.id, totalAmount: 0, availableAmount: 0 }})
+
         // make a confirmation email
         return this.login(createLandlordAccount);
     }

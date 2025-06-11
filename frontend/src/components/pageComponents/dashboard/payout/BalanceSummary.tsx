@@ -1,19 +1,11 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import axiosFetch from "@/lib/axios"
+import balanceSummaryQuery from "@/hooks/useQuery/balanceSummary";
 import formatToPesos from "@/lib/formatToPesos"
-import { useQuery } from "@tanstack/react-query"
 
 const BalanceSummary = () => {
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['balanceSummary'],
-        queryFn: async () => {
-            const response = await axiosFetch.get('/payout/balance-summary');
-
-            return response.data as getBalanceSummary;
-        }
-    })
+    const { data, isLoading } = balanceSummaryQuery();
 
     return (
         <Card>
