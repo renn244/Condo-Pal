@@ -31,7 +31,6 @@ export class NotificationService {
         return notification;
     }
 
-    // do pagination later
     async getNotifications(user: UserJwt, query: { cursor?: string }) {
         const [notifications, unreadCount] = await Promise.all([
             this.prisma.notification.findMany({

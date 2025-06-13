@@ -76,7 +76,7 @@ export class CondoPaymentService {
         const [targetMonth, targetYear] = billingMonth.split('-').map(Number);
         const targetDate = new Date(targetYear, targetMonth, 1);
 
-        const [expenses, expensesRecurring] = await Promise.all([
+        const [_, expensesRecurring] = await Promise.all([
             this.prisma.expense.updateMany({
                 where: {
                     condoId, isPaid: false,

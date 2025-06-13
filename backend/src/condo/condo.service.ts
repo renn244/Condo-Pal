@@ -12,8 +12,16 @@ export class CondoService {
         private readonly prisma: PrismaService,
         private readonly fileUploadService: FileUploadService,
         private readonly condoPaymentService: CondoPaymentService,
-        private readonly condoPaymentModule: CondoPaymentService,
     ) {}
+
+    async getCondoIdsByOwnerId(ownerId: string) {
+        const condos = await this.prisma.condo.findMany({
+            where: { ownerId: ownerId },
+            select: { id: true }
+        });
+
+        return condos.map(condo => condo.id);
+    }
 
     async createCondo(user: UserJwt, condoInfo: CreateCondoDto, condoPhoto: Express.Multer.File) {
         // save to cloudinary
@@ -48,10 +56,7 @@ export class CondoService {
     }
 
     async getMainDashboardSummary(user: UserJwt) {
-        const condo = await this.prisma.condo.findMany({
-            where: { ownerId: user.id }, select: { id: true }
-        })
-        const condoIds = condo.flatMap((condo) => condo.id)
+        const condoIds = await this.getCondoIdsByOwnerId(user.id);
         const currentBillingMonth = this.condoPaymentService.getBillingMonthOfDate(new Date());
 
         const [totalActive, totalCondo, totalPaidThisMonth, pendingMaintenance, pendingGcashPayment] = await Promise.all([
@@ -152,7 +157,6 @@ export class CondoService {
 
 
     async getCondoPaymentSummary(user: UserJwt, condoId: string) {
-        const billingMonth = await this.condoPaymentService.getBillingMonth(condoId, user.id);
 
         const [totalMaintenanceCost, totalIncome] = await Promise.all([
             this.prisma.maintenance.aggregate({

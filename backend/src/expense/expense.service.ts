@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ExpenseCategory, Prisma, Recurrence } from '@prisma/client';
+import { CondoPaymentService } from 'src/condo-payment/condo-payment.service';
+import { CondoService } from 'src/condo/condo.service';
+import { UserJwt } from 'src/lib/decorators/User.decorator';
+import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto/expense.dto';
-import { UserJwt } from 'src/lib/decorators/User.decorator';
-import { ExpenseCategory, Prisma, Recurrence } from '@prisma/client';
-import { CondoService } from 'src/condo/condo.service';
-import { CondoPaymentService } from 'src/condo-payment/condo-payment.service';
-import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class ExpenseService {
@@ -134,6 +134,16 @@ export class ExpenseService {
         return expense;
     }
 
+    calculateReduceExpense(expenses: { cost: number, recurring: boolean, timesPaid: number }[]) {
+        return expenses.reduce((acc, expense) => {
+            if (expense.recurring) {
+                return acc + (expense.cost * expense.timesPaid);
+            } else {
+                return acc + expense.cost;
+            }
+        }, 0);
+    }
+    
     async getTotalexpenses(condoId: string, isPaid?: boolean) {
         const expenses = await this.prisma.expense.findMany({
             where: { 
@@ -153,15 +163,7 @@ export class ExpenseService {
             }
         })
 
-        const total = expenses.reduce((acc, expense) => {
-            if (expense.recurring) {
-                return acc + (expense.cost * expense.timesPaid);
-            } else {
-                return acc + expense.cost;
-            }
-        }, 0);
-
-        return total;
+        return this.calculateReduceExpense(expenses);
     }
 
     async getExpenseSummary(user: UserJwt, condoId: string) {

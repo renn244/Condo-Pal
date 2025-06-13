@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateWorkerNameDto } from './dto/maintenance-worker-token.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { MaintenanceWorkerToken } from '@prisma/client';
 
 @Injectable()
 export class MaintenanceWorkerTokenService {
     constructor(
         private readonly prisma: PrismaService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
     async createMaintenanceWorkerToken(maintenanceId: string, token: string) {
@@ -20,6 +24,11 @@ export class MaintenanceWorkerTokenService {
     }
 
     async getMaintenanceWorkerToken(query: { maintenanceId: string, token: string }, isRequired: boolean = true) {
+        // Check cache first
+        const getCacheToken = await this.cacheManager.get(`${query.maintenanceId}-${query.token}`);
+        
+        if(getCacheToken) return getCacheToken as MaintenanceWorkerToken
+
         const maintenanceWorkerToken = await this.prisma.maintenanceWorkerToken.findUnique({
             where: {
                 token_maintenanceId: {
@@ -32,6 +41,8 @@ export class MaintenanceWorkerTokenService {
         if(!maintenanceWorkerToken && isRequired) {
             throw new NotFoundException("Maintenance worker token not found")
         }
+
+        this.cacheManager.set(`${query.maintenanceId}-${query.token}`, maintenanceWorkerToken, 1000 * 60 * 10)
 
         return maintenanceWorkerToken
     }
@@ -49,6 +60,9 @@ export class MaintenanceWorkerTokenService {
             }
         })
 
+        // Invalidate cache after update
+        this.cacheManager.del(`${query.maintenanceId}-${query.token}`) // remove old cache
+        
         return updatedMaintenanceWorkerToken;
     }
 }
