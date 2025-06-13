@@ -21,14 +21,7 @@ export class MaintenanceMessageService {
     async createMaintenanceMessageWithFile(maintenanceId: string, user: UserJwt, body: CreateMaintenanceMessageWithFileDto, 
     attachments: Array<Express.Multer.File>) {
         const senderType = user?.role.toUpperCase() as SenderType || 'WORKER';
-        const photoUrls = await Promise.all(
-            attachments.map(async (file) => {
-                const newPhoto = await this.fileUploadService.upload(file, {
-                    folder: 'maintenance-attachments'
-                })
-                return newPhoto.secure_url;
-            })
-        ) || [];
+        const photoUrls = (await this.fileUploadService.uploadMany(attachments, { folder: 'maintenance-attachments' })).map(p => p.secure_url);
 
         const getWorkerName = senderType === 'WORKER' ?
             (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token || ''}))?.workerName

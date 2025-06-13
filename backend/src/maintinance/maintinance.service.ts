@@ -50,17 +50,12 @@ export class MaintenanceService {
         })
 
         if(!condo) {
-            // internal server error because we was supposed to have a condo
+            // internal server error because he has supposed to have a condo
             throw new InternalServerErrorException("can't find your condo!")
         }
 
         // upload photos maximum of 3
-        const photoUrls = await Promise.all(
-            photos.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url;
-            })
-        );
+        const photoUrls = (await this.fileUploadService.uploadMany(photos)).map((p) => p.secure_url);
 
         const createMaintenanceRequest = await this.prisma.maintenance.create({
             data: {
@@ -92,12 +87,7 @@ export class MaintenanceService {
             throw new ForbiddenException('you are not allowed to create maintenance request for this condo!')
         }
         
-        const photoUrls = await Promise.all(
-            photos.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url;
-            })
-        )
+        const photoUrls = (await this.fileUploadService.uploadMany(photos)).map((p) => p.secure_url);
 
         const createMaintenanceRequest = await this.prisma.maintenance.create({
             data: {
@@ -319,20 +309,17 @@ export class MaintenanceService {
         
         // delete certain photos that will be replace
         if(getPhotosofMaintenance?.photos) {
-            await Promise.all(getPhotosofMaintenance?.photos
-            .filter((photo) => !previousPhotos.includes(photo))
-            .map(async (photo) => 
-                await this.fileUploadService.deleteFile(photo)
-            ))
+            await Promise.all(
+                getPhotosofMaintenance?.photos
+                .filter((photo) => !previousPhotos.includes(photo))
+                .map(async (photo) => 
+                    await this.fileUploadService.deleteFile(photo)
+                )
+            )
         }
 
         // upload photos maximum of 3
-        const photoUrls = await Promise.all(
-            photos.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url;
-            })
-        );
+        const photoUrls = (await this.fileUploadService.uploadMany(photos)).map((p) => p.secure_url);
 
         const editedMaintenance = await this.prisma.maintenance.update({
             where: {
@@ -481,12 +468,7 @@ export class MaintenanceService {
         
         if(!getWorker) throw new ForbiddenException('you are not allowed to update this!')
 
-        const photoUrls = await Promise.all(
-            proof.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url;
-            })
-        );
+        const photoUrls = (await this.fileUploadService.uploadMany(proof)).map((p) => p.secure_url);
         
         const maintenanceRequest = await this.prisma.maintenance.update({
             where: { id: maintenanceId },

@@ -15,13 +15,7 @@ export class MessageService {
     async createMessageWithFile(query: { leaseAgreementId: string, receiverId: string }, user: UserJwt, body: any, 
     attachments: Array<Express.Multer.File>) {
         const senderId = user.id;
-
-        const photoUrls = await Promise.all(
-            attachments?.map(async (file) => {
-                const newPhoto = await this.fileUploadService.upload(file, { folder: 'message-attachments', public_id: file.originalname.split('.')[0], overwrite: true })
-                return newPhoto.secure_url;
-            })
-        ) || [];
+        const photoUrls = (await this.fileUploadService.uploadMany(attachments, { folder: 'message-attachments', keepName: true ,overwrite: true })).map(p => p.secure_url);
 
         const message = await this.prisma.message.create({
             data: {

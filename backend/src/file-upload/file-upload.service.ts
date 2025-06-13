@@ -15,6 +15,23 @@ export class FileUploadService {
         return pulicId
     }
 
+    async uploadMany(files: Express.Multer.File[], options?: UploadApiOptions & { keepName?: boolean }): Promise<CloudinaryResponse[]> {
+        const { keepName, ...uploadOptions } = options || {};
+        
+        const uploadedFiles = await Promise.all(
+            files.map(async file => {
+                const newPhoto = await this.upload(file, {
+                    ...uploadOptions,
+                    ...(options?.keepName ? { public_id: file.originalname.split('.')[0], overwrite: true } : {}),
+                });
+
+                return newPhoto as CloudinaryResponse;
+            })
+        )
+
+        return uploadedFiles
+    }
+
     async upload(file: Express.Multer.File, options?: UploadApiOptions): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
