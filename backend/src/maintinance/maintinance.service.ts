@@ -363,14 +363,8 @@ export class MaintenanceService {
 
         // upload photos maximum of 3 each
         const [newphotos, newcompletionPhotos] = await Promise.all([
-            Promise.all(photos?.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url
-            }) || []),
-            Promise.all(completionPhotos?.map(async (photo) => {
-                const newPhoto = await this.fileUploadService.upload(photo);
-                return newPhoto.secure_url
-            }) || [])
+            (photos ? (await this.fileUploadService.uploadMany(photos)).map(p => p.secure_url) : []),
+            (completionPhotos ? (await this.fileUploadService.uploadMany(completionPhotos)).map(p => p.secure_url) : []),
         ])
 
         const editedMaintenance = await this.prisma.maintenance.update({
