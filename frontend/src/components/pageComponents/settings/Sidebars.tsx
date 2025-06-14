@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link, useLocation } from "react-router-dom"
-import { BadgeCheck, Bell, CreditCard, HelpCircle, Lock, LogOut, Mail, User } from 'lucide-react'
+import { BadgeCheck, CreditCard, HelpCircle, Lock, LogOut, Mail, User } from 'lucide-react'
 import { useAuthContext } from "@/context/AuthContext"
 
 const Sidebars = () => {
@@ -22,7 +22,6 @@ const Sidebars = () => {
     const navItems = [
         { id: "profile", label: "Profile", icon: User },
         { id: "security", label: "Security", icon: Lock },
-        { id: "notifications", label: "Notifications", icon: Bell },
         { id: "billingInfo", label: "Billing Information", icon: CreditCard },
     ]
 
