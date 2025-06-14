@@ -37,11 +37,6 @@ export class UserController {
         return this.userService.update2FA(user, body);
     }
 
-    @Patch('notification')
-    async updateNotification(@User() user: UserJwt, @Body() body: NotificationDto) {
-        return this.userService.updateNotification(user, body);
-    }
-
     @Patch("billingInfo")
     async updateBillingInfo(@User() user: UserJwt, @Body() body: BillingInfoDto) {
         return this.userService.updateBillingInfo(user, body);

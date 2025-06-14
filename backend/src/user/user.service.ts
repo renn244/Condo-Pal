@@ -117,19 +117,6 @@ export class UserService {
         return updatedUser;
     }
 
-    async updateNotification(user: UserJwt, body: NotificationDto) {
-
-        // update notification settings in the database
-        // const updatedUser = await this.prisma.notificationPreferences.update({
-        //     where: { id: user.id },
-        //     data: {
-        //        ...body
-        //     },
-        // });
-
-        // return updatedUser;
-    }
-
     async updateBillingInfo(user: UserJwt, body: BillingInfoDto) {
         const billingInfo = await this.prisma.billingInfo.upsert({
             where: {

@@ -2,7 +2,6 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import NotFound from "@/components/common/NotFound"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import BillingInfo from "@/components/pageComponents/settings/BillingInfo"
-import Notification from "@/components/pageComponents/settings/Notification"
 import Profile from "@/components/pageComponents/settings/Profile"
 import Security from "@/components/pageComponents/settings/Security/Security"
 import Sidebars from "@/components/pageComponents/settings/Sidebars"
@@ -79,12 +78,6 @@ const Settings = () => {
                                 <Security 
                                 initial2FA={initialData.TwoFA} 
                                 />
-                            } />
-                            <Route path="notifications" element={
-                                <Notification />
-                            } />
-                            <Route path="property" element={
-                                undefined
                             } />
                             <Route path="subscription" element={
                                 <Subscription />
