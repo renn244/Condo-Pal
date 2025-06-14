@@ -1,5 +1,5 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { SenderType } from '@prisma/client';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Maintenance, SenderType } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { MaintenanceWorkerTokenService } from 'src/maintenance-worker-token/maintenance-worker-token.service';
@@ -7,6 +7,8 @@ import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMaintenanceMessageWithFileDto, CreateMaintenanceStatusUpdateDto } from './dto/maintenance.dto';
 import { MaintenanceMessageGateway } from './maintenance-message.gateway';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class MaintenanceMessageService {
@@ -15,8 +17,34 @@ export class MaintenanceMessageService {
         private readonly fileUploadService: FileUploadService,
         private readonly maintenanceMessageGateway: MaintenanceMessageGateway,
         private readonly maintenanceWorkerTokenService: MaintenanceWorkerTokenService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
+
+    private shouldNotifyTenantAndLandlord(senderType: SenderType, lastMessageCreatedAt?: Date) {
+        if(senderType !== 'WORKER') return false;
+
+        const isFirstMessage = !lastMessageCreatedAt;
+        const isLastMessageOlderThan24Hours = lastMessageCreatedAt && 
+            new Date(lastMessageCreatedAt) < new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+        return isFirstMessage || isLastMessageOlderThan24Hours;
+    }
+
+    private async getMaintenanceAndLastMessage(maintenanceId: string) {
+        const getMaintenance = await this.prisma.maintenance.findUnique({
+            where: { id: maintenanceId, },
+            select: { 
+                id:true, title: true,
+                condo: { select: { ownerId: true, tenantId: true } },
+                messages: { select: { createdAt: true }, take: 1, orderBy: { createdAt: 'desc', }, }
+            },
+        })
+
+        if(!getMaintenance) throw new NotFoundException('Maintenance not found.');
+
+        return getMaintenance;
+    }
 
     private notifyBothLandlordAndTenant(title: string, maintenanceId: string, ownerId: string, tenantId?: string) {
         this.notificationService.sendNotificationToUser(ownerId, {
@@ -41,25 +69,18 @@ export class MaintenanceMessageService {
             (await this.maintenanceWorkerTokenService.getMaintenanceWorkerToken({ maintenanceId, token: body.token || ''}))?.workerName
         : null
 
-        // authorization for tenant and owner
-        if(senderType !== 'WORKER') {
-            const getMaintenance = await this.prisma.maintenance.findUnique({
-                where: { id: maintenanceId, },
-                select: { 
-                    id:true, title: true,
-                    condo: { select: { ownerId: true, tenantId: true } },
-                    messages: { select: { createdAt: true }, take: 1, orderBy: { createdAt: 'desc', }, }
-                },
-            })
+        const maintenance = await this.getMaintenanceAndLastMessage(maintenanceId);
 
-            if(getMaintenance?.condo.ownerId !== user?.id && getMaintenance?.condo.tenantId !== user?.id) {
-                throw new ForbiddenException('You are not authorized to send a message for this maintenance.')
-            }
+        if(
+            senderType !== 'WORKER' &&
+            maintenance.condo.ownerId !== user?.id && 
+            maintenance.condo.tenantId !== user?.id
+        ) {
+            throw new ForbiddenException('You are not authorized to send a message for this maintenance.');
+        }
 
-            // if the sender is a worker and it has been a day since the last message, send a notification to the condo owner and tenant
-            if(getMaintenance?.messages?.[0]?.createdAt! && new Date(getMaintenance?.messages?.[0]?.createdAt) < new Date(Date.now() - 24 * 60 * 60 * 1000)) {
-                this.notifyBothLandlordAndTenant(getMaintenance.title, maintenanceId, getMaintenance.condo.ownerId, getMaintenance.condo.tenantId || '');
-            }                                               
+        if(this.shouldNotifyTenantAndLandlord(senderType, maintenance.messages?.[0]?.createdAt)) {
+            this.notifyBothLandlordAndTenant(maintenance.title, maintenanceId, maintenance.condo.ownerId, maintenance.condo.tenantId || '');
         }
 
         const maintenanceMessage = await this.prisma.maintenanceMessage.create({
