@@ -77,21 +77,35 @@ const CondoHeader = ({
                             Latest Bill Information - {formatBillingMonth(condo.latestBill.billingMonth)}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
+                    <CardContent className="space-y-1">
+                        <div className="flex items-center justify-between">
                             <p className="text-sm text-muted-foreground">Monthly Rent</p>
-                            <p className="text-2xl font-bold text-primary">{formatToPesos(condo.latestBill.rentCost)}</p>
+                            <p className="font-medium">{formatToPesos(condo.latestBill.rentCost)}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
+                            <div className="col-span-2 flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">Additional Fee</p>
                                 <p className="font-medium">{formatToPesos(condo.latestBill.additionalCost)}</p>
                             </div>
                         </div>
-                        <Separator />
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="px-2 border-l-[3px]">
+                            <div className="flex justify-between items-center">
+                                <p className="text-xs text-muted-foreground">Expenses Cost</p>
+                                <p className="text-sm">
+                                    {formatToPesos(condo.latestBill.expensesCost || 0)}
+                                </p>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-xs text-muted-foreground">Maintenance Cost</p>
+                                <p className="text-sm">
+                                    {formatToPesos(condo.latestBill.maintenanceCost || 0)}
+                                </p>
+                            </div>
+                        </div>
+                        <Separator className="my-1" />
+                        <div className="flex items-center justify-between gap-2">
                             <p className="text-sm text-muted-foreground">Total Monthly</p>
-                            <p className="text-xl font-bold">
+                            <p className="text-xl font-bold text-primary">
                                 {formatToPesos(condo.latestBill.totalCost)}
                             </p>
                         </div>

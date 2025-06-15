@@ -82,9 +82,14 @@ type CondoPaymentsSummaryDashboard = {
 
 type billingMonth = {
     rentCost: number;
+    expensesCost: number;
+    maintenanceCost: number;
+    
     additionalCost: number;
     totalCost: number;
     billingMonth: string;
+
+    dueDate: string;
 }
 
 type CondoPaymentsTenant = {
