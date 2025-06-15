@@ -283,6 +283,9 @@ export class CondoPaymentService {
             data: {
                 type: CondoPaymentType.GCASH,
                 rentCost: parseInt(body.rentCost),
+                expensesCost: parseInt(body.expensesCost),
+                maintenanceCost: parseInt(body.maintenanceCost),
+
                 additionalCost: parseInt(body.additionalCost),
                 totalPaid: parseInt(body.totalPaid),
                 condoId: condoId,
@@ -393,6 +396,8 @@ export class CondoPaymentService {
                 type: CondoPaymentType.MANUAL,
                 condoId: condoId,
                 rentCost: body.rentCost,
+                expensesCost: body.expensesCost,
+                maintenanceCost: body.maintenanceCost,
                 additionalCost: body.additionalCost,
                 totalPaid: body.totalPaid,
                 isPaid: true,
@@ -436,6 +441,8 @@ export class CondoPaymentService {
                     condoId: condoId,
                     tenantId: tenant.id,
                     rentCost: totalPayment.rentCost,
+                    expensesCost: totalPayment.expensesCost,
+                    maintenanceCost: totalPayment.maintenanceCost,
                     additionalCost: totalPayment.additionalCost,
                     totalPaid: totalPayment.totalCost,
 

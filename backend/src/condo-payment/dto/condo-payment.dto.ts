@@ -6,6 +6,12 @@ export class GcashPayment {
     rentCost: string;
 
     @IsNumberString()
+    expensesCost: string;
+
+    @IsNumberString()
+    maintenanceCost: string;
+
+    @IsNumberString()
     additionalCost: string;
 
     @IsNumberString()
@@ -22,6 +28,12 @@ export class ManualPayment {
     @IsNumber()
     rentCost: number;
 
+    @IsNumber()
+    expensesCost: number;
+
+    @IsNumber()
+    maintenanceCost: number;
+    
     @IsNumber()
     additionalCost: number;
 

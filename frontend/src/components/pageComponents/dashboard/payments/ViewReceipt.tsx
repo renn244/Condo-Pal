@@ -39,13 +39,15 @@ const ViewReceipt = ({
                 </DialogHeader>
 
                 {/* Gcash Receipt Image (If it's Gcash) */}
-                {(payment.type === "GCASH" && payment.receiptImage) && <div className="flex justify-center">
-                  <img
-                    src={payment.receiptImage || "/placeholder.svg"}
-                    alt="Payment Receipt"
-                    className="max-h-[500px] rounded-md border object-contain w-full"
-                  />
-                </div>}
+                {(payment.type === "GCASH" && payment.receiptImage) && (
+                    <div className="flex justify-center">
+                        <img
+                        src={payment.receiptImage || "/placeholder.svg"}
+                        alt="Payment Receipt"
+                        className="max-h-[500px] rounded-md border object-contain w-full"
+                        />
+                    </div>
+                )}
 
                 <div className="bg-muted p-4 rounded-md">
                     <h3 className="font-medium mb-2">
@@ -63,6 +65,20 @@ const ViewReceipt = ({
                             <span className="font-medium">
                                 {formatToPesos(payment.additionalCost || 0)}
                             </span>
+                        </div>
+                        <div className="px-2 border-l-[3px]">
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs">Expenses Cost</span>
+                                <span className="text-sm">
+                                    {formatToPesos(payment.expensesCost || 0)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs">Maintenance Cost</span>
+                                <span className="text-sm">
+                                    {formatToPesos(payment.maintenanceCost || 0)}
+                                </span>
+                            </div>
                         </div>
                         <Separator className="my-2" />
                         <div className="flex justify-between items-center font-medium">

@@ -38,16 +38,29 @@ const ReceiptDownload = ({
                     <Text style={[styles.bold, { marginBottom: 5 }]}>Payment Breakdown</Text>
                     <View style={styles.row}>
                         <Text style={styles.text}>Rent Cost</Text>
-                        <Text style={styles.text}>PHP{payment.rentCost}</Text>
+                        <Text style={styles.text}>PHP {payment.rentCost}</Text>
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.text}>Additional Cost</Text>
-                        <Text style={styles.text}>PHP{payment.additionalCost || 0}</Text>
+                        <Text style={styles.text}>PHP {payment.additionalCost || 0}</Text>
+                    </View>
+                    <View style={{
+                        paddingLeft: 8, paddingRight: 8,
+                        borderLeftWidth: 3, borderLeftColor: "hsl(214.3 31.8% 91.4%)"
+                    }}>
+                        <View style={styles.subRow}>
+                            <Text style={styles.subText}>Expenses Cost</Text>
+                            <Text style={styles.subText}>PHP {payment.expensesCost}</Text>
+                        </View>
+                        <View style={styles.subRow}>
+                            <Text style={styles.subText}>Maintenance Cost</Text>
+                            <Text style={styles.subText}>PHP {payment.maintenanceCost}</Text>
+                        </View>
                     </View>
                     <View style={styles.separator}></View>
                     <View style={styles.row}>
                         <Text style={styles.bold}>Total Amount</Text>
-                        <Text style={styles.amount}>PHP{totalAmount}</Text>
+                        <Text style={styles.amount}>PHP {totalAmount}</Text>
                     </View>
                 </View>
 

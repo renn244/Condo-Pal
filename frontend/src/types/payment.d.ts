@@ -27,7 +27,10 @@ type CondoPayment = {
     type: CondoPaymentType, // enum
     
     rentCost: number,
-    additionalCost: number | null;
+    expensesCost: number,
+    maintenanceCost: number,
+
+    additionalCost: number;
     totalPaid: number,
 
     linkId: string | null,

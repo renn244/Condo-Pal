@@ -224,7 +224,12 @@ model CondoPayment {
 
   type            CondoPaymentType
 
+  // specific
   rentCost        Int
+  expensesCost    Int  @default(0)
+  maintenanceCost Int  @default(0)  
+
+  // summary
   additionalCost  Int? @default(0) // this is the additional costing for things like the maintenance, and penalties
   totalPaid       Int // should be the added rent cost and addiotional cost
 

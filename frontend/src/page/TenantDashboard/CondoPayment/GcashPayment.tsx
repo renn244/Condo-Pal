@@ -105,6 +105,9 @@ const GcashPayment = () => {
                     <PaymentReceipt 
                     condoId={condoBillInfo.id} 
                     rentCost={condoBillInfo.rentCost} 
+                    expensesCost={condoBillInfo.expensesCost}
+                    maintenanceCost={condoBillInfo.maintenanceCost}
+
                     additionalCost={condoBillInfo.additionalCost}
                     totalPaid={condoBillInfo.totalCost}
                     setIsSuccess={setIsSuccess}
