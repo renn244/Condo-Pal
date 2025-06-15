@@ -181,7 +181,7 @@ export class CondoPaymentService {
         // increase year number and back to 1 in next Month(which means it's january)
         let nextMonth = lastMonth + 1;
         let nextYear = lastYear;
-        if(nextMonth > 12) {
+        if(nextMonth > 12) { // of next year
             nextMonth = 1; 
             nextYear += 1;
         }
@@ -203,7 +203,7 @@ export class CondoPaymentService {
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
 
-        const [getCondoPayment, getExpensesCost ,getAdditionalCost] = await Promise.all([
+        const [getCondoPayment, getExpensesCost, getAdditionalCost] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
                 select: { rentAmount: true }
@@ -227,7 +227,12 @@ export class CondoPaymentService {
         }
 
         return {
+            // specific
             rentCost: getCondoPayment.rentAmount,
+            expensesCost: getExpensesCost || 0,
+            maintenanceCost: getAdditionalCost._sum.totalCost || 0,
+
+            // summary
             additionalCost: (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
             totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
             ...billingMonth,
@@ -265,7 +270,7 @@ export class CondoPaymentService {
 
         return {
             ...condoInfo,
-            ...getBill,
+            ...getBill
         }
     }
 
