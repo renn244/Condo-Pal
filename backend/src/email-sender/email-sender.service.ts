@@ -2,13 +2,13 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
-import { Queue } from 'bullmq';
+import { TypedEmailQueue } from 'src/types/job.type';
 
 @Injectable()
 export class EmailSenderService{
   constructor(
     configSevice: ConfigService,
-    @InjectQueue('email') private readonly emailQueue: Queue
+    @InjectQueue('email') private readonly emailQueue: TypedEmailQueue
   ){ 
     const sendgridApiKey = configSevice.get<string>('SENDGRID_API_KEY')
     if(!sendgridApiKey) throw new Error('SENDGRID_API_KEY is not defined')
