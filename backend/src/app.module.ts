@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailSenderModule } from './email-sender/email-sender.module';
 import { PaymongoModule } from './paymongo/paymongo.module';
 import { SubscriptionModule } from './subscription/subscription.module';
@@ -23,6 +23,7 @@ import { ServeStaticModule  } from '@nestjs/serve-static'
 import { join } from 'path';
 import { PayoutModule } from './payout/payout.module';
 import { PayoutMethodModule } from './payout-method/payout-method.module';
+import { BullModule } from '@nestjs/bullmq';
 
 const imports = [
   AuthModule, PrismaModule, 
@@ -32,6 +33,20 @@ const imports = [
   CacheModule.register({
     isGlobal: true,
     ttl: 60 * 1000, // time to live of 60 seconds
+  }),
+  BullModule.forRootAsync({
+    useFactory: (configService: ConfigService) => ({
+      connection: {
+        url: configService.get<string>('REDIS_URL'),
+        tls: {  }
+      },
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3,
+      }
+    }),
+    inject: [ConfigService]
   }),
   EmailSenderModule, PaymongoModule, 
   SubscriptionModule, CondoModule, 

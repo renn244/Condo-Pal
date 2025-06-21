@@ -4,31 +4,27 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/notification.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { NotificationType, Prisma } from '@prisma/client';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class NotificationService {
     constructor(
         private readonly generalGateway: GeneralGateway,
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
+        @InjectQueue('notification') private readonly notificationQueue: Queue
     ) {}
 
     async sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto) {
-        if(!userId) return;
+        // inject to the notfication queue to be processed since this is not a critical operation
+        if (!userId) return;
 
-        const notification = await this.prisma.notification.create({
-            data: {
-                type: body.type, title: body.title, 
-                message: body.message, link: body.link, userId: userId
-            }
+        this.notificationQueue.add('process', {
+            userId: userId, type: body.type,
+            title: body.title, message: body.message, link: body.link
         })
 
-        // send the notification to the user
-        const socketId = this.generalGateway.getSocketIdByUserId(userId);
-        if(socketId) {
-            this.generalGateway.io.to(socketId).emit('newNotification', notification);
-        }
-
-        return notification;
+        return { success: true };
     }
 
     async getNotifications(user: UserJwt, query: { cursor?: string }) {

@@ -1,11 +1,15 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
-import axios from 'axios';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class EmailSenderService{
-  constructor(configSevice: ConfigService){ 
+  constructor(
+    configSevice: ConfigService,
+    @InjectQueue('email') private readonly emailQueue: Queue
+  ){ 
     const sendgridApiKey = configSevice.get<string>('SENDGRID_API_KEY')
     if(!sendgridApiKey) throw new Error('SENDGRID_API_KEY is not defined')
 
@@ -14,22 +18,27 @@ export class EmailSenderService{
 
   async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {
     const msg = {
-        to: to,
-        from: 'condopal.management@gmail.com',
-        subject: subject,
-        html: content,
-        ...options
+      to: to,
+      from: 'condopal.management@gmail.com',
+      subject: subject,
+      html: content,
+      ...options
     } 
 
     try {
-        const response = await sgMail.send(msg)
-        return response
+      const response = await sgMail.send(msg)
+      return response
     } catch (error) {
-        console.log(`Error sending email: ${error}`)
+      console.log(`Error sending email: ${error}`)
+      throw Error(`Error sending email: ${error.message}`)
     }
   }
-
+  
   async sendDueReminderEmail(email: string, leaseAgreement: any) {
+    this.emailQueue.add('dueReminder', { email, leaseAgreement });
+  }
+
+  async processDueReminderEmail(email: string, leaseAgreement: any) {
     const baseUrl = process.env.CLIENT_BASE_URL;
     const photo = leaseAgreement.condo.photo;
     
@@ -87,6 +96,10 @@ export class EmailSenderService{
   }
 
   async sendResetPasswordEmail(email: string, token: string) {
+    this.emailQueue.add('resetPassword', { email, token });
+  }
+
+  async processResetPasswordEmail(email: string, token: string) {
     try {
       const baseUrl = process.env.CLIENT_BASE_URL;
       const magicLink = `${baseUrl}/forgot-password/reset?token=${token}&email=${email}`;
@@ -123,6 +136,10 @@ export class EmailSenderService{
   }
 
   async sendAssignedWorkerMaintenanceEmail(email: string, maintenance: any, token: string) {
+    this.emailQueue.add('assignedWorker', { email, maintenance, token });
+  }
+
+  async processAssignedWorkerMaintenanceEmail(email: string, maintenance: any, token: string) {
     const baseUrl = process.env.CLIENT_BASE_URL;
     const name = email.split('@')[0];
     const taskLink = `${baseUrl}/maintenance/worker/${maintenance.id}?token=${token}`;
