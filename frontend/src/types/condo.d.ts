@@ -54,6 +54,7 @@ type CondoBillInformation = {
     totalCost: number,
     billingMonth: string,
     dueDate: string,
+    isPaymentAllowed: boolean,
     tenant?: {
         id: user['id']
         name: user['name']

@@ -4,16 +4,15 @@ import SomethingWentWrong from "@/components/common/SomethingWentWrong";
 import PaymentReceipt from "@/components/pageComponents/tenantDashboard/PaymentReceipt";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import axiosFetch from "@/lib/axios";
-import formatToPesos from "@/lib/formatToPesos";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import CondoInformationCard from "../../../components/pageComponents/tenantDashboard/CondoInformationCard";
+import PaymentInstructions from "@/components/pageComponents/tenantDashboard/PaymentInstructions";
+import PaymentNotAllowed from "@/components/pageComponents/tenantDashboard/PaymentNotAllowed";
 
 const GcashPayment = () => {
     const { condoId } = useParams<{ condoId: string }>()
@@ -49,7 +48,7 @@ const GcashPayment = () => {
     if(error) return <SomethingWentWrong reset={refetch} />
 
     if(!condoBillInfo) return <NotFound />
-    
+
     return (
         <div className="container max-w-3xl py-8 mx-auto">
             <h1 className="text-2xl font-bold mb-6">Gcash Payment</h1>
@@ -72,46 +71,29 @@ const GcashPayment = () => {
                 <>
                     <CondoInformationCard condo={condoBillInfo} />
 
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle>Payment Instructions</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label className="text-sm text-muted-foreground">Gcash Number</Label>
-                                    {/* landlord gcash number */}
-                                    <p className="font-medium">{condoBillInfo.owner.billingInfo.gcashNumber}</p>
-                                </div>
-                                <div>
-                                    {/* This is for the landlord */}
-                                    <Label className="text-sm text-muted-foreground">Owner Name</Label>
-                                    <p className="font-medium">{condoBillInfo.owner.name}</p> 
-                                </div>
-                            </div>
+                    {condoBillInfo.isPaymentAllowed ? (
+                        <>
+                            <PaymentInstructions 
+                            gcashNumber={condoBillInfo.owner.billingInfo.gcashNumber}
+                            ownerName={condoBillInfo.owner.name}
+                            totalCost={condoBillInfo.totalCost}
+                            condoId={condoBillInfo.id} 
+                            />
 
-                            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                <li>Open your Gcash app and log-in</li>
-                                <li>Tap on "Send Money" and select "Send to Gcash Account"</li>
-                                <li>Enter Gcash number shown above</li>
-                                <li>Enter the exact amount: {formatToPesos(condoBillInfo.totalCost)}</li>
-                                <li>Include your condo ID ({condoBillInfo.id}) in the message</li>
-                                <li>Complete the payment and take a screenshot of the receipt</li>
-                                <li>Upload the screenshot below</li>
-                            </ol>
-                        </CardContent>
-                    </Card>
+                            <PaymentReceipt 
+                            condoId={condoBillInfo.id} 
+                            rentCost={condoBillInfo.rentCost} 
+                            expensesCost={condoBillInfo.expensesCost}
+                            maintenanceCost={condoBillInfo.maintenanceCost}
 
-                    <PaymentReceipt 
-                    condoId={condoBillInfo.id} 
-                    rentCost={condoBillInfo.rentCost} 
-                    expensesCost={condoBillInfo.expensesCost}
-                    maintenanceCost={condoBillInfo.maintenanceCost}
-
-                    additionalCost={condoBillInfo.additionalCost}
-                    totalPaid={condoBillInfo.totalCost}
-                    setIsSuccess={setIsSuccess}
-                    />
+                            additionalCost={condoBillInfo.additionalCost}
+                            totalPaid={condoBillInfo.totalCost}
+                            setIsSuccess={setIsSuccess}
+                            />
+                        </>
+                    ) : (
+                        <PaymentNotAllowed condoName={condoBillInfo.name} dueDate={condoBillInfo.dueDate} billingMonth={condoBillInfo.billingMonth} />
+                    )}
                 </>
             )}
         </div>

@@ -124,6 +124,14 @@ export class CondoPaymentService {
         return expensesId
     }
 
+    // 7 days before they can already pay
+    isPaymentAllowed(dueDate: string) {
+        const today = new Date();
+        const allowedDate = new Date(new Date(dueDate).setDate(new Date(dueDate).getDate() - 7)); // 3 days grace period
+
+        return today >= allowedDate;
+    }
+
     getBillingMonthOfDate(date: Date) {
         const month = date.getMonth() + 1; // base 1 means january is 1
         const year = date.getFullYear();
@@ -199,7 +207,6 @@ export class CondoPaymentService {
         const [month, year] = billingMonth.billingMonth.split('-').map((data) => Number(data));
 
         const startOfMonth = new Date(year, month - 1, 1);
-        
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
 
@@ -227,6 +234,9 @@ export class CondoPaymentService {
         }
 
         return {
+            // payment allowed?
+            isPaymentAllowed: this.isPaymentAllowed(billingMonth.dueDate),
+            
             // specific
             rentCost: getCondoPayment.rentAmount,
             expensesCost: getExpensesCost || 0,
@@ -278,6 +288,10 @@ export class CondoPaymentService {
     async createGcashPayment(user: UserJwt, condoId: string, gcashPhoto: Express.Multer.File, body: GcashPayment) {
         const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
         const billingMonth = await this.getBillingMonth(condoId, user.id);
+
+        if(this.isPaymentAllowed(billingMonth.dueDate) === false) {
+            throw new ForbiddenException('Payment is not allowed yet. Please wait until the payment date.');
+        }
 
         const createPaymentGcash = await this.prisma.condoPayment.create({
             data: {
@@ -432,6 +446,10 @@ export class CondoPaymentService {
         if(!getCondo) throw new NotFoundException('condo not found!');
 
         const totalPayment = await this.getTotalPayment(condoId, tenant);
+
+        if(!totalPayment.isPaymentAllowed) {
+            throw new ForbiddenException('Payment is not allowed yet. Please wait until the payment date.');
+        }
 
         const createCondoPayment = await this.prisma.$transaction(async txprisma => {
             
