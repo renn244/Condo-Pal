@@ -124,6 +124,14 @@ export class CondoPaymentService {
         return expensesId
     }
 
+    // 7 days before they can already pay
+    isPaymentAllowed(dueDate: string) {
+        const today = new Date();
+        const allowedDate = new Date(new Date(dueDate).setDate(new Date(dueDate).getDate() - 7)); // 3 days grace period
+
+        return today >= allowedDate;
+    }
+
     getBillingMonthOfDate(date: Date) {
         const month = date.getMonth() + 1; // base 1 means january is 1
         const year = date.getFullYear();
@@ -181,7 +189,7 @@ export class CondoPaymentService {
         // increase year number and back to 1 in next Month(which means it's january)
         let nextMonth = lastMonth + 1;
         let nextYear = lastYear;
-        if(nextMonth > 12) {
+        if(nextMonth > 12) { // of next year
             nextMonth = 1; 
             nextYear += 1;
         }
@@ -199,11 +207,10 @@ export class CondoPaymentService {
         const [month, year] = billingMonth.billingMonth.split('-').map((data) => Number(data));
 
         const startOfMonth = new Date(year, month - 1, 1);
-        
         const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
         endOfMonth.setHours(23, 59, 59, 999);
 
-        const [getCondoPayment, getExpensesCost ,getAdditionalCost] = await Promise.all([
+        const [getCondoPayment, getExpensesCost, getAdditionalCost] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
                 select: { rentAmount: true }
@@ -227,7 +234,15 @@ export class CondoPaymentService {
         }
 
         return {
+            // payment allowed?
+            isPaymentAllowed: this.isPaymentAllowed(billingMonth.dueDate),
+            
+            // specific
             rentCost: getCondoPayment.rentAmount,
+            expensesCost: getExpensesCost || 0,
+            maintenanceCost: getAdditionalCost._sum.totalCost || 0,
+
+            // summary
             additionalCost: (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
             totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
             ...billingMonth,
@@ -265,7 +280,7 @@ export class CondoPaymentService {
 
         return {
             ...condoInfo,
-            ...getBill,
+            ...getBill
         }
     }
 
@@ -274,10 +289,17 @@ export class CondoPaymentService {
         const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
         const billingMonth = await this.getBillingMonth(condoId, user.id);
 
+        if(this.isPaymentAllowed(billingMonth.dueDate) === false) {
+            throw new ForbiddenException('Payment is not allowed yet. Please wait until the payment date.');
+        }
+
         const createPaymentGcash = await this.prisma.condoPayment.create({
             data: {
                 type: CondoPaymentType.GCASH,
                 rentCost: parseInt(body.rentCost),
+                expensesCost: parseInt(body.expensesCost),
+                maintenanceCost: parseInt(body.maintenanceCost),
+
                 additionalCost: parseInt(body.additionalCost),
                 totalPaid: parseInt(body.totalPaid),
                 condoId: condoId,
@@ -388,6 +410,8 @@ export class CondoPaymentService {
                 type: CondoPaymentType.MANUAL,
                 condoId: condoId,
                 rentCost: body.rentCost,
+                expensesCost: body.expensesCost,
+                maintenanceCost: body.maintenanceCost,
                 additionalCost: body.additionalCost,
                 totalPaid: body.totalPaid,
                 isPaid: true,
@@ -423,6 +447,10 @@ export class CondoPaymentService {
 
         const totalPayment = await this.getTotalPayment(condoId, tenant);
 
+        if(!totalPayment.isPaymentAllowed) {
+            throw new ForbiddenException('Payment is not allowed yet. Please wait until the payment date.');
+        }
+
         const createCondoPayment = await this.prisma.$transaction(async txprisma => {
             
             const condoPayment = await txprisma.condoPayment.create({
@@ -431,6 +459,8 @@ export class CondoPaymentService {
                     condoId: condoId,
                     tenantId: tenant.id,
                     rentCost: totalPayment.rentCost,
+                    expensesCost: totalPayment.expensesCost,
+                    maintenanceCost: totalPayment.maintenanceCost,
                     additionalCost: totalPayment.additionalCost,
                     totalPaid: totalPayment.totalCost,
 

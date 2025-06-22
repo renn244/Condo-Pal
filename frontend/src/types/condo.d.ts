@@ -48,10 +48,13 @@ type CondoBillInformation = {
     address: condo['address'],
     photo: condo['photo'],
     rentCost: number,
+    expensesCost: number,
+    maintenanceCost: number,
     additionalCost: number,
     totalCost: number,
     billingMonth: string,
     dueDate: string,
+    isPaymentAllowed: boolean,
     tenant?: {
         id: user['id']
         name: user['name']

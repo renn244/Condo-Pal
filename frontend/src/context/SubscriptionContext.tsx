@@ -29,26 +29,36 @@ export const SubscriptionProvider = ({
 }: PropsWithChildren) => {
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const [isActive, setIsActive] = useState<boolean>(false);
+    const [isActiveLoading, setIsActiveLoading] = useState<boolean>(true);
+
     const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
     
     const { pathname } = useLocation();
     const { user, isLoading } = useAuthContext();
 
     const checkSubscription = () => {
-        if(!user) return false;
+        setIsActiveLoading(true);
+        try {
+            if(!user) return false;
 
-        const subscription = user.subscriptions?.[0];
-        const isActive = subscription ? true : false;
-        setIsActive(isActive);
+            const subscription = user.subscriptions?.[0];
+            const isActive = subscription ? true : false;
+            setIsActive(isActive);
 
-        if(subscription?.expiresAt) {
-            const today = new Date();
-            const diffTime = new Date(subscription.expiresAt).getTime() - today.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            setDaysRemaining(diffDays);
+            if(subscription?.expiresAt) {
+                const today = new Date();
+                const diffTime = new Date(subscription.expiresAt).getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                setDaysRemaining(diffDays);
+            }
+
+            return isActive;
+        } catch (error) {
+            console.error("Error checking subscription:", error);
+            return false;
+        } finally {
+            setIsActiveLoading(false);
         }
-
-        return isActive;
     }
 
     const exludedPaths = ['/payout', '/chats']
@@ -77,7 +87,9 @@ export const SubscriptionProvider = ({
 
     if(isLoading) return null;
 
-    const isNotAllowed = (!isActive && !exludedPaths.some((path) => pathname.endsWith(path)))
+    const isNotAllowed = (!isActive && !exludedPaths.some((path) => pathname.endsWith(path))) && !isActiveLoading;
+
+    if(isActiveLoading) return null;
 
     return (
         <SubscriptionContext.Provider value={value}>

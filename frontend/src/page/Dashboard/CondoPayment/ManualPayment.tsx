@@ -79,7 +79,9 @@ const ManualPayment = () => {
 
                     <ManualPaymentRecord 
                     condoId={condoBillInfo.id} 
-                    rentCost={condoBillInfo.rentCost} 
+                    rentCost={condoBillInfo.rentCost}
+                    expensesCost={condoBillInfo.expensesCost}
+                    maintenanceCost={condoBillInfo.maintenanceCost}
                     additionalCost={condoBillInfo.additionalCost}
                     setIsSuccess={setIsSuccess} />
                 </div>
@@ -92,12 +94,16 @@ type ManualPaymentRecordProps = {
     condoId: string,
     setIsSuccess: Dispatch<SetStateAction<boolean>>,
     rentCost: number,
+    expensesCost: number,
+    maintenanceCost: number,
     additionalCost: number
 }
 
 const ManualPaymentRecord = ({
     condoId,
     rentCost,
+    expensesCost,
+    maintenanceCost,
     additionalCost,
     setIsSuccess
 }: ManualPaymentRecordProps) => {
@@ -108,7 +114,7 @@ const ManualPaymentRecord = ({
         mutationKey: ['manual', 'recordPayment'],
         mutationFn: async () => {
             const response = await axiosFetch.post(`/condo-payment/createPayment/Manual?condoId=${condoId}`, {
-                rentCost,
+                rentCost, expensesCost, maintenanceCost,
                 additionalCost,
                 totalPaid,
                 notes

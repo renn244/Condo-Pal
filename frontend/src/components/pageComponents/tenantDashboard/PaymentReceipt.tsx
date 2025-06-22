@@ -13,6 +13,9 @@ import toast from "react-hot-toast"
 type PaymentReceiptProps = {
     condoId: string,
     rentCost: number,
+    expensesCost: number,
+    maintenanceCost: number,
+
     additionalCost: number,
     totalPaid: number,
     setIsSuccess: Dispatch<SetStateAction<boolean>>,
@@ -21,6 +24,8 @@ type PaymentReceiptProps = {
 const PaymentReceipt = ({
     condoId,
     rentCost,
+    expensesCost,
+    maintenanceCost,
     additionalCost,
     totalPaid,
     setIsSuccess,
@@ -37,6 +42,8 @@ const PaymentReceipt = ({
                 gcashPhoto: file,
                 notes: notes,
                 rentCost: rentCost,
+                expensesCost: expensesCost,
+                maintenanceCost: maintenanceCost,
                 additionalCost: additionalCost,
                 totalPaid: totalPaid
             })

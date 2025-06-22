@@ -10,6 +10,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import CondoInformationCard from "../../../components/pageComponents/tenantDashboard/CondoInformationCard";
+import PaymentNotAllowed from "@/components/pageComponents/tenantDashboard/PaymentNotAllowed";
 
 // paymongo available payment methods
 const paymentMethods = [
@@ -88,7 +89,7 @@ const PaymongoPayment = () => {
             toast.success('redirect...')
             window.location.assign(response.data.attributes.checkout_url);
         } catch (error: any) {
-            toast.success(error.message)
+            toast.error(error.message)
         } finally {
             setIsLoading(false)
         }
@@ -100,53 +101,60 @@ const PaymongoPayment = () => {
 
             <CondoInformationCard condo={condoBillInfo} />
 
-            <Card className="mb-6">
-                <CardHeader>
-                    <CardTitle>Available Payment Methods</CardTitle>
-                    <CardDescription>
-                        The following payment methods will be available on the Paymongo checkout page
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-6">
-                        {paymentMethods.map((group) => (
-                            <div key={group.id} className="space-y-3">
-                                <h3 className="font-medium text-sm">{group.title}</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {group.options.map((method) => (
-                                        <div key={method.id} className="flex items-center gap-3 p-3 border rounded-md">
-                                            <img
-                                            src={method.logo || "/placeholder.svg"}
-                                            alt={method.name}
-                                            className="w-8 h-8 object-contain rounded-md text-sm"
-                                            />
-                                            <span className="text-sm">{method.name}</span>
+            {condoBillInfo.isPaymentAllowed ? (
+                <>
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>Available Payment Methods</CardTitle>
+                            <CardDescription>
+                                The following payment methods will be available on the Paymongo checkout page
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                {paymentMethods.map((group) => (
+                                    <div key={group.id} className="space-y-3">
+                                        <h3 className="font-medium text-sm">{group.title}</h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            {group.options.map((method) => (
+                                                <div key={method.id} className="flex items-center gap-3 p-3 border rounded-md">
+                                                    <img
+                                                    src={method.logo || "/placeholder.svg"}
+                                                    alt={method.name}
+                                                    className="w-8 h-8 object-contain rounded-md text-sm"
+                                                    />
+                                                    <span className="text-sm">{method.name}</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Button variant="outline" type="button" onClick={() => window.history.back()}>
+                                Cancel
+                            </Button>
+                            <Button onClick={() => handleCreatePayment()} disabled={isLoading} className="gap-2">
+                                {isLoading ? <LoadingSpinner /> : "Create Payment"}
+                                <ArrowRight className="h-4 w-4" />
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                    
+                    {/* Security Notice */}
+                    <div className="text-center text-sm text-muted-foreground">
+                        <p className="flex items-center justify-center gap-2 mb-2">
+                            <CreditCard className="h-4 w-4" />
+                            Secure payments powered by Paymongo
+                        </p>
+                        <p>Your payment information is securely processed and never stored on our servers.</p>
                     </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                    <Button variant="outline" type="button" onClick={() => window.history.back()}>
-                        Cancel
-                    </Button>
-                    <Button onClick={() => handleCreatePayment()} disabled={isLoading} className="gap-2">
-                        {isLoading ? <LoadingSpinner /> : "Create Payment"}
-                        <ArrowRight className="h-4 w-4" />
-                    </Button>
-                </CardFooter>
-            </Card>
-            
-            {/* Security Notice */}
-            <div className="text-center text-sm text-muted-foreground">
-                <p className="flex items-center justify-center gap-2 mb-2">
-                    <CreditCard className="h-4 w-4" />
-                    Secure payments powered by Paymongo
-                </p>
-                <p>Your payment information is securely processed and never stored on our servers.</p>
-            </div>
+                </>
+            ) : (
+                <PaymentNotAllowed condoName={condoBillInfo.name} dueDate={condoBillInfo.dueDate} 
+                billingMonth={condoBillInfo.billingMonth} />
+            )}
         </div>
     )
 }

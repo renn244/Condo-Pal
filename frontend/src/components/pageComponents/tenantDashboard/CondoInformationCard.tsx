@@ -45,6 +45,16 @@ const CondoInformationCard = ({
                         <span className="text-sm">Additional Cost:</span>
                         <span>{formatToPesos(condo.additionalCost)}</span>
                     </div>
+                    <div className="px-2 border-l-[3px]">
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs">Expenses Cost:</span>
+                            <span className="text-sm">{formatToPesos(condo.expensesCost)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs">Maintenance Cost:</span>
+                            <span className="text-sm">{formatToPesos(condo.maintenanceCost)}</span>
+                        </div>
+                    </div>
                     <Separator className="my-2" />
                     <div className="flex justify-between items-center font-medium">
                         <span>Total Amount</span>

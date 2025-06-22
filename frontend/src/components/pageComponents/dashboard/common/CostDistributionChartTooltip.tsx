@@ -27,19 +27,19 @@ const CostDistributionChartTooltip = ({
             <div className={`h-2.5 w-2.5 shrink-0 rounded-[2px]`} style={{ backgroundColor: color }} />
             {chartConfig[name as keyof typeof chartConfig]?.label || name}
             <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                {value}
                 <span className="font-normal text-muted-foreground">
                     PHP
                 </span>
+                {value}
             </div>
             {index === 1 && (
                 <div className="mt-1.5 flex basis-full items-center border-t pt-1.5 text-xs font-medium text-foreground">
                     Total
                     <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground ">
-                        {total}
                         <span className="font-normal text-muted-foreground">
-                        PHP
+                            PHP
                         </span>
+                        {total}
                     </div>
                 </div>
             )}
