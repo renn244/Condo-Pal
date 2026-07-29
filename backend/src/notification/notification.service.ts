@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GeneralGateway } from 'src/general-gateway/general.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/notification.dto';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
@@ -12,12 +11,11 @@ export class NotificationService {
     private readonly logger = new Logger(NotificationService.name);
 
     constructor(
-        private readonly generalGateway: GeneralGateway,
         private readonly prisma: PrismaService,
         @InjectQueue('notification') private readonly notificationQueue: Queue
     ) {}
 
-    sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto) {
+    sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto): void {
         // Notifications must not delay API responses, but queue failures still
         // need an owner so they cannot become unhandled promise rejections.
         if (!userId) return;
