@@ -54,6 +54,15 @@ const CondoInformationCard = ({
                             <span className="text-xs">Maintenance Cost:</span>
                             <span className="text-sm">{formatToPesos(condo.maintenanceCost)}</span>
                         </div>
+                        {condo.maintenanceItems.map((maintenance) => (
+                            <div
+                                key={maintenance.id}
+                                className="flex justify-between items-center pl-2 text-muted-foreground"
+                            >
+                                <span className="text-xs">{maintenance.title}</span>
+                                <span className="text-xs">{formatToPesos(maintenance.totalCost)}</span>
+                            </div>
+                        ))}
                     </div>
                     <Separator className="my-2" />
                     <div className="flex justify-between items-center font-medium">

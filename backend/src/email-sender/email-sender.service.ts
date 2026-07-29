@@ -35,7 +35,7 @@ export class EmailSenderService{
   }
   
   async sendDueReminderEmail(email: string, leaseAgreement: any) {
-    this.emailQueue.add('dueReminder', { email, leaseAgreement });
+    return this.emailQueue.add('dueReminder', { email, leaseAgreement });
   }
 
   async processDueReminderEmail(email: string, leaseAgreement: any) {
@@ -49,7 +49,7 @@ export class EmailSenderService{
       new Date().getFullYear(), new Date().getMonth(), leaseAgreement.due_date
     );
 
-    this.sendEmail(
+    return this.sendEmail(
       email,
       "Condo Bill Due Reminder",
       "Condo Bill Due Reminder",
@@ -96,14 +96,14 @@ export class EmailSenderService{
   }
 
   async sendResetPasswordEmail(email: string, token: string) {
-    this.emailQueue.add('resetPassword', { email, token });
+    return this.emailQueue.add('resetPassword', { email, token });
   }
 
   async processResetPasswordEmail(email: string, token: string) {
     try {
       const baseUrl = process.env.CLIENT_BASE_URL;
       const magicLink = `${baseUrl}/forgot-password/reset?token=${token}&email=${email}`;
-      this.sendEmail(
+      return await this.sendEmail(
         email,
         "Reset Password",
         "Reset Password",
@@ -136,7 +136,43 @@ export class EmailSenderService{
   }
 
   async sendAssignedWorkerMaintenanceEmail(email: string, maintenance: any, token: string) {
-    this.emailQueue.add('assignedWorker', { email, maintenance, token });
+    return this.emailQueue.add('assignedWorker', { email, maintenance, token });
+  }
+
+  async sendTenantCredentialsEmail(email: string, password: string) {
+    return this.emailQueue.add('tenantCredentials', { email, password });
+  }
+
+  async processTenantCredentialsEmail(email: string, password: string) {
+    return this.sendEmail(
+      email,
+      'CondoPal tenant account',
+      'Your account credentials',
+      `
+        <div style="font-family: Helvetica, Arial, sans-serif; width: 600px; max-width: 100%; margin: 0 auto; line-height: 1.6; color: #333;">
+          <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
+            <div style="border-bottom: 1px solid #eee; padding-bottom: 12px;">
+              <a href="${process.env.CLIENT_BASE_URL}" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">CondoPal</a>
+            </div>
+            <p style="font-size: 1.1em;">Welcome to CondoPal,</p>
+            <p>Your landlord has created your tenant account. Use the credentials below to sign in and start managing your rental information.</p>
+            <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <p style="margin: 0 0 8px;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 0;"><strong>Temporary password:</strong> ${password}</p>
+            </div>
+            <p style="font-size: 0.9em; color: #666;">For your security, change this password after signing in.</p>
+            <a href="${process.env.CLIENT_BASE_URL}/login" style="display: inline-block; background: #00466a; padding: 10px 20px; color: #fff; border-radius: 4px; text-decoration: none;">Sign in to CondoPal</a>
+            <p style="font-size: 0.9em; margin-top: 24px;">Regards,<br />CondoPal Team</p>
+            <hr style="border: none; border-top: 1px solid #eee;" />
+            <div style="padding: 8px 0; color: #aaa; font-size: 0.8em;">
+              <p>CondoPal</p>
+              <p>Poblacion Sta Maria, Bulacan</p>
+              <p>Philippines</p>
+            </div>
+          </div>
+        </div>
+      `,
+    );
   }
 
   async processAssignedWorkerMaintenanceEmail(email: string, maintenance: any, token: string) {
@@ -148,7 +184,7 @@ export class EmailSenderService{
       return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "numeric" });
     }
   
-    this.sendEmail(
+    return this.sendEmail(
       email,
       "New Maintenance Request Assigned",
       "New Maintenance Request Assigned",

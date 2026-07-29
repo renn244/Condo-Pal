@@ -412,9 +412,11 @@ export class MaintenanceService {
             }
         })
 
-        this.maintenanceWorkerTokenService.createMaintenanceWorkerToken(maintenanceId, token);
+        // Persist the token before sharing the worker link, otherwise an early click
+        // can be rejected because the token has not reached the database yet.
+        await this.maintenanceWorkerTokenService.createMaintenanceWorkerToken(maintenanceId, token);
         if(!body.manualLink) {
-            this.emailSenderService.sendAssignedWorkerMaintenanceEmail(body.workerEmail!, scheduleMaintenance, token);
+            await this.emailSenderService.sendAssignedWorkerMaintenanceEmail(body.workerEmail!, scheduleMaintenance, token);
         }
 
         // get tenantId to notify

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GeneralGateway } from 'src/general-gateway/general.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNotificationDto } from './dto/notification.dto';
@@ -9,22 +9,25 @@ import { Queue } from 'bullmq';
 
 @Injectable()
 export class NotificationService {
+    private readonly logger = new Logger(NotificationService.name);
+
     constructor(
         private readonly generalGateway: GeneralGateway,
         private readonly prisma: PrismaService,
         @InjectQueue('notification') private readonly notificationQueue: Queue
     ) {}
 
-    async sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto) {
-        // inject to the notfication queue to be processed since this is not a critical operation
+    sendNotificationToUser(userId: string | undefined, body: CreateNotificationDto) {
+        // Notifications must not delay API responses, but queue failures still
+        // need an owner so they cannot become unhandled promise rejections.
         if (!userId) return;
 
-        this.notificationQueue.add('process', {
+        void this.notificationQueue.add('process', {
             userId: userId, type: body.type,
             title: body.title, message: body.message, link: body.link
-        })
-
-        return { success: true };
+        }).catch((error: Error) => {
+            this.logger.error(`Failed to queue notification for user ${userId}`, error.stack);
+        });
     }
 
     async getNotifications(user: UserJwt, query: { cursor?: string }) {

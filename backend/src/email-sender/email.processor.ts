@@ -19,6 +19,11 @@ export class EmailProcessor extends WorkerHost {
             case "assignedWorker":
                 const { email: workerEmail, maintenance, token } = job.data;
                 return this.emailSenderService.processAssignedWorkerMaintenanceEmail(workerEmail, maintenance, token);
+            case "tenantCredentials":
+                const { email: tenantEmail, password } = job.data;
+                return this.emailSenderService.processTenantCredentialsEmail(tenantEmail, password);
+            default:
+                throw new Error(`Unsupported email job: ${job.name}`);
             }
     }
 
@@ -35,5 +40,10 @@ export class EmailProcessor extends WorkerHost {
     @OnWorkerEvent('failed')
     onFailed(job: Job, error: Error) {
         console.error(`Email job ${job.id} failed with error: ${error.message}`);
+    }
+
+    @OnWorkerEvent('error')
+    onError(error: Error) {
+        console.error(`Email worker error: ${error.message}`);
     }
 }

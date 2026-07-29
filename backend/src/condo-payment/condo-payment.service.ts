@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CondoPaymentType, GcashPaymentStatus, Prisma, Recurrence } from '@prisma/client';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
@@ -72,19 +72,23 @@ export class CondoPaymentService {
         return total;
     }
  
-    async updateExpensesToPaid(condoId: string, billingMonth: string) {
+    async updateExpensesToPaid(
+        condoId: string,
+        billingMonth: string,
+        prisma: Prisma.TransactionClient | PrismaService = this.prisma,
+    ) {
         const [targetMonth, targetYear] = billingMonth.split('-').map(Number);
         const targetDate = new Date(targetYear, targetMonth, 1);
 
         const [_, expensesRecurring] = await Promise.all([
-            this.prisma.expense.updateMany({
+            prisma.expense.updateMany({
                 where: {
                     condoId, isPaid: false,
                     billingMonth: billingMonth, recurring: false
                 },
                 data: { isPaid: true }
             }),
-            this.prisma.expense.findMany({
+            prisma.expense.findMany({
                 where: {
                     condoId, isPaid: false, recurring: true
                 },
@@ -116,7 +120,7 @@ export class CondoPaymentService {
         const expensesId = filteredExpenses.map((expense) => expense.id);
         if (expensesId.length === 0) return; // no expenses to update
 
-        await this.prisma.expense.updateMany({
+        await prisma.expense.updateMany({
             where: { id: { in: expensesId }, },
             data: { timesPaid: { increment: 1 } },
         });
@@ -204,34 +208,41 @@ export class CondoPaymentService {
 
     async getTotalPayment(condoId: string, user: UserJwt) {
         const billingMonth = await this.getBillingMonth(condoId, user.id); 
-        const [month, year] = billingMonth.billingMonth.split('-').map((data) => Number(data));
 
-        const startOfMonth = new Date(year, month - 1, 1);
-        const endOfMonth = new Date(year, month, 0); // 0 for last day of that month (dynamically)
-        endOfMonth.setHours(23, 59, 59, 999);
-
-        const [getCondoPayment, getExpensesCost, getAdditionalCost] = await Promise.all([
+        const [getCondoPayment, getExpensesCost, outstandingMaintenance] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
                 select: { rentAmount: true }
             }),
             this.aggregateExpensesByBillingMonth(condoId, billingMonth.billingMonth),
-            this.prisma.maintenance.aggregate({
-                _sum: { totalCost: true },
+            this.prisma.maintenance.findMany({
                 where: {
                     condoId: condoId,
+                    Status: 'COMPLETED',
                     paymentResponsibility: 'TENANT',
-                    completionDate: {
-                        gte: startOfMonth,
-                        lte: endOfMonth
-                    }
-                }
+                    totalCost: { not: null },
+                    payments: {
+                        none: { isPaid: true },
+                    },
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    totalCost: true,
+                    completionDate: true,
+                },
+                orderBy: { completionDate: 'asc' },
             })
         ])
 
         if(!getCondoPayment) {
             throw new NotFoundException('condo not found')
         }
+
+        const maintenanceCost = outstandingMaintenance.reduce(
+            (total, maintenance) => total + (maintenance.totalCost ?? 0),
+            0,
+        );
 
         return {
             // payment allowed?
@@ -240,11 +251,12 @@ export class CondoPaymentService {
             // specific
             rentCost: getCondoPayment.rentAmount,
             expensesCost: getExpensesCost || 0,
-            maintenanceCost: getAdditionalCost._sum.totalCost || 0,
+            maintenanceCost,
+            maintenanceItems: outstandingMaintenance,
 
             // summary
-            additionalCost: (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
-            totalCost: getCondoPayment.rentAmount + (getAdditionalCost._sum.totalCost || 0) + (getExpensesCost || 0),
+            additionalCost: maintenanceCost + (getExpensesCost || 0),
+            totalCost: getCondoPayment.rentAmount + maintenanceCost + (getExpensesCost || 0),
             ...billingMonth,
         }
     }
@@ -286,30 +298,37 @@ export class CondoPaymentService {
 
     // GCASH PAYMENT
     async createGcashPayment(user: UserJwt, condoId: string, gcashPhoto: Express.Multer.File, body: GcashPayment) {
-        const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
-        const billingMonth = await this.getBillingMonth(condoId, user.id);
+        const totalPayment = await this.getTotalPayment(condoId, user);
 
-        if(this.isPaymentAllowed(billingMonth.dueDate) === false) {
+        if(!totalPayment.isPaymentAllowed) {
             throw new ForbiddenException('Payment is not allowed yet. Please wait until the payment date.');
         }
 
+        if(Number(body.totalPaid) !== totalPayment.totalCost) {
+            throw new ConflictException('The bill changed. Refresh the page and pay the updated total.');
+        }
+
+        const gcashUrl = (await this.fileUploadService.upload(gcashPhoto)).secure_url;
         const createPaymentGcash = await this.prisma.condoPayment.create({
             data: {
                 type: CondoPaymentType.GCASH,
-                rentCost: parseInt(body.rentCost),
-                expensesCost: parseInt(body.expensesCost),
-                maintenanceCost: parseInt(body.maintenanceCost),
+                rentCost: totalPayment.rentCost,
+                expensesCost: totalPayment.expensesCost,
+                maintenanceCost: totalPayment.maintenanceCost,
 
-                additionalCost: parseInt(body.additionalCost),
-                totalPaid: parseInt(body.totalPaid),
+                additionalCost: totalPayment.additionalCost,
+                totalPaid: totalPayment.totalCost,
                 condoId: condoId,
                 tenantId: user.id,
+                maintenances: {
+                    connect: totalPayment.maintenanceItems.map(({ id }) => ({ id })),
+                },
 
                 receiptImage: gcashUrl,
                 gcashStatus: 'PENDING',
                 isVerified: false,
 
-                billingMonth: billingMonth.billingMonth
+                billingMonth: totalPayment.billingMonth
             },
             include: { condo: { select: { ownerId: true, name: true } } }
         })
@@ -369,17 +388,42 @@ export class CondoPaymentService {
     async verifyGcashPayment(user: UserJwt, condoPaymentId: string, body: GcashPaymentVerification) {
         const isVerified = body.gcashStatus === 'APPROVED';
         const isPaid = isVerified; // same thing but this is used for paymongo
-        
-        const updatePayment = await this.prisma.condoPayment.update({
-            where: { id: condoPaymentId, condo: { ownerId: user.id } },
-            data: {
-                isVerified, isPaid, gcashStatus: body.gcashStatus
-            },
-            include: { condo: { select: { tenantId: true, name: true  } } }
-        })
 
-        // update to isPaid to the database
-        await this.updateExpensesToPaid(updatePayment.condoId, updatePayment.billingMonth);
+        const updatePayment = await this.prisma.$transaction(async (prisma) => {
+            const existingPayment = await prisma.condoPayment.findFirst({
+                where: {
+                    id: condoPaymentId,
+                    type: CondoPaymentType.GCASH,
+                    condo: { ownerId: user.id },
+                },
+                include: { condo: { select: { tenantId: true, name: true } } },
+            });
+
+            if(!existingPayment) {
+                throw new NotFoundException('gcash payment not found');
+            }
+
+            if(existingPayment.isPaid) {
+                if(!isPaid) {
+                    throw new ConflictException('An approved payment cannot be rejected.');
+                }
+                return existingPayment;
+            }
+
+            const payment = await prisma.condoPayment.update({
+                where: { id: condoPaymentId },
+                data: {
+                    isVerified, isPaid, gcashStatus: body.gcashStatus
+                },
+                include: { condo: { select: { tenantId: true, name: true  } } }
+            });
+
+            if(isPaid) {
+                await this.updateExpensesToPaid(payment.condoId, payment.billingMonth, prisma);
+            }
+
+            return payment;
+        });
 
         // notify the tenant if there is any
         if(updatePayment.condo.tenantId) {
@@ -394,40 +438,50 @@ export class CondoPaymentService {
 
     // MANUAL PAYMENT // only landlord are allowed
     async createManualPayment(user: UserJwt, condoId: string, body: ManualPayment) {
-        const getCondo = await this.prisma.condo.findUnique({ 
-            where: { id: condoId },
-            select: { tenantId: true } 
+        const getCondo = await this.prisma.condo.findFirst({
+            where: { id: condoId, ownerId: user.id },
+            select: { tenantId: true, name: true }
         })
 
         if(!getCondo) throw new NotFoundException('condo not found!')
 
         if(!getCondo.tenantId) throw new NotFoundException('there is no tenant!')
 
-        const billingMonth = await this.getBillingMonth(condoId, getCondo.tenantId);
+        const tenantId = getCondo.tenantId;
+        const totalPayment = await this.getTotalPayment(condoId, user);
 
-        const createManualPayment = await this.prisma.condoPayment.create({
-            data: {
-                type: CondoPaymentType.MANUAL,
-                condoId: condoId,
-                rentCost: body.rentCost,
-                expensesCost: body.expensesCost,
-                maintenanceCost: body.maintenanceCost,
-                additionalCost: body.additionalCost,
-                totalPaid: body.totalPaid,
-                isPaid: true,
-                tenantId: getCondo.tenantId,
+        if(body.totalPaid !== totalPayment.totalCost) {
+            throw new ConflictException(`The full bill amount is ${totalPayment.totalCost}. Refresh the page and enter that amount.`);
+        }
 
-                billingMonth: billingMonth.billingMonth
-            }, include: { condo: { select: { ownerId: true, name: true } } }
-        })
+        const createManualPayment = await this.prisma.$transaction(async (prisma) => {
+            const payment = await prisma.condoPayment.create({
+                data: {
+                    type: CondoPaymentType.MANUAL,
+                    condoId: condoId,
+                    rentCost: totalPayment.rentCost,
+                    expensesCost: totalPayment.expensesCost,
+                    maintenanceCost: totalPayment.maintenanceCost,
+                    additionalCost: totalPayment.additionalCost,
+                    totalPaid: totalPayment.totalCost,
+                    isPaid: true,
+                    tenantId,
+                    maintenances: {
+                        connect: totalPayment.maintenanceItems.map(({ id }) => ({ id })),
+                    },
 
-        // update expense to paid
-        await this.updateExpensesToPaid(condoId, createManualPayment.billingMonth);
+                    billingMonth: totalPayment.billingMonth
+                }
+            });
+
+            await this.updateExpensesToPaid(condoId, payment.billingMonth, prisma);
+            return payment;
+        });
 
         // notify the tenant
-        this.notificationService.sendNotificationToUser(getCondo.tenantId, { 
+        this.notificationService.sendNotificationToUser(tenantId, {
             type: "PAYMENT", title: "Manual Payment",
-            message: `The landlord has added a manual payment for the your condo "${createManualPayment.condo.name}".`,
+            message: `The landlord has added a manual payment for the your condo "${getCondo.name}".`,
         });
 
         return createManualPayment;
@@ -463,6 +517,9 @@ export class CondoPaymentService {
                     maintenanceCost: totalPayment.maintenanceCost,
                     additionalCost: totalPayment.additionalCost,
                     totalPaid: totalPayment.totalCost,
+                    maintenances: {
+                        connect: totalPayment.maintenanceItems.map(({ id }) => ({ id })),
+                    },
 
                     billingMonth: totalPayment.billingMonth
                 }
@@ -491,14 +548,18 @@ export class CondoPaymentService {
     }
 
     async verifyPaymongoPayment(condoPaymentId: string, user: UserJwt) {
-        const getSessionId = await this.prisma.condoPayment.findUnique({
+        const getSessionId = await this.prisma.condoPayment.findFirst({
             where: {
-                id: condoPaymentId
+                id: condoPaymentId,
+                tenantId: user.id,
+                type: CondoPaymentType.PAYMONGO,
             },
             select: {
                 linkId: true, // checkout_sessionId
                 billingMonth: true,
                 condoId: true,
+                isPaid: true,
+                totalPaid: true,
                 condo: { select: { ownerId: true, name: true } }
             }
         })
@@ -517,29 +578,42 @@ export class CondoPaymentService {
             }
         }
 
-        // update to isPaid to the database
-        await this.prisma.condoPayment.update({ where: { id: condoPaymentId }, data: { isPaid: true } })
-        await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth);
-        
-        
-        // transfer this to userpayout module later on
         const paymentAmount = getPayment.attributes.payment_intent.attributes.amount / 100;
-        await this.prisma.userPayout.upsert({
-            where: { userId: getSessionId.condo.ownerId },
-            create: { userId: getSessionId.condo.ownerId, totalAmount: paymentAmount, availableAmount: paymentAmount },
-            update: { totalAmount: { increment: paymentAmount }, availableAmount: { increment: paymentAmount } }
-        })
+
+        if(paymentAmount !== getSessionId.totalPaid) {
+            throw new ConflictException('The PayMongo amount does not match this condo payment.');
+        }
+
+        const wasSettled = await this.prisma.$transaction(async (prisma) => {
+            const updateResult = await prisma.condoPayment.updateMany({
+                where: { id: condoPaymentId, isPaid: false },
+                data: { isPaid: true },
+            });
+
+            if(updateResult.count === 0) return false;
+
+            await this.updateExpensesToPaid(getSessionId.condoId, getSessionId.billingMonth, prisma);
+
+            // transfer this to userpayout module later on
+            await prisma.userPayout.upsert({
+                where: { userId: getSessionId.condo.ownerId },
+                create: { userId: getSessionId.condo.ownerId, totalAmount: paymentAmount, availableAmount: paymentAmount },
+                update: { totalAmount: { increment: paymentAmount }, availableAmount: { increment: paymentAmount } }
+            });
+
+            return true;
+        });
 
         // notify the landlord
-        this.notificationService.sendNotificationToUser(getSessionId.condo.ownerId, {
+        if(wasSettled) this.notificationService.sendNotificationToUser(getSessionId.condo.ownerId, {
             type: "PAYMENT", title: "Paymongo Payment", link: `/dashboard/condo/${getSessionId.condoId}`,
             message: `the tenant ${user.name} has paid the rent for the condo "${getSessionId.condo.name}".`,
-        })
+        });
 
         return {
             name: "Condo Payment",
             status: status,
-            linkId: getSessionId,
+            linkId: getSessionId.linkId,
             checkouturl: getPayment.attributes.checkout_url
         }
     }

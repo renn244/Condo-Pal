@@ -274,12 +274,8 @@ export class AuthService {
             return {...createTenantAccount, leaseAgreementId: createLeaseAgreement.id}
         })
         
-        // send email
-        this.emailSender.sendEmail(body.email, 'tenants account', 'your account credentials',
-        `
-            email: ${body.email},
-            password: ${password}
-        `)
+        // Wait only until BullMQ stores the job; SendGrid runs in the email worker.
+        await this.emailSender.sendTenantCredentialsEmail(body.email, password);
 
         return {
             id: createTenantTransactions.id,

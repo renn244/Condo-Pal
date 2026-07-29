@@ -71,6 +71,7 @@ const CondoHeader = ({
                 </Card>
             </div>
             <div>
+                {condo.latestBill ? (
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-lg">
@@ -111,6 +112,18 @@ const CondoHeader = ({
                         </div>
                     </CardContent>
                 </Card>
+                ) : (
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Latest Bill Information</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                            No bill is available until a tenant lease agreement is added.
+                        </p>
+                    </CardContent>
+                </Card>
+                )}
             </div>
         </div>
     )

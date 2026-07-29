@@ -183,7 +183,7 @@ export class CondoService {
     }
 
     async getViewCondo(condoId: string, user: UserJwt) {
-        const [Condo, condoSummary, latestBilling] = await Promise.all([
+        const [Condo, condoSummary] = await Promise.all([
             this.prisma.condo.findUnique({
                 where: { id: condoId },
                 include: {
@@ -192,10 +192,18 @@ export class CondoService {
                 }
             }),
             this.getCondoPaymentSummary(user, condoId),
-            this.condoPaymentService.getTotalPayment(condoId, user),
         ])
 
         if(!Condo) throw new NotFoundException("condo not found!") 
+
+        // A condo can exist before a tenant or lease agreement is created. In that
+        // state there is no bill to calculate, but the condo view must still load.
+        let latestBilling: Awaited<ReturnType<CondoPaymentService['getTotalPayment']>> | null = null;
+        try {
+            latestBilling = await this.condoPaymentService.getTotalPayment(condoId, user);
+        } catch (error) {
+            if(!(error instanceof NotFoundException)) throw error;
+        }
 
         return {
             ...Condo,

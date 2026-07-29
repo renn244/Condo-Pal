@@ -44,4 +44,9 @@ export class NotificationProcessor extends WorkerHost {
     onFailed(job: Job, error: Error) {
         console.error(`Notification job ${job.id} failed with error: ${error.message}`);
     }
+
+    @OnWorkerEvent('error')
+    onError(error: Error) {
+        console.error(`Notification worker error: ${error.message}`);
+    }
 }

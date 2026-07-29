@@ -17,10 +17,16 @@ export interface AssignedWorkerJobData {
     token: string;
 }
 
+export interface TenantCredentialsJobData {
+    email: string;
+    password: string;
+}
+
 type JobDataMap = {
     dueReminder: DueReminderJobData;
     resetPassword: ResetPasswordJobData;
     assignedWorker: AssignedWorkerJobData;
+    tenantCredentials: TenantCredentialsJobData;
 }
 
 type JobName = keyof JobDataMap;

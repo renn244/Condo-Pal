@@ -41,9 +41,16 @@ const imports = [
         tls: {  }
       },
       defaultJobOptions: {
-        removeOnComplete: true,
-        removeOnFail: true,
+        // Keep a bounded job history so failures can be investigated without
+        // letting Redis grow forever.
+        removeOnComplete: { age: 60 * 60 * 24, count: 1_000 },
+        removeOnFail: { age: 60 * 60 * 24 * 7, count: 5_000 },
         attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1_000,
+        },
+        stackTraceLimit: 10,
       }
     }),
     inject: [ConfigService]

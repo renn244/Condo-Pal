@@ -56,7 +56,8 @@ const Pricing = () => {
             }, { validateStatus: () => true })
             
             if(response.status === 401) {
-                return location.assign('/login?next=/pricing')
+                window.location.assign('/login?next=/pricing');
+                return null;
             }
 
             if(response.status >= 400) throw new Error(response.data.message);
@@ -67,6 +68,8 @@ const Pricing = () => {
             return toast.error(error.message)
         },
         onSuccess: (data) => {
+            // A guest is redirected above, so there is no checkout URL to open.
+            if(!data) return;
             window.location.assign(data.attributes.checkout_url)
         }
     })

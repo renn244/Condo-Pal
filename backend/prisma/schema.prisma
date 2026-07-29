@@ -19,96 +19,96 @@ enum Role {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  profile       String?
-  name          String?
-  password      String?
-  TwoFA         Boolean  @default(false)
+  id       String  @id @default(cuid())
+  email    String  @unique
+  profile  String?
+  name     String?
+  password String?
+  TwoFA    Boolean @default(false)
   // phoneNumber   String?  @unique
 
-  role          Role     @default(landlord)
+  role Role @default(landlord)
 
-  isOAuth       Boolean  @default(false)
-  provider      String? // e.g, "google", "local"
-  providerId    String?  @unique // Unique ID from OAuth provider
+  isOAuth    Boolean @default(false)
+  provider   String? // e.g, "google", "local"
+  providerId String? @unique // Unique ID from OAuth provider
 
   subscriptions Subscription[]
-  
-  condos        Condo[]  @relation("Owner")
-  condo         Condo?   @relation("Tenant") 
 
-  payout        UserPayout? // this is the payout of the user if they are a landlord
-  payoutMethod  PayoutMethod[] // this is the payout method of the user if they are a landlord
+  condos Condo[] @relation("Owner")
+  condo  Condo?  @relation("Tenant")
 
-  billingInfo   BillingInfo? // this is the billing info of the landlord
-  payments      CondoPayment[]
-  agreement     LeaseAgreement? // if it's a landlord then this should be null
+  payout       UserPayout? // this is the payout of the user if they are a landlord
+  payoutMethod PayoutMethod[] // this is the payout method of the user if they are a landlord
+
+  billingInfo BillingInfo? // this is the billing info of the landlord
+  payments    CondoPayment[]
+  agreement   LeaseAgreement? // if it's a landlord then this should be null
 
   maintenanceMessage MaintenanceMessage[] // this is the message that the user sent to the maintenance
 
-  messagesSent      Message[] @relation("SendMessages")
-  messagesReceived  Message[] @relation("ReceivedMessages")
+  messagesSent     Message[] @relation("SendMessages")
+  messagesReceived Message[] @relation("ReceivedMessages")
 
-  notifications  Notification[]
+  notifications Notification[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserPayout {
-  id              String   @id @default(cuid())
-  
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
   totalAmount     Int // this is the total amount that the user has earned from the condo payments
   availableAmount Int // this is the amount that the user can withdraw
 
-  payouts         Payouts[] // this is the payouts that the user has made
+  payouts Payouts[] // this is the payouts that the user has made
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PayoutMethod {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  methodType      String // e.g., "GCASH", "MAYA", "GRABPAY"
-  mobileNumber    String // e.g., "09123456789" for GCASH or MAYA
-  accountName     String // e.g., "Juan Dela Cruz" for GCASH or MAYA
+  methodType   String // e.g., "GCASH", "MAYA", "GRABPAY"
+  mobileNumber String // e.g., "09123456789" for GCASH or MAYA
+  accountName  String // e.g., "Juan Dela Cruz" for GCASH or MAYA
 
-  transactions    Payouts[] // this is the payout transactions that the user has made
+  transactions Payouts[] // this is the payout transactions that the user has made
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // actual payout transactions
 model Payouts {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userPayoutId    String
-  userPayout      UserPayout @relation(fields: [userPayoutId], references: [id])
+  userPayoutId String
+  userPayout   UserPayout @relation(fields: [userPayoutId], references: [id])
 
-  payoutMethodId  String
-  payoutMethod    PayoutMethod @relation(fields: [payoutMethodId], references: [id])
+  payoutMethodId String
+  payoutMethod   PayoutMethod @relation(fields: [payoutMethodId], references: [id])
 
-  amount          Int
-  status          String // e.g., "pending", "completed", "failed" // this was meant for banks but of course we can't make a system that big yet
+  amount Int
+  status String // e.g., "pending", "completed", "failed" // this was meant for banks but of course we can't make a system that big yet
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BillingInfo {
-  id          String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId      String  @unique
-  user        User    @relation(fields: [userId], references: [id])
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
   firstName   String?
   lastName    String?
@@ -116,46 +116,46 @@ model BillingInfo {
   phoneNumber String?
 
   gcashNumber String? // this is the gcash number of the landlord that is used for the tenant payment
-  
-  createdAt   DateTime @default(now())
+
+  createdAt DateTime @default(now())
 }
 
 model LeaseAgreement {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  leaseStart    DateTime
-  leaseEnd      DateTime?
-  due_date      Int     // Day of the month or (-1) for end of the month. maximum(28 for all month)
+  leaseStart DateTime
+  leaseEnd   DateTime?
+  due_date   Int // Day of the month or (-1) for end of the month. maximum(28 for all month)
 
-  condoId       String   
-  condo         Condo    @relation(fields: [condoId], references: [id])
+  condoId String
+  condo   Condo  @relation(fields: [condoId], references: [id])
 
-  tenantId      String   @unique
-  tenant        User     @relation(fields: [tenantId], references: [id])
+  tenantId String @unique
+  tenant   User   @relation(fields: [tenantId], references: [id])
 
-  isLeaseEnded  Boolean  @default(false)
+  isLeaseEnded Boolean @default(false)
 
-  messages      Message[] // this is the message for tenant and landlord
+  messages Message[] // this is the message for tenant and landlord
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model refreshToken {
-  id         String   @id @default(cuid())
-  userId     String // the user
-  token      String // the random unique token
+  id     String @id @default(cuid())
+  userId String // the user
+  token  String // the random unique token
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model resetPassword {
-  id         String   @id @default(cuid())
-  userId     String // the user
-  token      String // the random unique token
+  id     String @id @default(cuid())
+  userId String // the user
+  token  String // the random unique token
 
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime // the token expiration date // 1 hour
+  createdAt DateTime @default(now())
+  expiresAt DateTime // the token expiration date // 1 hour
 }
 
 enum SubscriptionType {
@@ -165,91 +165,92 @@ enum SubscriptionType {
 }
 
 model Subscription {
-  id          String   @id @default(cuid())
-  type        SubscriptionType
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String           @id @default(cuid())
+  type   SubscriptionType
+  userId String
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  linkId      String? // this the the linkId of the checkout payment
-  isPaid      Boolean @default(false)
+  linkId String? // this the the linkId of the checkout payment
+  isPaid Boolean @default(false)
 
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 
-  canceledAt  DateTime? // is this needed?
+  canceledAt DateTime? // is this needed?
 }
 
 model Condo {
-  id          String    @id @default(cuid())
-  name        String    // to easily remember certain condo's
-  address     String 
-  photo       String
+  id      String @id @default(cuid())
+  name    String // to easily remember certain condo's
+  address String
+  photo   String
 
-  ownerId     String
-  owner       User      @relation("Owner", fields: [ownerId], references: [id])
+  ownerId String
+  owner   User   @relation("Owner", fields: [ownerId], references: [id])
 
-  tenantId    String?   @unique
-  tenant      User?     @relation("Tenant", fields: [tenantId], references: [id])
+  tenantId String? @unique
+  tenant   User?   @relation("Tenant", fields: [tenantId], references: [id])
 
-  rentAmount  Float     // per month
-  isActive    Boolean   // if there is currently a tenant or not?
+  rentAmount Float // per month
+  isActive   Boolean // if there is currently a tenant or not?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   agreements   LeaseAgreement[] // condo may have many leases from different time
   maintinances Maintenance[]
   expenses     Expense[]
 
-  payments     CondoPayment[]
+  payments CondoPayment[]
 
   // used for update and delete to make sure the one performing those actions is the owner
-  @@unique([id, ownerId]) 
+  @@unique([id, ownerId])
 }
 
 enum CondoPaymentType {
   PAYMONGO // this is include all digital payment automated
-  GCASH    // this is just in photo of the receipt itself being sent to the landlord
-  MANUAL   // this is when the landlord get the payment physically // much more riskier since there is no evidence.
+  GCASH // this is just in photo of the receipt itself being sent to the landlord
+  MANUAL // this is when the landlord get the payment physically // much more riskier since there is no evidence.
 }
 
 enum GcashPaymentStatus {
-  PENDING  // Awaiting landlord verification (for GCASH)
+  PENDING // Awaiting landlord verification (for GCASH)
   APPROVED // Verified by the landlord
   REJECTED // Rejected by the landlord (if invalid proof)
 }
 
 model CondoPayment {
-  id              String    @id @default(cuid())
+  id String @id @default(cuid())
 
-  type            CondoPaymentType
+  type CondoPaymentType
 
   // specific
   rentCost        Int
-  expensesCost    Int  @default(0)
-  maintenanceCost Int  @default(0)  
+  expensesCost    Int @default(0)
+  maintenanceCost Int @default(0)
 
   // summary
-  additionalCost  Int? @default(0) // this is the additional costing for things like the maintenance, and penalties
-  totalPaid       Int // should be the added rent cost and addiotional cost
+  additionalCost Int? @default(0) // this is the additional costing for things like the maintenance, and penalties
+  totalPaid      Int // should be the added rent cost and addiotional cost
 
   // paymongo
-  linkId          String? // this the the linkId of the checkout payment
-  isPaid          Boolean @default(false)
+  linkId String? // this the the linkId of the checkout payment
+  isPaid Boolean @default(false)
 
-  tenantId        String
-  tenant          User  @relation(fields: [tenantId], references: [id])
+  tenantId String
+  tenant   User   @relation(fields: [tenantId], references: [id])
 
-  condoId         String
-  condo           Condo  @relation(fields: [condoId], references: [id])
+  condoId      String
+  condo        Condo         @relation(fields: [condoId], references: [id])
+  maintenances Maintenance[] @relation("MaintenancePayments")
 
   // gcash
-  receiptImage    String? // for GCASH receipt
-  isVerified      Boolean? // for confirming GCASH payment only landlord is allowed to do this
-  gcashStatus     GcashPaymentStatus?
+  receiptImage String? // for GCASH receipt
+  isVerified   Boolean? // for confirming GCASH payment only landlord is allowed to do this
+  gcashStatus  GcashPaymentStatus?
 
-  billingMonth    String // MM-YYYY
-  payedAt         DateTime @default(now())
+  billingMonth String // MM-YYYY
+  payedAt      DateTime @default(now())
 }
 
 enum ExpenseCategory {
@@ -266,25 +267,25 @@ enum Recurrence {
 }
 
 model Expense {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  condoId         String
-  condo           Condo    @relation(fields: [condoId], references: [id])
+  condoId String
+  condo   Condo  @relation(fields: [condoId], references: [id])
 
-  title           String
-  cost            Float
-  notes           String? // this is the notes for the expense
+  title String
+  cost  Float
+  notes String? // this is the notes for the expense
 
-  category        ExpenseCategory
-  isPaid          Boolean @default(false) // if this is paid or not
-  
-  recurring       Boolean @default(false) // if this is a recurring expense or not
-  recurrence      Recurrence? // if this is a recurring expense then this is the type of recurrence
-  timesPaid       Int @default(0) // how many times this has been paid
+  category ExpenseCategory
+  isPaid   Boolean         @default(false) // if this is paid or not
 
-  billingMonth    String? // MM-YYYY
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  recurring  Boolean     @default(false) // if this is a recurring expense or not
+  recurrence Recurrence? // if this is a recurring expense then this is the type of recurrence
+  timesPaid  Int         @default(0) // how many times this has been paid
+
+  billingMonth String? // MM-YYYY
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum MaintenanceStatus {
@@ -293,12 +294,12 @@ enum MaintenanceStatus {
   IN_PROGRESS
   COMPLETED
   CANCELED
-} 
+}
 
 // this will define how you want to respond to maintenance
 enum PriorityLevel {
   LOW
-  MEDIUM 
+  MEDIUM
   HIGH
 }
 
@@ -310,16 +311,17 @@ enum PaymentResponsibility {
 enum MaintenanceType {
   CORRECTIVE // fixing the issues that had occured
   PREVENTIVE // routing check to prevent future issues that might occur // cleaning air filter
-  EMERGENCY  // Urgent repairs to prevent property damage or safety hazards.
+  EMERGENCY // Urgent repairs to prevent property damage or safety hazards.
 }
 
 model Maintenance {
-  id          String    @id @default(cuid())
-  
-  condoId     String
-  condo       Condo     @relation(fields: [condoId], references: [id]) 
+  id String @id @default(cuid())
 
-  photos      String[]  // 3 photos max
+  condoId  String
+  condo    Condo          @relation(fields: [condoId], references: [id])
+  payments CondoPayment[] @relation("MaintenancePayments")
+
+  photos      String[] // 3 photos max
   title       String
   description String
 
@@ -327,13 +329,13 @@ model Maintenance {
   Status        MaintenanceStatus @default(PENDING)
   priorityLevel PriorityLevel
 
-  estimatedCost     Int?
-  totalCost         Int?
+  estimatedCost Int?
+  totalCost     Int?
 
   paymentResponsibility PaymentResponsibility?
-  canceledBy        String? // "Tenant" and "Landlord"
+  canceledBy            String? // "Tenant" and "Landlord"
 
-  messages         MaintenanceMessage[] // this is only used for the onProgress status
+  messages          MaintenanceMessage[] // this is only used for the onProgress status
   maintenanceWorker MaintenanceWorkerToken[]
 
   preferredSchedule DateTime? // if null then that means anytime
@@ -341,19 +343,19 @@ model Maintenance {
   completionDate    DateTime? // if null then it means i has been cancelled
   proofOfCompletion String[] // this is the proof of completion of the maintenance
 
-  createdAt         DateTime  @default(now())
+  createdAt DateTime @default(now())
 }
 
 model MaintenanceWorkerToken {
-  id              String   @id @default(cuid())
-  token           String   // the random unique token
-  workerName      String? // the name of the worker that is assigned to the maintenance
-  used            Boolean @default(false)
+  id         String  @id @default(cuid())
+  token      String // the random unique token
+  workerName String? // the name of the worker that is assigned to the maintenance
+  used       Boolean @default(false)
 
-  maintenanceId   String
-  maintenance     Maintenance @relation(fields: [maintenanceId], references: [id])
+  maintenanceId String
+  maintenance   Maintenance @relation(fields: [maintenanceId], references: [id])
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([token, maintenanceId])
 }
@@ -368,52 +370,52 @@ enum MaintenanceMessageStatusUpdate {
   IN_PROGRESS
   COMPLETED
   // this is the status of the maintenance message only becasue in maintenance status it would go back to pending
-  NOT_COMPLETED 
+  NOT_COMPLETED
 }
 
 // for maintenance message within a group
 model MaintenanceMessage {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // this is where the message is being sent like a group
-  maintenanceId   String 
-  maintenance     Maintenance @relation(fields: [maintenanceId], references: [id])
+  maintenanceId String
+  maintenance   Maintenance @relation(fields: [maintenanceId], references: [id])
 
   // only tenant and landlord. no senderId means it's the assigned worker
-  senderId        String?
-  sender          User?     @relation(fields: [senderId], references: [id])
-  
-  workerName      String? // this is the name of the worker that is assigned to the maintenance
-  senderType      SenderType // this is the type of sender
+  senderId String?
+  sender   User?   @relation(fields: [senderId], references: [id])
 
-  message         String
-  attachment      String[] // Optional: If message can include photos/documents
+  workerName String? // this is the name of the worker that is assigned to the maintenance
+  senderType SenderType // this is the type of sender
 
-  isStatusUpdate  Boolean? // if this is true then this is a status update
-  statusUpdate    MaintenanceMessageStatusUpdate? 
+  message    String
+  attachment String[] // Optional: If message can include photos/documents
 
-  createdAt       DateTime @default(now())
+  isStatusUpdate Boolean? // if this is true then this is a status update
+  statusUpdate   MaintenanceMessageStatusUpdate?
+
+  createdAt DateTime @default(now())
 }
 
 model Message {
-  id                  String   @id @default(cuid())
-  
-  leaseAgreementId    String
-  leaseAgreement      LeaseAgreement  @relation(fields: [leaseAgreementId], references: [id])
+  id String @id @default(cuid())
 
-  senderId            String
-  sender              User     @relation("SendMessages", fields: [senderId], references: [id])
+  leaseAgreementId String
+  leaseAgreement   LeaseAgreement @relation(fields: [leaseAgreementId], references: [id])
 
-  receiverId          String
-  receiver            User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  senderId String
+  sender   User   @relation("SendMessages", fields: [senderId], references: [id])
 
-  message             String
-  attachment          String[]
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
-  isRead              Boolean @default(false)
-  
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  message    String
+  attachment String[]
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum NotificationType {
@@ -426,19 +428,19 @@ enum NotificationType {
 }
 
 model Notification {
-  id          String    @id  @default(cuid())
-  userId      String  
-  user        User      @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  type        NotificationType // type of notification
+  type NotificationType // type of notification
 
-  title       String
-  message     String
-  isRead      Boolean   @default(false)
-  isDeleted   Boolean   @default(false) // soft delete // not yet used
+  title     String
+  message   String
+  isRead    Boolean @default(false)
+  isDeleted Boolean @default(false) // soft delete // not yet used
 
-  link        String?
+  link String?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

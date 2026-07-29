@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ReminderService {
+    private readonly logger = new Logger(ReminderService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly emailSender: EmailSenderService,
@@ -52,7 +54,7 @@ export class ReminderService {
         })
 
         // calculate if the due date is 1 week before
-        notEndedLeaseAgreement.forEach((leaseAgreement) => {
+        const reminderJobs = notEndedLeaseAgreement.flatMap((leaseAgreement) => {
             // send email reminders if it is 1 week before (might want to have a queing system for it not to have a timeout)
             const isLastDayofMonthDue = leaseAgreement.due_date === -1;
             const is1WeekBeforeDue = isLastDayofMonthDue 
@@ -61,15 +63,25 @@ export class ReminderService {
             
             // TODOLATER: check if already paid
             if(is1WeekBeforeDue) {
-                this.emailSender.sendDueReminderEmail(leaseAgreement.tenant.email, leaseAgreement);
+                const emailJob = this.emailSender.sendDueReminderEmail(leaseAgreement.tenant.email, leaseAgreement);
                 
                 // send notification to the tenant
                 this.notificationService.sendNotificationToUser(leaseAgreement.tenant.id, {
                     title: "Payment Reminder", type: "LEASE_AGREEMENT",
                     message: `Your rent payment is due in 1 week for ${leaseAgreement.condo.name}. make sure to pay it before the due date.`,
                 })
+
+                return [emailJob];
             }
-        })
+            return [];
+        });
+
+        const emailResults = await Promise.allSettled(reminderJobs);
+        emailResults.forEach((result) => {
+            if(result.status === 'rejected') {
+                this.logger.error('Failed to queue a payment reminder email', result.reason);
+            }
+        });
 
         return `Sent the daily reminders for billing due dates`;
     }

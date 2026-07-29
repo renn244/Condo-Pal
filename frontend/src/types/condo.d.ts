@@ -50,6 +50,12 @@ type CondoBillInformation = {
     rentCost: number,
     expensesCost: number,
     maintenanceCost: number,
+    maintenanceItems: {
+        id: string,
+        title: string,
+        totalCost: number,
+        completionDate: string | null,
+    }[],
     additionalCost: number,
     totalCost: number,
     billingMonth: string,
@@ -88,7 +94,7 @@ type ViewCondoInformation = {
         profile: user['profile']
     },
     condoSummary: CondoSummary,
-    latestBill: billingMonth,
+    latestBill: billingMonth | null,
 } & condo
 
 type CondoLinkCard = {

@@ -83,6 +83,7 @@ const ManualPayment = () => {
                     expensesCost={condoBillInfo.expensesCost}
                     maintenanceCost={condoBillInfo.maintenanceCost}
                     additionalCost={condoBillInfo.additionalCost}
+                    totalCost={condoBillInfo.totalCost}
                     setIsSuccess={setIsSuccess} />
                 </div>
             )}
@@ -96,7 +97,8 @@ type ManualPaymentRecordProps = {
     rentCost: number,
     expensesCost: number,
     maintenanceCost: number,
-    additionalCost: number
+    additionalCost: number,
+    totalCost: number,
 }
 
 const ManualPaymentRecord = ({
@@ -105,9 +107,10 @@ const ManualPaymentRecord = ({
     expensesCost,
     maintenanceCost,
     additionalCost,
+    totalCost,
     setIsSuccess
 }: ManualPaymentRecordProps) => {
-    const [totalPaid, setTotalPaid] = useState<number>(0)
+    const [totalPaid, setTotalPaid] = useState<number>(totalCost)
     const [notes, setNotes] = useState<string>("")
 
     const { mutate: recordPayment, isPending } = useMutation({
