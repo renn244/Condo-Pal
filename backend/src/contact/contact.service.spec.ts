@@ -38,13 +38,14 @@ describe('ContactService', () => {
 
 describe('EmailSenderService.processContactEmail', () => {
     it('escapes the visitor text and replies to the visitor', async () => {
-        const config = { get: () => 'SG.test' };
+        const config = { get: (key: string) => key === 'CONTACT_EMAIL' ? 'inbox@example.com' : undefined };
         const service = new EmailSenderService(config as any, {} as any);
         const sendEmail = jest.spyOn(service, 'sendEmail').mockResolvedValue(undefined as any);
 
         await service.processContactEmail('<b>Juan</b>', 'juan@example.com', '<script>alert(1)</script>');
 
-        const [, , , html, options] = sendEmail.mock.calls[0];
+        const [to, , , html, options] = sendEmail.mock.calls[0];
+        expect(to).toBe('inbox@example.com');
         expect(html).not.toContain('<script>');
         expect(html).toContain('&#60;script&#62;');
         expect(options).toEqual({ replyTo: 'juan@example.com' });

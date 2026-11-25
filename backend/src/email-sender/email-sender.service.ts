@@ -1,37 +1,43 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as sgMail from '@sendgrid/mail';
 import { TypedEmailQueue } from 'src/types/job.type';
 
 @Injectable()
 export class EmailSenderService{
   constructor(
-    configSevice: ConfigService,
+    private readonly configService: ConfigService,
     @InjectQueue('email') private readonly emailQueue: TypedEmailQueue
-  ){ 
-    const sendgridApiKey = configSevice.get<string>('SENDGRID_API_KEY')
-    if(!sendgridApiKey) throw new Error('SENDGRID_API_KEY is not defined')
+  ){}
 
-    sgMail.setApiKey(sendgridApiKey)
-  }
+  // sends through Resend's email API (Render's free tier blocks SMTP)
+  async sendEmail(to: string, subject: string, title: string, content: string, options?: { replyTo?: string }) {
+    const apiKey = this.configService.get<string>('RESEND_API_KEY')
+    if(!apiKey) throw new Error('RESEND_API_KEY is not defined')
 
-  async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {
-    const msg = {
-      to: to,
-      from: 'condopal.management@gmail.com',
-      subject: subject,
-      html: content,
-      ...options
-    } 
+    // an address on the domain verified in Resend
+    const from = this.configService.get<string>('EMAIL_FROM')
+    if(!from) throw new Error('EMAIL_FROM is not defined')
 
-    try {
-      const response = await sgMail.send(msg)
-      return response
-    } catch (error) {
-      console.log(`Error sending email: ${error}`)
-      throw Error(`Error sending email: ${error.message}`)
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: `CondoPal <${from}>`,
+        to: [to],
+        subject: subject,
+        html: content,
+        ...(options?.replyTo && { reply_to: options.replyTo }),
+      }),
+    })
+
+    if(!response.ok) {
+      const error = await response.text()
+      console.log(`Error sending email: ${response.status} ${error}`)
+      throw new Error(`Error sending email: ${response.status} ${error}`)
     }
+
+    return response.json()
   }
   
   async sendDueReminderEmail(email: string, leaseAgreement: any) {
@@ -143,10 +149,11 @@ export class EmailSenderService{
     return this.emailQueue.add('contactMessage', { name, email, message });
   }
 
-  // goes to the CondoPal inbox; replying answers the visitor directly
+  // goes to CONTACT_EMAIL; replying answers the visitor directly
   async processContactEmail(name: string, email: string, message: string) {
     const escape = (text: string) => text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`)
-    const inbox = process.env.CONTACT_EMAIL || 'condopal.management@gmail.com'
+    const inbox = this.configService.get<string>('CONTACT_EMAIL')
+    if(!inbox) throw new Error('CONTACT_EMAIL is not defined')
 
     return this.sendEmail(
       inbox,
