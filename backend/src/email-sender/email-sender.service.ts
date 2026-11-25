@@ -10,24 +10,24 @@ export class EmailSenderService{
     @InjectQueue('email') private readonly emailQueue: TypedEmailQueue
   ){}
 
-  // sends through Brevo's transactional email API
+  // sends through Resend's email API (Render's free tier blocks SMTP)
   async sendEmail(to: string, subject: string, title: string, content: string, options?: { replyTo?: string }) {
-    const apiKey = this.configService.get<string>('BREVO_API_KEY')
-    if(!apiKey) throw new Error('BREVO_API_KEY is not defined')
+    const apiKey = this.configService.get<string>('RESEND_API_KEY')
+    if(!apiKey) throw new Error('RESEND_API_KEY is not defined')
 
-    // must be a sender verified in Brevo
+    // an address on the domain verified in Resend
     const from = this.configService.get<string>('EMAIL_FROM')
     if(!from) throw new Error('EMAIL_FROM is not defined')
 
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      headers: { Authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
       body: JSON.stringify({
-        sender: { name: 'CondoPal', email: from },
-        to: [{ email: to }],
+        from: `CondoPal <${from}>`,
+        to: [to],
         subject: subject,
-        htmlContent: content,
-        ...(options?.replyTo && { replyTo: { email: options.replyTo } }),
+        html: content,
+        ...(options?.replyTo && { reply_to: options.replyTo }),
       }),
     })
 
@@ -149,11 +149,11 @@ export class EmailSenderService{
     return this.emailQueue.add('contactMessage', { name, email, message });
   }
 
-  // goes to CONTACT_EMAIL (or the sender inbox); replying answers the visitor directly
+  // goes to CONTACT_EMAIL; replying answers the visitor directly
   async processContactEmail(name: string, email: string, message: string) {
     const escape = (text: string) => text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`)
-    const inbox = this.configService.get<string>('CONTACT_EMAIL') || this.configService.get<string>('EMAIL_FROM')
-    if(!inbox) throw new Error('CONTACT_EMAIL or EMAIL_FROM is not defined')
+    const inbox = this.configService.get<string>('CONTACT_EMAIL')
+    if(!inbox) throw new Error('CONTACT_EMAIL is not defined')
 
     return this.sendEmail(
       inbox,
