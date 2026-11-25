@@ -74,8 +74,8 @@ const SignUp = () => {
   }
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <Card className="w-[450px]">
+    <div className="w-full h-screen flex justify-center items-center px-4">
+      <Card className="w-full max-w-[450px]">
         <CardHeader>
           <CardTitle>
             Sign Up

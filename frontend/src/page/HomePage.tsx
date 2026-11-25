@@ -102,7 +102,7 @@ const HomePage = () => {
             <section className="py-12 relative">
                 <div className="w-full max-w-[1480px] px-4 md:px-5 lg:px-5 mx-auto">
                     <div className="w-full justify-start items-center gap-8 grid lg:grid-cols-2 grid-cols-1">
-                        <img data-aos="fade-right" data-aos-duration="600" data-aos-delay="400" className="lg:mx-0 mx-auto h-full rounded-3xl object-cover" src="https://pagedone.io/asset/uploads/1717751272.png" alt="about Us image" />
+                        <img data-aos="fade-right" data-aos-duration="600" data-aos-delay="400" className="lg:mx-0 mx-auto h-full rounded-3xl object-cover" src="/about/CondoPal-Team.jpg" alt="The CondoPal team" />
                         <div className="w-full flex-col justify-start lg:items-start items-center gap-10 inline-flex">
                             <div className="w-full flex-col justify-start lg:items-start items-center gap-4 flex">
                                 <h2 data-aos="fade-down" data-aos-duration="600" className="text-gray-900 text-4xl font-bold font-manrope leading-normal lg:text-start text-center">

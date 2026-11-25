@@ -1,7 +1,6 @@
 import { Check } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Button } from "../ui/button"
-import { UseMutateFunction } from "@tanstack/react-query"
 import LoadingSpinner from "./LoadingSpinner"
 
 type PricingCardProps = {
@@ -11,7 +10,7 @@ type PricingCardProps = {
     features: string[],
     mostPopular?: boolean,
     buttonText: string,
-    onButtonClick: UseMutateFunction<void, Error, string, unknown>,
+    onButtonClick: () => void,
     isLoading?: boolean,
 }
 
@@ -40,7 +39,7 @@ const PricingCard = ({
                     {description}
                 </CardDescription>
                 <div className="mt-4">
-                    <span className="text-4xl font-bold">${monthlyPrice}</span>
+                    <span className="text-4xl font-bold">₱{monthlyPrice.toLocaleString()}</span>
                     <span className="text-muted-foreground">/month</span>
                 </div>
             </CardHeader>
@@ -55,7 +54,7 @@ const PricingCard = ({
                 </ul>
             </CardContent>
             <CardFooter>
-                <Button disabled={isLoading} onClick={() => onButtonClick(title)} className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                <Button disabled={isLoading} onClick={onButtonClick} className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
                     {isLoading ? <LoadingSpinner /> : buttonText}
                 </Button>  
             </CardFooter>

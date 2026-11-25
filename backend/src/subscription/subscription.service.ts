@@ -14,53 +14,25 @@ export class SubscriptionService {
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
-    handleTypeSubscription(type: 'Starter' | 'Pro' | 'Enterprise') {
-        const prices = {
-            'Starter': {
-                price: 450,
-                title: 'Starter',
-                description: 'Perfect for side projects',
-                features: [
-                    "5 projects", 
-                    "10GB storage", 
-                    "Basic analytics", 
-                    "Email support"
-                ],
-            },
-            'Pro': {
-                price: 1450,
-                title: 'Professional',
-                description: 'For growing businesses',
-                features: [
-                    "Unlimited projects",
-                    "100GB storage",
-                    "Advanced analytics",
-                    "Priority support",
-                    "Custom domains",
-                    "Team collaboration",
-                ],
-            },
-            'Enterprise': {
-                price: 5950,
-                title: 'Enterprise',
-                description: 'For large organizations',
-                features: [
-                    "Unlimited everything",
-                    "Advanced security",
-                    "Custom integrations",
-                    "24/7 phone support",
-                    "SLA guarantee",
-                    "Dedicated account manager",
-                ],
-            },
+    // one plan for everyone; old Pro and Enterprise records show the same plan
+    getPlan() {
+        return {
+            price: 450,
+            title: 'CondoPal',
+            description: 'Everything you need to manage your condos',
+            features: [
+                "Unlimited condos and tenants",
+                "Rent payments by GCash or manual entry",
+                "Maintenance requests and tracking",
+                "Expense tracking",
+                "Chat with tenants",
+                "Dashboard and payment history",
+            ],
         }
-
-        return prices[type]
     }
 
-    // the types will be changed depending of the pricing titles
     async handleSubscriptionPayment(type: 'Starter' | 'Pro' | 'Enterprise', user: UserJwt) {
-        const subscription = this.handleTypeSubscription(type);
+        const subscription = this.getPlan();
 
         const createSubscription = await this.prisma.$transaction(async (txprisma) => {
             const expiresAt = addMonths(new Date(), 1);
@@ -154,7 +126,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.handleTypeSubscription(subscription.type),
+            ...this.getPlan(),
         };
     }
 
@@ -173,7 +145,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.handleTypeSubscription(subscription.type),
+            ...this.getPlan(),
         };
     }
 
