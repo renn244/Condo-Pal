@@ -15,11 +15,15 @@ export class EmailSenderService{
     const apiKey = this.configService.get<string>('BREVO_API_KEY')
     if(!apiKey) throw new Error('BREVO_API_KEY is not defined')
 
+    // must be a sender verified in Brevo
+    const from = this.configService.get<string>('EMAIL_FROM')
+    if(!from) throw new Error('EMAIL_FROM is not defined')
+
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({
-        sender: { name: 'CondoPal', email: 'condopal.management@gmail.com' },
+        sender: { name: 'CondoPal', email: from },
         to: [{ email: to }],
         subject: subject,
         htmlContent: content,
@@ -145,10 +149,11 @@ export class EmailSenderService{
     return this.emailQueue.add('contactMessage', { name, email, message });
   }
 
-  // goes to the CondoPal inbox; replying answers the visitor directly
+  // goes to CONTACT_EMAIL (or the sender inbox); replying answers the visitor directly
   async processContactEmail(name: string, email: string, message: string) {
     const escape = (text: string) => text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`)
-    const inbox = process.env.CONTACT_EMAIL || 'condopal.management@gmail.com'
+    const inbox = this.configService.get<string>('CONTACT_EMAIL') || this.configService.get<string>('EMAIL_FROM')
+    if(!inbox) throw new Error('CONTACT_EMAIL or EMAIL_FROM is not defined')
 
     return this.sendEmail(
       inbox,

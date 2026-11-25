@@ -94,6 +94,8 @@ In here you would only need 1 terminal
 - GOOGLE_CLIENT_SECRET
 - GOOGLE_REDIRECT_URL
 - BREVO_API_KEY
+- EMAIL_FROM (a sender verified in Brevo)
+- CONTACT_EMAIL (optional, where contact form messages go; defaults to EMAIL_FROM)
 - PAYMONGO_TEST_PUBLIC
 - PAYMONGO_TEST_SECRET
 - PAYMONGO_API_URL

@@ -1,7 +1,10 @@
 import { EmailSenderService } from './email-sender.service';
 
 describe('EmailSenderService.sendEmail (Brevo)', () => {
-    const createService = (apiKey?: string) => new EmailSenderService({ get: () => apiKey } as any, {} as any);
+    const createService = (apiKey?: string) => {
+        const env = { BREVO_API_KEY: apiKey, EMAIL_FROM: 'sender@example.com' };
+        return new EmailSenderService({ get: (key: string) => env[key] } as any, {} as any);
+    };
     const fetchMock = jest.fn();
 
     beforeEach(() => {
@@ -19,7 +22,7 @@ describe('EmailSenderService.sendEmail (Brevo)', () => {
         expect(url).toBe('https://api.brevo.com/v3/smtp/email');
         expect(init.headers['api-key']).toBe('xkeysib-test');
         expect(JSON.parse(init.body)).toEqual({
-            sender: { name: 'CondoPal', email: 'condopal.management@gmail.com' },
+            sender: { name: 'CondoPal', email: 'sender@example.com' },
             to: [{ email: 'juan@example.com' }],
             subject: 'Hi',
             htmlContent: '<p>Hello</p>',
