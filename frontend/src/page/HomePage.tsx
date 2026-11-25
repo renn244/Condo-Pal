@@ -10,7 +10,7 @@ const HomePage = () => {
     const features = [
         {
             title: "Streamlined Rent Collection",
-            description: "Facilitate rent payments through GCash, PayMongo, or manual cash entries. Automated reminders via email and SMS (integrated with SendGrid or Twilio) help ensure timely payments.",
+            description: "Facilitate rent payments through GCash, PayMongo, or manual cash entries. Automated email reminders (sent through Resend) help ensure timely payments.",
             icon: <IdCard />,
         },
         {

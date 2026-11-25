@@ -120,7 +120,7 @@ const PrivacyPolicy = () => {
                             </p>
                             <ul className="list-disc pl-8 sm:pl-10 mb-4 text-sm sm:text-base text-foreground space-y-1">
                                 <li>
-                                    With third-party services used for messaging (e.g., Twilio, SendGrid) and payments (e.g., PayMongo)
+                                    With third-party services used for email (e.g., Resend) and payments (e.g., PayMongo)
                                 </li>
                                 <li>When required by law or to protect legal rights</li>
                                 <li>If landlords use our legal add-on services (only relevant details with consent)</li>
