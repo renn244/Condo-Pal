@@ -1,7 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { addMonths } from 'date-fns';
+import { addDays, addMonths } from 'date-fns';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -15,10 +15,10 @@ export class SubscriptionService {
     ) {}
 
     // one plan for everyone; old Pro and Enterprise records show the same plan
-    getPlan() {
+    getPlan(isTrial = false) {
         return {
-            price: 450,
-            title: 'CondoPal',
+            price: isTrial ? 0 : 450,
+            title: isTrial ? 'Free trial' : 'CondoPal',
             description: 'Everything you need to manage your condos',
             features: [
                 "Unlimited condos and tenants",
@@ -29,6 +29,32 @@ export class SubscriptionService {
                 "Dashboard and payment history",
             ],
         }
+    }
+
+    // only for landlords who never had a subscription
+    async startTrial(user: UserJwt) {
+        if(user.role !== 'landlord') {
+            throw new ForbiddenException({ name: 'subscription', message: 'Only landlords can start a free trial' })
+        }
+
+        const hasSubscription = await this.prisma.subscription.findFirst({ where: { userId: user.id, isPaid: true } })
+        if(hasSubscription) {
+            throw new BadRequestException({ name: 'subscription', message: 'The free trial is only for accounts that never had a subscription' })
+        }
+
+        const trial = await this.prisma.subscription.create({
+            data: {
+                type: 'Starter',
+                userId: user.id,
+                isPaid: true,
+                isTrial: true,
+                expiresAt: addDays(new Date(), 14)
+            }
+        })
+
+        this.cacheManager.del(user.id) // so the new subscription shows right away
+
+        return trial
     }
 
     async handleSubscriptionPayment(type: 'Starter' | 'Pro' | 'Enterprise', user: UserJwt) {
@@ -116,8 +142,8 @@ export class SubscriptionService {
                 isPaid: true
             },
             select: {
-                id: true, type: true, linkId: true,
-                createdAt: true, expiresAt: true, canceledAt: true, 
+                id: true, type: true, linkId: true, isTrial: true,
+                createdAt: true, expiresAt: true, canceledAt: true,
             },
             orderBy: { createdAt: 'desc' }
         })
@@ -126,7 +152,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.getPlan(),
+            ...this.getPlan(subscription.isTrial),
         };
     }
 
@@ -134,6 +160,7 @@ export class SubscriptionService {
     async getLatestSubscription(user: UserJwt) {
         const subscription = await this.prisma.subscription.findFirst({
             where: { userId: user.id, isPaid: true },
+            orderBy: { createdAt: 'desc' }
         })
 
         if(!subscription) {
@@ -145,7 +172,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.getPlan(),
+            ...this.getPlan(subscription.isTrial),
         };
     }
 
@@ -155,7 +182,7 @@ export class SubscriptionService {
 
         const [billingHistory, totalCount] = await Promise.all([
             this.prisma.subscription.findMany({
-                where: { userId: user.id, isPaid: true },
+                where: { userId: user.id, isPaid: true, isTrial: false },
                 select: {
                     id: true, type: true,  linkId: true,
                     createdAt: true, expiresAt: true, canceledAt: true, 
@@ -164,7 +191,7 @@ export class SubscriptionService {
                 take, skip
             }),
             this.prisma.subscription.count({
-                where: { userId: user.id }
+                where: { userId: user.id, isPaid: true, isTrial: false }
             })
         ])
 

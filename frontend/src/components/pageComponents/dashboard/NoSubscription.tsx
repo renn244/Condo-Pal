@@ -3,8 +3,11 @@ import axiosFetch from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldAlert } from "lucide-react"
 import { Link } from "react-router-dom";
+import StartTrialButton from "@/components/common/StartTrialButton";
+import { useAuthContext } from "@/context/AuthContext";
 
 const NoSubscription = () => {
+    const { user } = useAuthContext();
 
     const { data } = useQuery({
         queryKey: ["subscription", "latest"],
@@ -42,7 +45,10 @@ const NoSubscription = () => {
                         }
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs">
+                    <div className="flex flex-col gap-4 w-full max-w-xs">
+                        {!isExpired && user?.role === 'landlord' && (
+                            <StartTrialButton />
+                        )}
                         <Button className="w-full" asChild>
                             <Link to={'/pricing'}>
                                 View Plans

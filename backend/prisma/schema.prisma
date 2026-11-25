@@ -172,6 +172,7 @@ model Subscription {
 
   linkId String? // this the the linkId of the checkout payment
   isPaid Boolean @default(false)
+  isTrial Boolean @default(false)
 
   createdAt DateTime @default(now())
   expiresAt DateTime

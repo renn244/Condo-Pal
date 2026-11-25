@@ -45,7 +45,7 @@ const Subscription = () => {
                                         <Badge className="mb-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
                                             Current Plan
                                         </Badge>
-                                        <h3 className="text-xl font-bold">{currentPlan.type} Plan</h3>
+                                        <h3 className="text-xl font-bold">{currentPlan.title}</h3>
                                         <p className="text-muted-foreground">
                                             {formatToPesos(currentPlan.price)}/month • {formatDate(new Date(currentPlan.createdAt))}-{formatDate(new Date(currentPlan.expiresAt))}
                                             </p>

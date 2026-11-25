@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import StartTrialButton from "@/components/common/StartTrialButton"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import axiosFetch from "@/lib/axios"
@@ -61,7 +62,7 @@ const SubscriptionExpiredDialog = ({
                     <DialogDescription className="text-center pt-1">
                         {isExpired
                             ? "Your access to CondoPal's premium features has been limited. Renew now to continue managing your properties without interruption."
-                            : "You currently don't have an active subscription. Subscribe now to access CondoPal's premium features and start managing your properties efficiently."
+                            : "You don't have an active subscription yet. Start a free 14-day trial or subscribe to start managing your properties."
                         }
                     </DialogDescription>
                 </DialogHeader>
@@ -102,6 +103,9 @@ const SubscriptionExpiredDialog = ({
                     <Button variant="outline" className="sm:w-auto w-full" asChild>
                         <Link to="/pricing">View Plans</Link>
                     </Button>
+                    {!isExpired && (
+                        <StartTrialButton className="sm:w-auto bg-primary text-white hover:bg-primary/90 hover:text-white" />
+                    )}
                     {isExpired && (
                         <Button className="sm:w-auto w-full" asChild>
                             <Link to={"/subscription-expired"}>

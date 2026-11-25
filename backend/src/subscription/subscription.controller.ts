@@ -11,6 +11,11 @@ export class SubscriptionController {
         private readonly subscriptionService: SubscriptionService,
     ) {}
 
+    @Post('startTrial')
+    async startTrial(@User() user: UserJwt) {
+        return this.subscriptionService.startTrial(user)
+    }
+
     @Post('generatePayment')
     async generatePaymentLink(@Body() body: SubscriptionTypeBody, @User() user: UserJwt) {
         return this.subscriptionService.handleSubscriptionPayment(body.type, user)
