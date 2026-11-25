@@ -24,6 +24,7 @@ import { join } from 'path';
 import { PayoutModule } from './payout/payout.module';
 import { PayoutMethodModule } from './payout-method/payout-method.module';
 import { BullModule } from '@nestjs/bullmq';
+import { ContactModule } from './contact/contact.module';
 
 const imports = [
   AuthModule, PrismaModule, 
@@ -62,7 +63,8 @@ const imports = [
   ReminderModule, MaintenanceMessageModule,
   MaintenanceWorkerTokenModule, MessageModule, 
   GeneralGatewayModule, UserModule, ExpenseModule, 
-  NotificationModule, PayoutModule, PayoutMethodModule
+  NotificationModule, PayoutModule, PayoutMethodModule,
+  ContactModule
 ]
 
 if(process.env.SOFTWARE_ENV === 'production') {

@@ -13,12 +13,14 @@ import { z } from "zod"
 const formSchema = z.object({
     name: z.string({
         required_error: "Name is required",
-    }),
+    }).min(1, { message: "Name is required" }),
     email: z.string().email({
         message: "Please enter a valid email address",
     }),
     message: z.string().min(20, {
         message: "Message must be at least 20 characters long",
+    }).max(2000, {
+        message: "Message must be at most 2000 characters long",
     }),
 })
 
@@ -31,16 +33,16 @@ const ContactUs = () => {
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsLoading(true)
         try {
-            const response = await axiosFetch.post("/contact", data)
+            const response = await axiosFetch.post("/contact", data, { validateStatus: () => true })
 
             if(response.status >= 400) {
                 throw new Error(response.data.message);
             }
 
             toast.success("Message sent successfully")
-            form.reset()            
-        } catch (error) {
-            toast.error("An error occurred. Please try again later.")
+            form.reset({ name: "", email: "", message: "" })
+        } catch (error: any) {
+            toast.error(error?.message || "An error occurred. Please try again later.")
         } finally {
             setIsLoading(false)
         }

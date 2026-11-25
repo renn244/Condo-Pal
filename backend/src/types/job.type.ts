@@ -22,11 +22,18 @@ export interface TenantCredentialsJobData {
     password: string;
 }
 
+export interface ContactMessageJobData {
+    name: string;
+    email: string;
+    message: string;
+}
+
 type JobDataMap = {
     dueReminder: DueReminderJobData;
     resetPassword: ResetPasswordJobData;
     assignedWorker: AssignedWorkerJobData;
     tenantCredentials: TenantCredentialsJobData;
+    contactMessage: ContactMessageJobData;
 }
 
 type JobName = keyof JobDataMap;
