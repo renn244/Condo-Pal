@@ -274,7 +274,7 @@ export class AuthService {
             return {...createTenantAccount, leaseAgreementId: createLeaseAgreement.id}
         })
         
-        // Wait only until BullMQ stores the job; SendGrid runs in the email worker.
+        // Wait only until BullMQ stores the job; the email worker does the sending.
         await this.emailSender.sendTenantCredentialsEmail(body.email, password);
 
         return {

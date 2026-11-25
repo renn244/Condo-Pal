@@ -1,37 +1,39 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as sgMail from '@sendgrid/mail';
 import { TypedEmailQueue } from 'src/types/job.type';
 
 @Injectable()
 export class EmailSenderService{
   constructor(
-    configSevice: ConfigService,
+    private readonly configService: ConfigService,
     @InjectQueue('email') private readonly emailQueue: TypedEmailQueue
-  ){ 
-    const sendgridApiKey = configSevice.get<string>('SENDGRID_API_KEY')
-    if(!sendgridApiKey) throw new Error('SENDGRID_API_KEY is not defined')
+  ){}
 
-    sgMail.setApiKey(sendgridApiKey)
-  }
+  // sends through Brevo's transactional email API
+  async sendEmail(to: string, subject: string, title: string, content: string, options?: { replyTo?: string }) {
+    const apiKey = this.configService.get<string>('BREVO_API_KEY')
+    if(!apiKey) throw new Error('BREVO_API_KEY is not defined')
 
-  async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {
-    const msg = {
-      to: to,
-      from: 'condopal.management@gmail.com',
-      subject: subject,
-      html: content,
-      ...options
-    } 
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({
+        sender: { name: 'CondoPal', email: 'condopal.management@gmail.com' },
+        to: [{ email: to }],
+        subject: subject,
+        htmlContent: content,
+        ...(options?.replyTo && { replyTo: { email: options.replyTo } }),
+      }),
+    })
 
-    try {
-      const response = await sgMail.send(msg)
-      return response
-    } catch (error) {
-      console.log(`Error sending email: ${error}`)
-      throw Error(`Error sending email: ${error.message}`)
+    if(!response.ok) {
+      const error = await response.text()
+      console.log(`Error sending email: ${response.status} ${error}`)
+      throw new Error(`Error sending email: ${response.status} ${error}`)
     }
+
+    return response.json()
   }
   
   async sendDueReminderEmail(email: string, leaseAgreement: any) {
