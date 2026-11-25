@@ -1,7 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { addMonths } from 'date-fns';
+import { addDays, addMonths } from 'date-fns';
 import { UserJwt } from 'src/lib/decorators/User.decorator';
 import { PaymongoService } from 'src/paymongo/paymongo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,53 +14,51 @@ export class SubscriptionService {
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
-    handleTypeSubscription(type: 'Starter' | 'Pro' | 'Enterprise') {
-        const prices = {
-            'Starter': {
-                price: 450,
-                title: 'Starter',
-                description: 'Perfect for side projects',
-                features: [
-                    "5 projects", 
-                    "10GB storage", 
-                    "Basic analytics", 
-                    "Email support"
-                ],
-            },
-            'Pro': {
-                price: 1450,
-                title: 'Professional',
-                description: 'For growing businesses',
-                features: [
-                    "Unlimited projects",
-                    "100GB storage",
-                    "Advanced analytics",
-                    "Priority support",
-                    "Custom domains",
-                    "Team collaboration",
-                ],
-            },
-            'Enterprise': {
-                price: 5950,
-                title: 'Enterprise',
-                description: 'For large organizations',
-                features: [
-                    "Unlimited everything",
-                    "Advanced security",
-                    "Custom integrations",
-                    "24/7 phone support",
-                    "SLA guarantee",
-                    "Dedicated account manager",
-                ],
-            },
+    // one plan for everyone; old Pro and Enterprise records show the same plan
+    getPlan(isTrial = false) {
+        return {
+            price: isTrial ? 0 : 450,
+            title: isTrial ? 'Free trial' : 'CondoPal',
+            description: 'Everything you need to manage your condos',
+            features: [
+                "Unlimited condos and tenants",
+                "Rent payments by GCash or manual entry",
+                "Maintenance requests and tracking",
+                "Expense tracking",
+                "Chat with tenants",
+                "Dashboard and payment history",
+            ],
         }
-
-        return prices[type]
     }
 
-    // the types will be changed depending of the pricing titles
+    // only for landlords who never had a subscription
+    async startTrial(user: UserJwt) {
+        if(user.role !== 'landlord') {
+            throw new ForbiddenException({ name: 'subscription', message: 'Only landlords can start a free trial' })
+        }
+
+        const hasSubscription = await this.prisma.subscription.findFirst({ where: { userId: user.id, isPaid: true } })
+        if(hasSubscription) {
+            throw new BadRequestException({ name: 'subscription', message: 'The free trial is only for accounts that never had a subscription' })
+        }
+
+        const trial = await this.prisma.subscription.create({
+            data: {
+                type: 'Starter',
+                userId: user.id,
+                isPaid: true,
+                isTrial: true,
+                expiresAt: addDays(new Date(), 14)
+            }
+        })
+
+        this.cacheManager.del(user.id) // so the new subscription shows right away
+
+        return trial
+    }
+
     async handleSubscriptionPayment(type: 'Starter' | 'Pro' | 'Enterprise', user: UserJwt) {
-        const subscription = this.handleTypeSubscription(type);
+        const subscription = this.getPlan();
 
         const createSubscription = await this.prisma.$transaction(async (txprisma) => {
             const expiresAt = addMonths(new Date(), 1);
@@ -144,8 +142,8 @@ export class SubscriptionService {
                 isPaid: true
             },
             select: {
-                id: true, type: true, linkId: true,
-                createdAt: true, expiresAt: true, canceledAt: true, 
+                id: true, type: true, linkId: true, isTrial: true,
+                createdAt: true, expiresAt: true, canceledAt: true,
             },
             orderBy: { createdAt: 'desc' }
         })
@@ -154,7 +152,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.handleTypeSubscription(subscription.type),
+            ...this.getPlan(subscription.isTrial),
         };
     }
 
@@ -162,6 +160,7 @@ export class SubscriptionService {
     async getLatestSubscription(user: UserJwt) {
         const subscription = await this.prisma.subscription.findFirst({
             where: { userId: user.id, isPaid: true },
+            orderBy: { createdAt: 'desc' }
         })
 
         if(!subscription) {
@@ -173,7 +172,7 @@ export class SubscriptionService {
 
         return {
             ...subscription,
-            ...this.handleTypeSubscription(subscription.type),
+            ...this.getPlan(subscription.isTrial),
         };
     }
 
@@ -183,7 +182,7 @@ export class SubscriptionService {
 
         const [billingHistory, totalCount] = await Promise.all([
             this.prisma.subscription.findMany({
-                where: { userId: user.id, isPaid: true },
+                where: { userId: user.id, isPaid: true, isTrial: false },
                 select: {
                     id: true, type: true,  linkId: true,
                     createdAt: true, expiresAt: true, canceledAt: true, 
@@ -192,7 +191,7 @@ export class SubscriptionService {
                 take, skip
             }),
             this.prisma.subscription.count({
-                where: { userId: user.id }
+                where: { userId: user.id, isPaid: true, isTrial: false }
             })
         ])
 

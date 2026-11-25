@@ -76,8 +76,8 @@ const Login = () => {
     }
 
     return (
-        <div className="w-full h-screen flex justify-center items-center">
-            <Card className="w-[400px]">
+        <div className="w-full h-screen flex justify-center items-center px-4">
+            <Card className="w-full max-w-[400px]">
                 <CardHeader>
                     <CardTitle>
                         Login

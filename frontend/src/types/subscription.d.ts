@@ -13,6 +13,7 @@ type subscription = {
     userId: string,
 
     linkId: string, // this is the linkId of the link payment from paymongo
+    isTrial: boolean,
 
     createdAt: string,
     expiresAt: string,

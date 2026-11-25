@@ -139,6 +139,29 @@ export class EmailSenderService{
     return this.emailQueue.add('assignedWorker', { email, maintenance, token });
   }
 
+  async sendContactEmail(name: string, email: string, message: string) {
+    return this.emailQueue.add('contactMessage', { name, email, message });
+  }
+
+  // goes to the CondoPal inbox; replying answers the visitor directly
+  async processContactEmail(name: string, email: string, message: string) {
+    const escape = (text: string) => text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`)
+    const inbox = process.env.CONTACT_EMAIL || 'condopal.management@gmail.com'
+
+    return this.sendEmail(
+      inbox,
+      `Contact form: message from ${name}`,
+      'Contact form message',
+      `
+        <div style="font-family: Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6; color: #333;">
+          <p><strong>From:</strong> ${escape(name)} (${escape(email)})</p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">${escape(message)}</p>
+        </div>
+      `,
+      { replyTo: email }
+    )
+  }
+
   async sendTenantCredentialsEmail(email: string, password: string) {
     return this.emailQueue.add('tenantCredentials', { email, password });
   }

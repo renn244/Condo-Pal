@@ -22,6 +22,9 @@ export class EmailProcessor extends WorkerHost {
             case "tenantCredentials":
                 const { email: tenantEmail, password } = job.data;
                 return this.emailSenderService.processTenantCredentialsEmail(tenantEmail, password);
+            case "contactMessage":
+                const { name, email: contactEmail, message } = job.data;
+                return this.emailSenderService.processContactEmail(name, contactEmail, message);
             default:
                 throw new Error(`Unsupported email job: ${job.name}`);
             }
